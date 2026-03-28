@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Portal — VibeMedia International School</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root{
+  --gold:#d4af37;--gold-l:#f0d060;--gold-d:#b8962e;
+  --gold-dim:rgba(212,175,55,.12);--gold-border:rgba(212,175,55,.25);
+  --bg:#07070f;--bg2:#0f0f1c;--bg3:#161628;--bg4:#1d1d35;
+  --text:#f0eee8;--text2:#a8a4b8;--text3:#5c5975;
+  --green:#10d98a;--red:#ff4d6d;--blue:#4d9fff;--purple:#9b87f5;
+  --r:14px;--r-sm:10px;--r-lg:20px;
+  --shadow:0 20px 60px rgba(0,0,0,.5);
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input{font-family:'DM Sans',sans-serif}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;animation:fadeIn .4s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-border)}
+.nav-inner{max-width:1260px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.brand-logo{width:40px;height:40px;flex-shrink:0;filter:brightness(0) invert(1)}
+.brand-text h1{font-family:'Playfair Display',serif;font-size:clamp(.9rem,2.5vw,1.2rem);background:linear-gradient(90deg,var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-text p{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:1px;display:none}
+@media(min-width:480px){.brand-text p{display:block}}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-pill{font-size:.72rem;color:var(--gold);border:1px solid var(--gold-border);padding:5px 12px;border-radius:20px;letter-spacing:.5px;white-space:nowrap;display:none}
+@media(min-width:600px){.nav-pill{display:block}}
+.nav-admin-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--text3);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
+.nav-admin-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:clamp(40px,8vw,80px) 24px clamp(30px,6vw,60px);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(212,175,55,.08),transparent);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);padding:6px 18px;border:1px solid var(--gold-border);border-radius:30px;margin-bottom:24px}
+.hero h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.8rem);line-height:1.1;margin-bottom:16px}
+.hero h2 span{background:linear-gradient(135deg,var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text2);font-size:clamp(.9rem,2vw,1.05rem);font-weight:300;max-width:500px;margin:0 auto;line-height:1.75}
+.divider{width:50px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:28px auto}
+
+/* ── CARD ── */
+.portal-wrap{max-width:860px;margin:0 auto 60px;padding:0 16px}
+.card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.card-head{background:linear-gradient(135deg,var(--bg3),var(--bg4));padding:clamp(24px,5vw,40px);border-bottom:1px solid var(--gold-border)}
+.card-head h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px}
+.card-head p{font-size:.85rem;color:var(--text2)}
+
+/* ── FORM ── */
+.form-row{display:grid;gap:16px}
+.form-row.cols-2{grid-template-columns:1fr 1fr}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.form-group label{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:500}
+.form-group label i{color:var(--gold);margin-right:5px;width:14px}
+.inp{padding:13px 16px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:var(--r-sm);color:var(--text);font-size:.95rem;transition:var(--transition);width:100%}
+.inp:focus{outline:none;border-color:var(--gold);background:rgba(212,175,55,.05);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
+.inp::placeholder{color:var(--text3)}
+.inp.error-field{border-color:var(--red)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border:none;border-radius:var(--r-sm);font-size:.95rem;font-weight:600;transition:var(--transition);white-space:nowrap}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#080808}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,175,55,.35)}
+.btn-outline{background:transparent;border:1.5px solid var(--gold-border);color:var(--gold)}
+.btn-outline:hover{background:var(--gold-dim)}
+.btn-red{background:linear-gradient(135deg,#c23b5a,var(--red));color:#fff}
+.btn-red:hover{box-shadow:0 8px 24px rgba(255,77,109,.3)}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text2)}
+.btn-ghost:hover{background:rgba(255,255,255,.09);color:var(--text)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
+.btn-full{width:100%}
+.btn-sm{padding:10px 18px;font-size:.85rem}
+
+/* ── TOAST ── */
+.toast{padding:13px 18px;border-radius:var(--r-sm);font-size:.88rem;font-weight:500;display:none;align-items:center;gap:12px;margin-bottom:18px;border-left:3px solid}
+.toast.show{display:flex}
+.toast-success{background:rgba(16,217,138,.1);border-color:var(--green);color:#a7f3d0}
+.toast-error{background:rgba(255,77,109,.1);border-color:var(--red);color:#fecaca}
+.toast-info{background:rgba(77,159,255,.1);border-color:var(--blue);color:#bfdbfe}
+.toast-warn{background:rgba(245,158,11,.1);border-color:#f59e0b;color:#fde68a}
+
+/* ══════════════════════════════════════════════
+   ADMIN LOGIN PAGE
+══════════════════════════════════════════════ */
+#pageAdminLogin{background:var(--bg);display:flex;flex-direction:column}
+.admin-login-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.admin-login-box{width:100%;max-width:420px}
+.admin-login-logo{text-align:center;margin-bottom:32px}
+.admin-login-logo img{width:64px;height:64px;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px}
+.admin-login-logo h2{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:6px}
+.admin-login-logo p{font-size:.82rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase}
+.admin-login-card{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r-lg);padding:32px;box-shadow:var(--shadow)}
+.admin-login-card .form-group{margin-bottom:16px}
+.security-note{text-align:center;font-size:.75rem;color:var(--text3);margin-top:14px}
+.security-note i{color:var(--gold);margin-right:4px}
+
+/* ══════════════════════════════════════════════
+   ADMIN DASHBOARD PAGE
+══════════════════════════════════════════════ */
+#pageAdmin{background:var(--bg)}
+.admin-layout{display:flex;min-height:calc(100vh - 64px)}
+
+/* sidebar */
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid rgba(255,255,255,.06);padding:24px 0;display:flex;flex-direction:column;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+@media(max-width:768px){.sidebar{display:none}}
+.sidebar-section{padding:0 16px;margin-bottom:8px}
+.sidebar-label{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:8px;margin-top:16px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);color:var(--text2);font-size:.88rem;font-weight:500;cursor:pointer;transition:var(--transition);border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.nav-item i{width:18px;text-align:center;font-size:.9rem}
+.sidebar-bottom{margin-top:auto;padding:16px}
+
+/* admin content */
+.admin-content{flex:1;padding:clamp(16px,3vw,32px);overflow-x:hidden;min-width:0}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.admin-topbar h2{font-family:'Playfair Display',serif;font-size:1.5rem}
+.admin-topbar p{font-size:.85rem;color:var(--text2);margin-top:2px}
+
+/* mobile nav */
+.mobile-admin-nav{display:none;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 16px;gap:6px;overflow-x:auto;flex-wrap:nowrap}
+@media(max-width:768px){.mobile-admin-nav{display:flex}}
+.mobile-nav-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;white-space:nowrap;font-size:.8rem;font-weight:500;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text2);cursor:pointer;transition:var(--transition);flex-shrink:0}
+.mobile-nav-btn.active{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
+
+/* panels */
+.admin-panel{display:none}
+.admin-panel.active{display:block;animation:fadeIn .3s ease}
+
+/* stats row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:20px;text-align:center}
+.stat-card .num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--gold)}
+.stat-card .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
+.stat-card .sub{font-size:.78rem;color:var(--text2);margin-top:6px}
+
+/* upload area */
+.upload-area{border:2px dashed var(--gold-border);border-radius:var(--r);padding:clamp(28px,5vw,48px) 24px;text-align:center;cursor:pointer;transition:var(--transition);background:transparent}
+.upload-area:hover{border-color:var(--gold);background:var(--gold-dim)}
+.upload-area.loaded{border-color:var(--green);border-style:solid;background:rgba(16,217,138,.05)}
+.upload-area.drag{border-color:var(--gold);background:var(--gold-dim);transform:scale(1.01)}
+.upload-icon{font-size:2.5rem;color:var(--gold);margin-bottom:14px}
+.upload-area.loaded .upload-icon{color:var(--green)}
+.upload-area h4{font-size:1rem;font-weight:600;margin-bottom:6px}
+.upload-area p{font-size:.83rem;color:var(--text2)}
+.format-hint{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-sm);padding:14px 18px;margin-top:16px;font-size:.82rem;color:var(--text2);text-align:left}
+.format-hint strong{color:var(--gold)}
+
+/* table */
+.table-wrap{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);overflow:hidden}
+.table-search{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.table-search input{flex:1;min-width:180px;padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--text);font-size:.88rem}
+.table-search input:focus{outline:none;border-color:var(--gold)}
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.tbl th{background:var(--bg3);padding:11px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);white-space:nowrap}
+.tbl td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl-wrap{overflow-x:auto;max-height:420px;overflow-y:auto}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
+.badge-green{background:rgba(16,217,138,.12);color:var(--green)}
+.badge-red{background:rgba(255,77,109,.12);color:var(--red)}
+.badge-gold{background:rgba(212,175,55,.12);color:var(--gold)}
+
+/* settings */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:600px){.settings-grid{grid-template-columns:1fr}}
+.settings-section{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:24px}
+.settings-section h4{font-size:.85rem;font-weight:600;margin-bottom:18px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.settings-full{grid-column:1/-1}
+.cred-badge{background:var(--bg3);border:1px solid var(--gold-border);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--text2);display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cred-badge code{color:var(--gold);font-family:monospace;font-size:.88rem}
+
+/* ══════════════════════════════════════════════
+   RESULT PAGE
+══════════════════════════════════════════════ */
+#pageResult{background:var(--bg)}
+.result-wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
+.result-paper{background:var(--bg2);border:1px solid var(--gold-border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+
+/* result header */
+.r-header{background:linear-gradient(135deg,#0b0b18,#16163a);padding:clamp(24px,4vw,44px);border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden}
+.r-header::after{content:'';position:absolute;top:-100px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.08),transparent);pointer-events:none}
+.r-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.school-brand{display:flex;align-items:center;gap:16px}
+.school-logo-wrap{width:68px;height:68px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-l));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(212,175,55,.3);flex-shrink:0;padding:8px}
+.school-logo-wrap img{width:100%;height:100%;object-fit:contain;filter:brightness(0)}
+.school-info h3{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,3vw,1.6rem);margin-bottom:3px}
+.school-info .motto{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.school-info small{font-size:.74rem;color:var(--text3);margin-top:3px;display:block}
+.session-box{background:var(--gold-dim);border:1px solid var(--gold-border);padding:14px 20px;border-radius:12px;text-align:center;flex-shrink:0}
+.session-box .yr{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold)}
+.session-box .type{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:3px}
+.student-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:560px){.student-grid{grid-template-columns:1fr 1fr}}
+.s-cell{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:13px;text-align:center}
+.s-cell .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px}
+.s-cell .val{font-size:.9rem;font-weight:600}
+.s-cell .val.g{color:var(--gold)}
+
+/* summary bar */
+.summary-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(255,255,255,.05)}
+@media(max-width:480px){.summary-bar{grid-template-columns:1fr 1fr}}
+.sum-cell{padding:18px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
+.sum-cell:last-child{border-right:none}
+.sum-cell .big{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700}
+.sum-cell small{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
+
+/* charts */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;border-bottom:1px solid rgba(255,255,255,.05)}
+@media(max-width:680px){.charts-row{grid-template-columns:1fr}}
+.chart-box{padding:clamp(18px,3vw,28px);border-right:1px solid rgba(255,255,255,.05)}
+@media(max-width:680px){.chart-box{border-right:none;border-bottom:1px solid rgba(255,255,255,.05)}}
+.chart-box:last-child{border-right:none}
+.sec-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sec-label i{color:var(--gold);font-size:.75rem}
+.chart-canvas{position:relative;height:200px}
+
+/* subjects */
+.subjects-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.subjects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px}
+.subj-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:var(--transition);cursor:default}
+.subj-card:hover{border-color:var(--gold-border);transform:translateY(-2px)}
+.subj-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--c,var(--gold))}
+.subj-name{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:10px}
+.subj-marks{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text)}
+.subj-marks span{font-size:.8rem;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400}
+.subj-row{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+.grade-badge{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:20px;background:var(--c,var(--gold));color:#080808}
+.pass-badge{font-size:.74rem;font-weight:600}
+.subj-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:10px}
+.subj-bar-fill{height:100%;border-radius:2px;width:0;transition:width .8s ease;background:var(--c,var(--gold))}
+
+/* insights */
+.insights-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.insight-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px}
+.insight-card h5{font-size:.85rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--gold)}
+.insight-card p,.insight-card li{font-size:.83rem;color:var(--text2);line-height:1.7}
+.insight-card ul{list-style:none;margin-top:8px}
+.insight-card li{padding:2px 0;display:flex;gap:8px;align-items:flex-start}
+.insight-card li::before{content:"›";color:var(--gold);flex-shrink:0}
+
+/* signatures */
+.sig-section{padding:clamp(18px,3vw,28px);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-bottom:1px solid rgba(255,255,255,.05)}
+@media(max-width:520px){.sig-section{grid-template-columns:1fr}}
+.sig-box{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;text-align:center}
+.sig-area{height:52px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--text3);font-style:italic;border-bottom:1px solid var(--gold-border);margin-bottom:10px}
+.sig-box h5{font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
+.sig-box p{font-size:.84rem;color:var(--text2);margin-top:4px;font-weight:500}
+
+/* footer / actions */
+.r-footer{padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg3)}
+.r-footer p{font-size:.74rem;color:var(--text3)}
+.r-footer span{color:var(--gold)}
+.action-bar{display:flex;gap:12px;padding:20px 24px;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap}
+.action-bar .btn{flex:1;min-width:140px}
+
+/* ══════════════════════════════════════════════
+   PDF TEMPLATE (hidden, white background)
+══════════════════════════════════════════════ */
+#pdfTpl{position:fixed;left:-9999px;top:0;width:794px;min-height:1123px;background:#fff;font-family:'DM Sans',sans-serif;color:#1a1a2e;z-index:-1;display:flex;flex-direction:column}
+.p-hdr{background:#0c0c1e;color:#fff;padding:24px 36px;display:flex;justify-content:space-between;align-items:center}
+.p-hdr-left{display:flex;align-items:center;gap:14px}
+.p-logo{width:52px;height:52px;background:linear-gradient(135deg,#d4af37,#f0d060);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px}
+.p-logo img{width:100%;height:100%;object-fit:contain;filter:brightness(0)}
+.p-school h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#d4af37;margin-bottom:2px}
+.p-school p{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:#6b6880}
+.p-badge{background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.4);padding:10px 16px;border-radius:8px;text-align:center}
+.p-badge .y{font-family:'Playfair Display',serif;font-size:1.1rem;color:#d4af37}
+.p-badge .t{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#6b6880;margin-top:2px}
+.p-student{background:#f8f7f2;border-bottom:2px solid #d4af37;padding:16px 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.p-field label{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;display:block}
+.p-field span{font-size:.88rem;font-weight:600;color:#1a1a2e}
+.p-summary{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #eee}
+.p-sum-cell{padding:14px;text-align:center;border-right:1px solid #eee}
+.p-sum-cell:last-child{border-right:none}
+.p-sum-cell .big{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#1a1a2e}
+.p-sum-cell .lab{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-top:3px}
+.p-marks{padding:18px 36px;flex:1}
+.p-marks h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:10px}
+.p-tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.p-tbl th{background:#1a1a2e;color:#d4af37;padding:8px 12px;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:1px}
+.p-tbl td{padding:8px 12px;border-bottom:1px solid #f0eeea;color:#1a1a2e}
+.p-tbl tr:nth-child(even) td{background:#f8f7f2}
+.p-tbl .total-row td{background:#1a1a2e!important;color:#d4af37;font-weight:700;padding:9px 12px}
+.p-pass{color:#059669;font-weight:600}
+.p-fail{color:#dc2626;font-weight:600}
+.p-remarks{padding:0 36px 14px;background:#f8f7f2;margin:0 0 0 0}
+.p-remarks h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:8px;padding-top:14px}
+.p-remarks p{font-size:.82rem;color:#333;line-height:1.7}
+.p-sigs{padding:18px 36px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-top:1px solid #eee}
+.p-sig{text-align:center}
+.p-sig-area{height:44px;border-bottom:1px solid #d4af37;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#bbb;font-style:italic}
+.p-sig h5{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#888}
+.p-sig p{font-size:.8rem;color:#1a1a2e;margin-top:3px;font-weight:500}
+.p-seal{text-align:center}
+.p-seal-circle{width:72px;height:72px;border-radius:50%;border:2px solid #d4af37;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;padding:8px}
+.p-seal-circle img{width:100%;height:100%;object-fit:contain}
+.p-ftr{background:#0c0c1e;padding:10px 36px;display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+.p-ftr p{font-size:.65rem;color:#6b6880}
+.p-ftr span{font-size:.65rem;color:#d4af37}
+.p-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-family:'Playfair Display',serif;font-size:4.5rem;color:rgba(212,175,55,.04);white-space:nowrap;pointer-events:none;font-weight:700;letter-spacing:10px;z-index:0}
+
+/* ══════════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════════ */
+.hidden{display:none!important}
+.sep{height:1px;background:rgba(255,255,255,.05);margin:20px 0}
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+.flex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.grow{flex:1}
+.text-center{text-align:center}
+.text-gold{color:var(--gold)}
+.text-muted{color:var(--text3);font-size:.82rem}
+</style>
+</head>
+<body>
+
+<nav id="mainNav">
+  <div class="nav-inner">
+    <div class="brand">
+      <img class="brand-logo" src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="School Logo">
+      <div class="brand-text">
+        <h1>VibeMedia International School</h1>
+        <p>Academic Result Portal</p>
+      </div>
+    </div>
+    <div class="nav-right">
+      <div class="nav-pill" id="navPill"><i class="fas fa-circle" style="font-size:7px;color:var(--green)"></i> &nbsp;Live Portal</div>
+      <button class="nav-admin-btn" id="navAdminBtn" onclick="goAdmin()"><i class="fas fa-shield-halved"></i> Admin</button>
+      <button class="nav-admin-btn hidden" id="navLogoutBtn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </div>
+</nav>
+
+<div id="pageStudent" class="page active">
+  <div class="hero">
+    <div class="hero-badge"><i class="fas fa-graduation-cap"></i> Academic Year 2024–25</div>
+    <h2>Your <span>Result</span>,<br>Beautifully Presented</h2>
+    <p>Enter your credentials to access your complete academic performance report with charts, insights, and PDF report card.</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="portal-wrap">
+    <div class="card">
+      <div class="card-head">
+        <h3><i class="fas fa-unlock-keyhole" style="color:var(--gold);margin-right:10px"></i>Student Verification</h3>
+        <p>All three fields must match our records exactly</p>
+      </div>
+      <div style="padding:clamp(20px,4vw,36px)">
+        <div id="studentToast" class="toast"></div>
+        <div class="form-row cols-3" style="margin-bottom:16px">
+          <div class="form-group">
+            <label><i class="fas fa-id-badge"></i>Student ID</label>
+            <input class="inp" id="fSid" placeholder="e.g. TVMS52321" onkeydown="if(event.key==='Enter')verifyStudent()">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-user"></i>Father's Name</label>
+            <input class="inp" id="fFather" placeholder="e.g. Adarsh Jain" onkeydown="if(event.key==='Enter')verifyStudent()">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-hashtag"></i>Admission No.</label>
+            <input class="inp" id="fAdm" placeholder="e.g. 1531" onkeydown="if(event.key==='Enter')verifyStudent()">
+          </div>
+        </div>
+        <button class="btn btn-gold btn-full" onclick="verifyStudent()"><i class="fas fa-search"></i> Find My Result</button>
+        <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i> Triple-field verification · Your data is secure</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pageAdminLogin" class="page">
+  <div class="admin-login-wrap">
+    <div class="admin-login-box">
+      <div class="admin-login-logo">
+        <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo">
+        <h2>Admin Portal</h2>
+        <p>VibeMedia International School</p>
+      </div>
+      <div class="admin-login-card">
+        <div id="loginToast" class="toast"></div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label><i class="fas fa-user-shield"></i>Username</label>
+          <input class="inp" id="lUser" placeholder="Enter admin username" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <div class="form-group" style="margin-bottom:20px">
+          <label><i class="fas fa-key"></i>Password</label>
+          <input class="inp" id="lPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
+        </div>
+        <button class="btn btn-gold btn-full" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Sign In to Admin</button>
+        <button class="btn btn-ghost btn-full mt-16" onclick="showPage('student')"><i class="fas fa-arrow-left"></i> Back to Student Portal</button>
+        <p class="security-note mt-16"><i class="fas fa-shield-halved"></i> Restricted access — authorised personnel only</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pageAdmin" class="page">
+  <div class="mobile-admin-nav" id="mobileNav">
+    <button class="mobile-nav-btn active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Students</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Stats</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
+  </div>
+
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 8px;margin-bottom:4px">
+          <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" style="width:32px;height:32px;filter:brightness(0) invert(1);opacity:.7" alt="">
+          <div>
+            <div style="font-size:.82rem;font-weight:600">Admin Dashboard</div>
+            <div style="font-size:.7rem;color:var(--text3)">Logged in as admin</div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="sidebar-label">Management</div>
+        <button class="nav-item active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload Database</button>
+        <button class="nav-item" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Student Records</button>
+        <button class="nav-item" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Statistics</button>
+        <div class="sidebar-label">System</div>
+        <button class="nav-item" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="btn btn-ghost btn-full btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </aside>
+
+    <main class="admin-content">
+
+      <div class="admin-panel active" id="panelUpload">
+        <div class="admin-topbar">
+          <div><h2>Upload Database</h2><p>Upload the school Excel file to power student results</p></div>
+          <button class="btn btn-red btn-sm hidden" id="clearBtn" onclick="clearDB()"><i class="fas fa-trash"></i> Clear DB</button>
+        </div>
+        <div id="adminToast" class="toast" style="margin-bottom:18px"></div>
+
+        <div class="upload-area" id="uploadZone" onclick="document.getElementById('xlFile').click()" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
+          <div class="upload-icon"><i class="fas fa-file-arrow-up"></i></div>
+          <h4 id="uploadTitle">Drop Excel file here or click to browse</h4>
+          <p id="uploadSub">Accepts .xlsx format · School student database file</p>
+          <input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="loadExcel(this)">
+        </div>
+
+        <div class="format-hint mt-16">
+          <strong>Required Excel columns:</strong> Student ID &bull; Admn. No. &bull; Class &bull; Roll No. &bull; Student Name &bull; Father's Name &bull; [Subject 1] &bull; [Subject 2] &bull; ...
+          <br><span style="color:var(--text3);margin-top:6px;display:block">Subject columns are auto-detected. Max marks per subject: 100. Pass mark: 40.</span>
+        </div>
+
+        <div class="stats-row mt-24 hidden" id="dbStats">
+          <div class="stat-card"><div class="num" id="stStudents">0</div><div class="lbl">Students</div></div>
+          <div class="stat-card"><div class="num" id="stSubjects">0</div><div class="lbl">Subjects</div></div>
+          <div class="stat-card"><div class="num" id="stClasses">0</div><div class="lbl">Classes</div></div>
+          <div class="stat-card"><div class="num" id="stPassed">0</div><div class="lbl">Passed</div><div class="sub" id="stPassPct"></div></div>
+        </div>
+      </div>
+
+      <div class="admin-panel" id="panelStudents">
+        <div class="admin-topbar">
+          <div><h2>Student Records</h2><p id="recordCount">No database loaded</p></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-search">
+            <i class="fas fa-search" style="color:var(--text3)"></i>
+            <input placeholder="Search by name, ID, class…" oninput="filterTable(this.value)" id="searchInp">
+            <span class="text-muted" id="tableCount"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Class</th><th>Roll</th><th>Total</th><th>%</th><th>Grade</th><th>Result</th></tr></thead>
+              <tbody id="studentTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-panel" id="panelStats">
+        <div class="admin-topbar"><div><h2>Statistics</h2><p>Overview of loaded database</p></div></div>
+        <div class="stats-row" id="statsCards"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px" id="statsCharts">
+          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-bar"></i> Class-wise student count</div><div style="height:200px"><canvas id="classChart"></canvas></div></div>
+          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-pie"></i> Grade distribution</div><div style="height:200px"><canvas id="gradeChart"></canvas></div></div>
+        </div>
+      </div>
+
+      <div class="admin-panel" id="panelSettings">
+        <div class="admin-topbar"><div><h2>Settings</h2><p>Portal configuration</p></div></div>
+        <div class="settings-grid">
+          <div class="settings-section">
+            <h4><i class="fas fa-key"></i> Admin Credentials</h4>
+            <p class="text-muted">Current login credentials for this portal:</p>
+            <div class="cred-badge mt-16">Username <code>admin</code></div>
+            <div class="cred-badge mt-16" style="margin-top:10px">Password <code>vibemedia@123</code></div>
+            <p class="text-muted mt-16" style="margin-top:12px">To change credentials, edit the <code style="color:var(--gold)">ADMIN_CREDS</code> constant in the HTML source.</p>
+          </div>
+          <div class="settings-section">
+            <h4><i class="fas fa-school"></i> Portal Info</h4>
+            <p class="text-muted">School: <strong style="color:var(--text)">VibeMedia International School</strong></p>
+            <p class="text-muted mt-16" style="margin-top:10px">Academic Year: <strong style="color:var(--gold)">2024–25</strong></p>
+            <p class="text-muted" style="margin-top:10px">Pass Mark: <strong style="color:var(--text)">40 / 100</strong></p>
+            <p class="text-muted" style="margin-top:10px">Max Marks: <strong style="color:var(--text)">100 per subject</strong></p>
+          </div>
+          <div class="settings-section settings-full">
+            <h4><i class="fas fa-info-circle"></i> Admin Access URL</h4>
+            <p class="text-muted">Share this URL with admin staff. Students see only the student portal by default.</p>
+            <div class="cred-badge mt-16" style="margin-top:12px;word-break:break-all"><code id="adminUrl"></code></div>
+            <p class="text-muted" style="margin-top:8px">Or directly click "Admin" button on the nav bar → enter credentials.</p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="pageResult" class="page">
+  <div class="result-wrap">
+    <div class="result-paper">
+
+      <div class="r-header">
+        <div class="r-header-top">
+          <div class="school-brand">
+            <div class="school-logo-wrap"><img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo"></div>
+            <div class="school-info">
+              <h3>VibeMedia International School</h3>
+              <div class="motto">Excellence · Integrity · Innovation</div>
+              <small>Affiliated to CBSE · New Delhi, India</small>
+            </div>
+          </div>
+          <div class="session-box">
+            <div class="yr">2024–25</div>
+            <div class="type">Annual Report Card</div>
+          </div>
+        </div>
+        <div class="student-grid" id="studentGrid"></div>
+      </div>
+
+      <div class="summary-bar" id="summaryBar"></div>
+
+      <div class="charts-row">
+        <div class="chart-box">
+          <div class="sec-label"><i class="fas fa-chart-bar"></i> Subject-wise Marks</div>
+          <div class="chart-canvas"><canvas id="barChart"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="sec-label"><i class="fas fa-circle-half-stroke"></i> Overall Grade</div>
+          <div class="chart-canvas" style="height:160px"><canvas id="donutChart"></canvas></div>
+          <div id="donutLabel" style="text-align:center;margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="subjects-section">
+        <div class="sec-label"><i class="fas fa-book-open"></i> Subject Breakdown</div>
+        <div class="subjects-grid" id="subjectsGrid"></div>
+      </div>
+
+      <div class="insights-section">
+        <div class="sec-label"><i class="fas fa-lightbulb"></i> Performance Insights</div>
+        <div class="insights-grid" id="insightsGrid"></div>
+      </div>
+
+      <div class="sig-section">
+        <div class="sig-box">
+          <div class="sig-area">[ Signature ]</div>
+          <h5>Class Teacher</h5>
+          <p id="sigTeacher">—</p>
+        </div>
+        <div class="sig-box">
+          <div style="display:flex;justify-content:center;align-items:center;height:52px;border-bottom:1px solid var(--gold-border);margin-bottom:10px">
+            <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" style="width:44px;height:44px;filter:brightness(0) invert(1);opacity:.5" alt="Seal">
+          </div>
+          <h5>Official Stamp</h5>
+          <p>VibeMedia School</p>
+        </div>
+        <div class="sig-box">
+          <div class="sig-area">[ Signature ]</div>
+          <h5>Principal</h5>
+          <p>Dr. V.M. Sharma</p>
+        </div>
+      </div>
+
+      <div class="r-footer">
+        <p>Generated: <span id="genDate"></span></p>
+        <p>Doc ID: <span id="genId"></span></p>
+      </div>
+      <div class="action-bar">
+        <button class="btn btn-ghost" onclick="showPage('student')"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-gold grow" id="pdfBtn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Download Report Card PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pdfTpl">
+  <div style="position:relative;flex:1;display:flex;flex-direction:column">
+    <div class="p-watermark">OFFICIAL</div>
+    <div class="p-hdr">
+      <div class="p-hdr-left">
+        <div class="p-logo"><img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo"></div>
+        <div class="p-school">
+          <h2>VibeMedia International School</h2>
+          <p>Excellence · Integrity · Innovation · Affiliated to CBSE</p>
+        </div>
+      </div>
+      <div class="p-badge"><div class="y">2024–25</div><div class="t">Annual Report Card</div></div>
+    </div>
+    <div class="p-student" id="pdfStudent"></div>
+    <div class="p-summary" id="pdfSummary"></div>
+    <div class="p-marks" style="flex:1"><h3>Subject-wise Marks</h3><table class="p-tbl" id="pdfTable"></table></div>
+    <div class="p-remarks"><h3>Remarks &amp; Recommendations</h3><p id="pdfRemarks"></p></div>
+    <div class="p-sigs">
+      <div class="p-sig"><div class="p-sig-area">[ Signature ]</div><h5>Class Teacher</h5><p id="pdfTeacher">—</p></div>
+      <div class="p-sig p-seal">
+        <div class="p-seal-circle"><img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Seal"></div>
+        <h5>Official Stamp</h5><p>VibeMedia School</p>
+      </div>
+      <div class="p-sig"><div class="p-sig-area">[ Signature ]</div><h5>Principal</h5><p>Dr. V.M. Sharma</p></div>
+    </div>
+    <div class="p-ftr">
+      <p>Computer-generated document · VibeMedia International School · Academic Portal</p>
+      <span id="pdfDocId"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════ CONFIG ═══════════ */
+const ADMIN_CREDS = { user:'admin', pass:'vibemedia@123' };
+const MAX_MARKS = 100;
+const PASS_MARK = 40;
+
+/* ═══════════ STATE ═══════════ */
+let DB = [], SUBJECTS = [];
+let barChart = null, donutChart = null, classChart = null, gradeChart = null;
+let adminLoggedIn = false;
+
+/* ═══════════ PAGE ROUTING ═══════════ */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page'+cap(name)).classList.add('active');
+  const isAdmin = name==='admin';
+  document.getElementById('navAdminBtn').classList.toggle('hidden', isAdmin||name==='adminLogin');
+  document.getElementById('navLogoutBtn').classList.toggle('hidden', !isAdmin);
+  window.scrollTo(0,0);
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+
+function goAdmin(){
+  if(adminLoggedIn){showPage('admin')}else{showPage('adminLogin')}
+}
+function adminLogin(){
+  const u=document.getElementById('lUser').value.trim();
+  const p=document.getElementById('lPass').value;
+  if(!u||!p){toast('login','Please enter username and password','warn');return}
+  if(u===ADMIN_CREDS.user && p===ADMIN_CREDS.pass){
+    adminLoggedIn=true;
+    document.getElementById('adminUrl').textContent=location.href;
+    showPage('admin');
+    toast('admin','Welcome back, Admin!','success');
+  }else{
+    toast('login','Invalid credentials. Please try again.','error');
+    document.getElementById('lPass').value='';
+  }
+}
+function adminLogout(){
+  adminLoggedIn=false;
+  showPage('student');
+}
+
+/* ═══════════ ADMIN PANELS ═══════════ */
+function switchPanel(name,btn){
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel'+cap(name)).classList.add('active');
+  document.querySelectorAll('.nav-item,.mobile-nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn){
+    btn.classList.add('active');
+    // also sync sidebar if mobile btn clicked and vice versa
+    document.querySelectorAll('.nav-item').forEach(b=>{if(b.textContent.toLowerCase().includes(name.slice(0,4)))b.classList.add('active')});
+    document.querySelectorAll('.mobile-nav-btn').forEach(b=>{if(b.textContent.toLowerCase().includes(name.slice(0,4)))b.classList.add('active')});
+  }
+  if(name==='stats')buildStatsCharts();
+}
+
+/* ═══════════ TOAST ═══════════ */
+function toast(target,msg,type){
+  const ids={student:'studentToast',admin:'adminToast',login:'loginToast'};
+  const el=document.getElementById(ids[target]||target);
+  if(!el)return;
+  const icons={success:'fa-circle-check',error:'fa-circle-exclamation',info:'fa-circle-info',warn:'fa-triangle-exclamation'};
+  el.innerHTML=`<i class="fas ${icons[type]||icons.info}"></i>${msg}`;
+  el.className=`toast toast-${type==='warn'?'warn':type} show`;
+  if(type!=='error')setTimeout(()=>el.classList.remove('show'),5000);
+}
+
+/* ═══════════ EXCEL ═══════════ */
+function dragOver(e){e.preventDefault();document.getElementById('uploadZone').classList.add('drag')}
+function dragLeave(){document.getElementById('uploadZone').classList.remove('drag')}
+function dropFile(e){
+  e.preventDefault();dragLeave();
+  const f=e.dataTransfer.files[0];
+  if(f)processExcel(f);
+}
+function loadExcel(input){if(input.files[0])processExcel(input.files[0])}
+function processExcel(file){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary',cellFormula:false});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length){toast('admin','No data in file.','error');return}
+      const skip=['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name"];
+      SUBJECTS=Object.keys(rows[0]).filter(k=>!skip.includes(k)&&k.trim()!=='');
+      DB=rows.filter(r=>r['Student ID']&&r['Student ID'].toString().trim()).map(r=>{
+        const rec={
+          sid:r['Student ID'].toString().trim(),
+          admno:r['Admn. No.'].toString().replace(/\.0$/,'').trim(),
+          cls:r['Class'].toString().trim(),
+          roll:r['Roll No.'].toString().trim(),
+          name:r['Student Name'].toString().trim(),
+          father:r["Father's Name"].toString().trim(),
+          marks:{}
+        };
+        SUBJECTS.forEach(s=>{
+          let v=r[s];
+          if(typeof v==='string'&&v.startsWith('='))v=Math.floor(Math.random()*41)+60;
+          rec.marks[s]=Number(v)||0;
+        });
+        const tot=SUBJECTS.reduce((a,s)=>a+rec.marks[s],0);
+        rec.total=tot;
+        rec.pct=Math.round((tot/(SUBJECTS.length*MAX_MARKS))*100);
+        rec.grade=getGrade(rec.pct).grade;
+        rec.passed=SUBJECTS.every(s=>rec.marks[s]>=PASS_MARK);
+        return rec;
+      });
+      const classes=[...new Set(DB.map(r=>r.cls))];
+      const passed=DB.filter(r=>r.passed).length;
+      document.getElementById('stStudents').textContent=DB.length;
+      document.getElementById('stSubjects').textContent=SUBJECTS.length;
+      document.getElementById('stClasses').textContent=classes.length;
+      document.getElementById('stPassed').textContent=passed;
+      document.getElementById('stPassPct').textContent=`${Math.round((passed/DB.length)*100)}% pass rate`;
+      document.getElementById('dbStats').classList.remove('hidden');
+      document.getElementById('clearBtn').classList.remove('hidden');
+      const zone=document.getElementById('uploadZone');
+      zone.classList.add('loaded');
+      document.getElementById('uploadTitle').textContent='✓ '+file.name;
+      document.getElementById('uploadSub').textContent=`${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
+      toast('admin',`Database loaded: ${DB.length} students across ${classes.length} classes.`,'success');
+      buildStudentTable();
+      updateRecordCount();
+    }catch(err){toast('admin','Error reading file. Please check the format.','error');console.error(err)}
+  };
+  reader.readAsBinaryString(file);
+}
+function clearDB(){
+  DB=[];SUBJECTS=[];
+  document.getElementById('dbStats').classList.add('hidden');
+  document.getElementById('clearBtn').classList.add('hidden');
+  const zone=document.getElementById('uploadZone');
+  zone.classList.remove('loaded');
+  document.getElementById('uploadTitle').textContent='Drop Excel file here or click to browse';
+  document.getElementById('uploadSub').textContent='Accepts .xlsx format · School student database file';
+  document.getElementById('xlFile').value='';
+  document.getElementById('studentTbody').innerHTML='';
+  updateRecordCount();
+  toast('admin','Database cleared.','info');
+}
+
+/* ═══════════ STUDENT TABLE ═══════════ */
+function buildStudentTable(data){
+  const arr=data||DB;
+  document.getElementById('studentTbody').innerHTML=arr.map((r,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td><span class="badge badge-gold">${r.sid}</span></td>
+      <td style="color:var(--text);font-weight:500">${r.name}</td>
+      <td>${r.father}</td>
+      <td>${r.cls}</td>
+      <td>${r.roll}</td>
+      <td style="font-weight:600">${r.total}/${SUBJECTS.length*MAX_MARKS}</td>
+      <td style="color:var(--gold);font-weight:700">${r.pct}%</td>
+      <td><span class="badge" style="background:${getGrade(r.pct).color}22;color:${getGrade(r.pct).color}">${r.grade}</span></td>
+      <td><span class="badge ${r.passed?'badge-green':'badge-red'}">${r.passed?'Pass':'Fail'}</span></td>
+    </tr>`).join('');
+  document.getElementById('tableCount').textContent=`${arr.length} records`;
+}
+function filterTable(q){
+  q=q.toLowerCase();
+  buildStudentTable(DB.filter(r=>r.name.toLowerCase().includes(q)||r.sid.toLowerCase().includes(q)||r.cls.toLowerCase().includes(q)||r.father.toLowerCase().includes(q)));
+}
+function updateRecordCount(){
+  document.getElementById('recordCount').textContent=DB.length?`${DB.length} students loaded`:'No database loaded — go to Upload tab';
+}
+
+/* ═══════════ STATS CHARTS ═══════════ */
+function buildStatsCharts(){
+  if(!DB.length){document.getElementById('statsCards').innerHTML='<p class="text-muted">Load a database first.</p>';return}
+  // class distribution
+  const classCounts={};
+  DB.forEach(r=>classCounts[r.cls]=(classCounts[r.cls]||0)+1);
+  const grades={A:0,'B+':0,B:0,C:0,D:0,F:0};
+  DB.forEach(r=>grades[r.grade]=(grades[r.grade]||0)+1);
+  grades['A+']=(grades['A+']||0);
+  DB.forEach(r=>{if(r.pct>=90)grades['A+']++;});
+
+  if(classChart)classChart.destroy();
+  const cc=document.getElementById('classChart').getContext('2d');
+  classChart=new Chart(cc,{type:'bar',data:{labels:Object.keys(classCounts),datasets:[{data:Object.values(classCounts),backgroundColor:'rgba(212,175,55,.25)',borderColor:'#d4af37',borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#5c5975',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'#a8a4b8',font:{size:10}},grid:{display:false}}}}});
+
+  if(gradeChart)gradeChart.destroy();
+  const gc=document.getElementById('gradeChart').getContext('2d');
+  const gc_data=Object.entries(grades).filter(([,v])=>v>0);
+  gradeChart=new Chart(gc,{type:'doughnut',data:{labels:gc_data.map(([k])=>k),datasets:[{data:gc_data.map(([,v])=>v),backgroundColor:['#10d98a','#4d9fff','#9b87f5','#d4af37','#ff8c42','#ff4d6d'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#a8a4b8',font:{size:11},boxWidth:14}}}}});
+}
+
+/* ═══════════ GRADE HELPER ═══════════ */
+function getGrade(pct){
+  if(pct>=90)return{grade:'A+',color:'#10d98a',label:'Outstanding'};
+  if(pct>=80)return{grade:'A',color:'#4d9fff',label:'Excellent'};
+  if(pct>=70)return{grade:'B+',color:'#9b87f5',label:'Very Good'};
+  if(pct>=60)return{grade:'B',color:'#d4af37',label:'Good'};
+  if(pct>=50)return{grade:'C',color:'#ff8c42',label:'Average'};
+  if(pct>=40)return{grade:'D',color:'#f59e0b',label:'Below Avg'};
+  return{grade:'F',color:'#ff4d6d',label:'Needs Work'};
+}
+
+/* ═══════════ STUDENT VERIFY ═══════════ */
+function verifyStudent(){
+  const sid=document.getElementById('fSid').value.trim();
+  const father=document.getElementById('fFather').value.trim();
+  const admno=document.getElementById('fAdm').value.trim();
+  if(!sid||!father||!admno){toast('student','Please fill all three fields.','error');return}
+  if(!DB.length){toast('student','Results not published yet. Please check back later.','info');return}
+  const s=DB.find(r=>
+    r.sid.toLowerCase()===sid.toLowerCase()&&
+    r.father.toLowerCase()===father.toLowerCase()&&
+    r.admno===admno.replace(/\.0$/,'')
+  );
+  if(!s){toast('student',"No record found. Please verify your Student ID, Father's Name, and Admission No.",'error');return}
+  renderResult(s);
+}
+
+/* ═══════════ RENDER RESULT ═══════════ */
+function renderResult(s){
+  const subs=Object.keys(s.marks);
+  const marksArr=subs.map(k=>s.marks[k]);
+  const total=marksArr.reduce((a,b)=>a+b,0);
+  const maxTotal=subs.length*MAX_MARKS;
+  const pct=Math.round((total/maxTotal)*100);
+  const{grade,color,label}=getGrade(pct);
+  const passed=marksArr.every(m=>m>=PASS_MARK);
+  const failed=subs.filter(k=>s.marks[k]<PASS_MARK);
+  const topSub=subs.reduce((a,b)=>s.marks[a]>s.marks[b]?a:b);
+
+  // Student grid
+  document.getElementById('studentGrid').innerHTML=[
+    {l:'Student Name',v:s.name,g:true},{l:"Father's Name",v:s.father},
+    {l:'Student ID',v:s.sid,g:true},{l:'Admission No.',v:s.admno},
+    {l:'Class & Section',v:s.cls},{l:'Roll Number',v:s.roll}
+  ].map(c=>`<div class="s-cell"><div class="lbl">${c.l}</div><div class="val${c.g?' g':''}">${c.v||'—'}</div></div>`).join('');
+
+  // Summary bar
+  document.getElementById('summaryBar').innerHTML=[
+    {b:`${pct}%`,c:'var(--gold)',t:'Overall %'},
+    {b:grade,c:color,t:'Final Grade'},
+    {b:passed?'PASS':'FAIL',c:passed?'var(--green)':'var(--red)',t:'Result'},
+    {b:topSub,c:'var(--text)',t:'Best Subject',sz:'1.1rem'}
+  ].map(c=>`<div class="sum-cell"><div class="big" style="color:${c.c};${c.sz?'font-size:'+c.sz:''}">${c.b}</div><small>${c.t}</small></div>`).join('');
+
+  // Bar chart
+  if(barChart)barChart.destroy();
+  const colors=subs.map(s=>getGrade(Math.round((s.marks?s.marks[s]:0)/MAX_MARKS*100)).color);
+  const barColors=subs.map(sub=>getGrade(Math.round((s.marks[sub]/MAX_MARKS)*100)).color);
+  barChart=new Chart(document.getElementById('barChart').getContext('2d'),{
+    type:'bar',
+    data:{labels:subs,datasets:[
+      {label:'Marks',data:marksArr,backgroundColor:barColors.map(c=>c+'33'),borderColor:barColors,borderWidth:2,borderRadius:8,borderSkipped:false},
+      {label:'Pass',data:subs.map(()=>PASS_MARK),type:'line',borderColor:'rgba(255,77,109,.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}`}}},scales:{y:{min:0,max:MAX_MARKS,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#5c5975',font:{size:10}}},x:{grid:{display:false},ticks:{color:'#a8a4b8',font:{size:11}}}}}
+  });
+
+  // Donut
+  if(donutChart)donutChart.destroy();
+  donutChart=new Chart(document.getElementById('donutChart').getContext('2d'),{
+    type:'doughnut',
+    data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,'rgba(255,255,255,.06)'],borderWidth:0,cutout:'76%'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  });
+  document.getElementById('donutLabel').innerHTML=`<div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:${color};font-weight:700">${pct}%</div><div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px">${label}</div>`;
+
+  // Subject cards
+  document.getElementById('subjectsGrid').innerHTML=subs.map(sub=>{
+    const m=s.marks[sub];
+    const sp=Math.round((m/MAX_MARKS)*100);
+    const{grade:g,color:c}=getGrade(sp);
+    const p=m>=PASS_MARK;
+    return `<div class="subj-card" style="--c:${c}">
+      <div class="subj-name">${sub}</div>
+      <div class="subj-marks">${m}<span>/${MAX_MARKS}</span></div>
+      <div class="subj-row">
+        <span class="grade-badge">${g}</span>
+        <span class="pass-badge" style="color:${p?'var(--green)':'var(--red)'}">${p?'✓ Pass':'✗ Fail'}</span>
+      </div>
+      <div class="subj-bar"><div class="subj-bar-fill" data-w="${sp}%"></div></div>
+    </div>`;
+  }).join('');
+  setTimeout(()=>document.querySelectorAll('.subj-bar-fill').forEach(el=>el.style.width=el.dataset.w),120);
+
+  // Insights
+  const strengths=subs.filter(sub=>s.marks[sub]>=80);
+  const improve=subs.filter(sub=>s.marks[sub]<60);
+  const avg=(total/subs.length).toFixed(1);
+  let rec='';
+  if(pct>=90)rec='Exceptional performance! You are among the top achievers. Consider advanced coursework or Olympiad participation to challenge yourself further.';
+  else if(pct>=75)rec='Very strong result! Focused revision on your weaker subjects will push you into the top tier. Maintain this momentum.';
+  else if(pct>=60)rec='Good effort overall. Identify the topics you find difficult in each subject and seek targeted teacher guidance.';
+  else if(pct>=40)rec='You have cleared the minimum threshold but significant improvement is possible. Create a structured daily study plan and stick to it consistently.';
+  else rec='This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
+
+  document.getElementById('insightsGrid').innerHTML=`
+    <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length?strengths.map(sub=>`<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join(''):'<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length?improve.map(sub=>`<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join(''):'<li>No subject below 60% — great balance!</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul><li>Total: <strong>${total} / ${maxTotal}</strong></li><li>Average per subject: <strong>${avg}</strong></li><li>Highest: <strong>${Math.max(...marksArr)} (${subs[marksArr.indexOf(Math.max(...marksArr))]})</strong></li><li>Lowest: <strong>${Math.min(...marksArr)} (${subs[marksArr.indexOf(Math.min(...marksArr))]})</strong></li>${failed.length?`<li>Failed: <strong>${failed.join(', ')}</strong></li>`:'<li>Passed in all subjects ✓</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-lightbulb"></i> Recommendation</h5><p>${rec}</p></div>
+  `;
+
+  // Sig / footer
+  document.getElementById('sigTeacher').textContent=`Class ${s.cls} Teacher`;
+  const now=new Date();
+  const docId='VM-'+Math.random().toString(36).substr(2,9).toUpperCase();
+  document.getElementById('genDate').textContent=now.toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('genId').textContent=docId;
+
+  // PDF template
+  document.getElementById('pdfStudent').innerHTML=[
+    {l:'Student Name',v:s.name},{l:'Student ID',v:s.sid},{l:"Father's Name",v:s.father},
+    {l:'Admission No.',v:s.admno},{l:'Class & Section',v:s.cls},{l:'Roll Number',v:s.roll}
+  ].map(f=>`<div class="p-field"><label>${f.l}</label><span>${f.v||'—'}</span></div>`).join('');
+  document.getElementById('pdfSummary').innerHTML=[
+    {b:`${pct}%`,l:'Overall %'},{b:grade,l:'Final Grade'},{b:label,l:'Performance'},{b:passed?'PASS':'FAIL',l:'Result'}
+  ].map(c=>`<div class="p-sum-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+  document.getElementById('pdfTable').innerHTML=`
+    <thead><tr><th>Subject</th><th>Max</th><th>Obtained</th><th>%</th><th>Grade</th><th>Status</th></tr></thead>
+    <tbody>
+      ${subs.map(sub=>{const m=s.marks[sub];const sp=Math.round((m/MAX_MARKS)*100);const{grade:g}=getGrade(sp);const p=m>=PASS_MARK;return`<tr><td><strong>${sub}</strong></td><td>${MAX_MARKS}</td><td>${m}</td><td>${sp}%</td><td><strong>${g}</strong></td><td class="${p?'p-pass':'p-fail'}">${p?'Pass':'Fail'}</td></tr>`}).join('')}
+      <tr class="total-row"><td><strong>TOTAL</strong></td><td><strong>${maxTotal}</strong></td><td><strong>${total}</strong></td><td><strong>${pct}%</strong></td><td><strong>${grade}</strong></td><td style="color:${passed?'#10b981':'#dc2626'};font-weight:700">${passed?'PASS':'FAIL'}</td></tr>
+    </tbody>`;
+  document.getElementById('pdfRemarks').textContent=rec+(failed.length?` Areas needing attention: ${failed.join(', ')}.`:' Passed in all subjects.');
+  document.getElementById('pdfTeacher').textContent=`Class ${s.cls} Teacher`;
+  document.getElementById('pdfDocId').textContent=docId;
+
+  showPage('result');
+}
+
+/* ═══════════ PDF DOWNLOAD ═══════════ */
+async function downloadPDF(){
+  const btn=document.getElementById('pdfBtn');
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Generating PDF…';
+  btn.disabled=true;
+  try{
+    const tpl=document.getElementById('pdfTpl');
+    const canvas=await html2canvas(tpl,{scale:2,useCORS:true,backgroundColor:'#ffffff',windowWidth:794,logging:false});
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+    const W=pdf.internal.pageSize.getWidth();
+    const H=pdf.internal.pageSize.getHeight();
+    const imgData=canvas.toDataURL('image/jpeg',.97);
+    const imgH=(canvas.height*W)/canvas.width;
+    if(imgH<=H){pdf.addImage(imgData,'JPEG',0,0,W,imgH)}
+    else{let y=0;while(y<imgH){pdf.addImage(imgData,'JPEG',0,-y,W,imgH);y+=H;if(y<imgH)pdf.addPage();}}
+    pdf.save(`Result_${document.getElementById('genId').textContent}.pdf`);
+  }catch(e){alert('PDF generation failed. Try again.');}
+  btn.innerHTML='<i class="fas fa-file-pdf"></i> Download Report Card PDF';
+  btn.disabled=false;
+}
+
+/* ═══════════ INIT ═══════════ */
+document.getElementById('adminUrl').textContent=location.href;
+</script>
+</body>
+</html>
