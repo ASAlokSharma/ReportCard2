@@ -1,0 +1,101 @@
+Student ID,Admn. No.,Class,Roll No.,Student Name,Father's Name,Maths,Science,English,History,Sanskrit
+TVMS52321,1531,9th A,1,Anvesh Jain,Adarsh Jain,77,87,91,71,80
+TVMS52322,1532,6th A,2,Shiromani Shukla,Chandresh Shukla,72,60,80,83,64
+TVMS52323,1533,1st B,3,Drishti Kharbanda,Rishi Kharbanda,76,69,77,62,64
+TVMS52324,1534,3rd B,4,Bhumi Kher,Abhinav Kher,83,70,72,96,80
+TVMS52325,1535,7th A,5,Jignesh,Jayesh,91,98,83,78,65
+TVMS52326,1536,4th D,6,Amrendra Sukla,Jitendra Shukla,62,88,98,84,96
+TVMS52327,1537,4th A,7,Jinny Goyal,Anup Goyal,65,62,72,68,62
+TVMS52328,1538,5th B,8,Anuj Kumar,Bhawesh Kumar,81,74,92,91,69
+TVMS52329,1539,6th A,9,Shiv Nadar,Shambhu Nadar,61,69,60,74,90
+TVMS52330,1540,2nd D,10,Dhriti Sharma,Rakesh Sharma,74,93,91,63,62
+TVMS52331,1541,10th A,11,Shehzada Sheikh,Shehenshah Sheikh,68,81,72,86,85
+TVMS52332,1542,9th C,12,Farooq Abdullah,Faraaz Abdullah,64,87,62,67,60
+TVMS52333,1543,4th C,13,Teja Reddy,Ranga Reddy,67,92,83,94,70
+TVMS52334,1544,4th A,14,Josheph Emmanuel,Michel Emmanuel,76,92,76,96,78
+TVMS52335,1545,5th B,15,Jayesh Dwivedi,Rakesh Dwivedi,72,82,80,76,91
+TVMS52336,1546,6th A,16,Rosy Cindrella,Edvith Garelo,78,86,73,91,86
+TVMS52337,1547,2nd D,17,Kumari Anita,Kailash Kumar,79,63,66,87,87
+TVMS52338,1548,2nd A,18,Amrita Kushwah,Nitin Kushwah,74,97,72,64,73
+TVMS52339,1549,5th A,19,Vrinda Sharma,Raunak Sharma,79,64,74,83,73
+TVMS52340,1550,6th B,20,Arnaz Sheihk,Salman Sheikh,65,82,93,72,88
+TVMS52341,1551,7th A,21,Arnab Gupta,Jaspreet Gupta,81,92,95,82,65
+TVMS52342,1552,3rd D,22,Arshita Gautam,Saurabh Kr. Gautam,93,86,60,78,91
+TVMS52343,1553,3rd A,23,Jannat Khan,Rizvan Khan,80,95,91,87,99
+TVMS52344,1554,4th C,24,Wilson Robert,Luckas Robert,89,87,67,60,66
+TVMS52345,1555,5th B,25,Hardik Bhardhwaj,Bharat Bhardhwaj,98,71,95,98,63
+TVMS52346,1556,7th B,26,Manan Bhanushali,Kuljeet Bhanushali,96,74,81,81,81
+TVMS52347,1557,8th A,27,Aprajita Sharma,Arnav Sharma,71,89,65,77,95
+TVMS52348,1558,5th D,28,Sohail Saifi,Irfan Saifi,94,83,79,73,100
+TVMS52349,1559,5th A,29,Jasleen Bhatt,Mishresh Bhatt,91,96,76,60,91
+TVMS52350,1560,6th B,30,Kiara Sharma,Vinod Kumar Sharma,68,95,82,94,61
+TVMS52351,1561,7th A,31,Jisjet Singh,Harshvardhan Singh,69,71,78,87,82
+TVMS52352,1562,3rd D,32,Gurujot Singh,Ashok Singh,66,79,65,83,74
+TVMS52353,1563,3rd A,33,Kamal Singh,Roshan Singh,80,66,91,93,67
+TVMS52354,1564,4th C,34,Gulab Kumar Sharma,Hanshraj Sharma,99,89,61,98,91
+TVMS52355,1565,7th A,35,Aditya Shakya,Prakash Kr Shakya,60,85,65,99,84
+TVMS52356,1566,5th B,36,Kiran Jha,Kundan Jha,84,92,64,74,62
+TVMS52357,1567,7th B,37,Mamta Bhardhwaj,Manan Bhardhwaj,86,84,86,93,64
+TVMS52358,1568,8th A,38,Aansi Tomar,Shilajeet Tomar,64,69,64,96,73
+TVMS52359,1569,5th D,39,Ansh Kumar Gehlot,Shailesh Gehlot,67,100,62,91,75
+TVMS52360,1570,5th A,40,Subhramaniam Iyer,Balakrishna Iyer,69,98,81,71,70
+TVMS52361,1571,6th B,41,Mohandas K. Gandhi,Indresh C. Gandhi,88,62,85,93,76
+TVMS52362,1572,7th A,42,KunwarJeet Kaur,Ashwajeet Kaur,83,66,98,79,98
+TVMS52363,1573,3rd D,43,Jaypee Amrita,Aadiya Amrita,86,84,61,63,95
+TVMS52364,1574,3rd A,44,Narendra Kumar,Naresh Kumar,69,77,68,100,91
+TVMS52365,1575,9th C,45,Anas Siddhiqui,Ahaan Siddhiqui,63,69,89,75,91
+TVMS52366,1576,4th C,46,Ahmed Raja,Abdul Raja,63,64,76,62,61
+TVMS52367,1577,5th A,47,Ritesh Behruchia,Kamlesh Behruchia,89,84,67,74,62
+TVMS52368,1578,6th B,48,Rishav Dhuni,Arpit Dhuni,84,87,69,82,66
+TVMS52369,1579,7th A,49,Amrit Varsha,Anil Kumar,61,95,77,92,65
+TVMS52370,1580,3rd D,50,Varsha Kumari,Arun Singh,82,76,87,66,70
+TVMS52371,1581,3rd A,51,Aarushi Sharma,Dhirendra Sharma,84,83,88,96,83
+TVMS52372,1582,6th A,52,Arnab Dutta,Mahesh Kumar Dutta,84,79,66,77,90
+TVMS52373,1583,5th B,53,Khelesh Kumar,Manjesh Kumar,65,83,77,72,97
+TVMS52374,1584,10th B,54,Jitendra Awasthi,Shivam Awasthi,71,86,73,81,62
+TVMS52375,1585,8th A,55,Dhirima Chaturvedi,Vimal Chaturvedi,82,78,75,62,72
+TVMS52376,1586,10th D,56,Dimple Khanna,Naresh Khanna,82,76,63,84,71
+TVMS52377,1587,5th A,57,Poonam Pandey,Dilip Kumar Pandey,70,76,92,80,68
+TVMS52378,1588,6th B,58,Amrit Raj,Girish Kumar,62,91,70,95,63
+TVMS52379,1589,7th A,59,Ronny Mahesh,Naresh Kumar,65,89,78,90,94
+TVMS52380,1590,3rd D,60,Amit Mahajan,Shailesh Mahajan,93,85,92,69,65
+TVMS52381,1591,3rd A,61,Shreeji Sharma,Srinivas Sharma,100,69,96,68,100
+TVMS52382,1592,4th C,62,Nitin Mundelkar,Ritesh Mindelkar,93,79,91,64,64
+TVMS52383,1593,7th A,63,Atif Rehmaan,Anif Rehman,93,71,86,95,85
+TVMS52384,1594,5th B,64,Mohammed Saad,Mohammed Rizan,66,84,93,79,76
+TVMS52385,1595,7th B,65,Abdul Ghani,Atif Ghani,89,81,63,65,69
+TVMS52386,1596,8th A,66,Nirbhay Mehta,Tarun Mehta,97,74,90,99,75
+TVMS52387,1597,5th D,67,Shweta Aggrawal,Jitendra Aggrawal,63,97,71,93,89
+TVMS52388,1598,5th A,68,Zainab Ali,Mohammed Rahat Ali,72,73,92,97,99
+TVMS52389,1599,7th D,69,Arpit Vishwakarma,Sushil Kumar Vishwakarma,71,72,81,99,78
+TVMS52390,1600,4th A,70,Rubina Ali,Mehtab Ali,99,84,78,71,81
+TVMS52391,1601,9th A,71,Atiq Ahmed,Ashraf Ahmed,63,73,61,83,89
+TVMS52392,1602,6th A,72,Shakuntala Devi,Abdul Kumar,60,86,92,70,68
+TVMS52393,1603,1st B,73,Devras Bhardhwaj,Bharat Bhardhwaj,87,71,85,81,60
+TVMS52394,1604,3rd B,74,Shiromani Kumar,Ashish Kumar,94,90,87,96,95
+TVMS52395,1605,7th A,75,Yatin Kumar Nisad,Shikhar Kumar,64,67,87,79,87
+TVMS52396,1606,4th D,76,Amit Kumar,Arun Kumar,76,89,86,64,94
+TVMS52397,1607,4th A,77,Krish Dwivedi,Rajesh Dwivedi,96,73,73,71,80
+TVMS52398,1608,5th B,78,Arnab Goswami,Shailesh Goswami,65,81,82,95,76
+TVMS52399,1609,6th A,79,Amita Naresh,Shreshtha Naresh,97,100,60,79,84
+TVMS52400,1610,2nd D,80,Shiveshwaraya Kamakuti,Sadagopan Kamakuti,98,79,91,94,85
+TVMS52401,1611,2nd A,81,Gullak Kumar,Dev Kumar,63,83,75,90,76
+TVMS52402,1612,9th C,82,Arpit Sharma,Aarush Sharma,75,76,78,92,80
+TVMS52403,1613,4th C,83,Mehboob Sheikh,Mo. Iqbal Sheikh,61,71,98,83,63
+TVMS52404,1614,4th A,84,Rubaika Dillaik,Shahabuddin Dillaik,63,74,91,81,100
+TVMS52405,1615,5th B,85,Kumari Priya,Rakesh Kumar,84,86,86,68,89
+TVMS52406,1616,6th A,86,Sarfaroz Ahmed,Shrafzad Ahmed,77,66,94,64,86
+TVMS52407,1617,2nd D,87,Reyazuddin Ali,Raibul Ali,86,70,67,98,99
+TVMS52408,1618,2nd A,88,Mumtaz Begam,Ghulam Ahmed,96,96,95,73,89
+TVMS52409,1619,5th A,89,Nicharan Bibi,Sheikh Abdullah,78,61,79,94,97
+TVMS52410,1620,6th B,90,Yuvika Shekhar,Amrit Shekhar,77,71,99,82,78
+TVMS52411,1621,7th A,91,Rani Mukherji,Rana Duggapati Mukherji,97,89,78,79,88
+TVMS52412,1622,3rd D,92,Padma Kumari,Parveen Kumar,77,86,63,67,81
+TVMS52413,1623,3rd A,93,Firoz Ahmed,Fehullah Ahmed,85,74,63,60,94
+TVMS52414,1624,4th C,94,Binod Kumar,Deepak Kumar,97,69,85,73,73
+TVMS52415,1625,5th B,95,Pramod Kumar,Harun Kumar,98,77,84,69,67
+TVMS52416,1626,7th B,96,Ashok Fernandez,Jockey Fernandez,65,97,60,61,90
+TVMS52417,1627,8th A,97,Jack,Jayson,89,72,62,85,83
+TVMS52418,1628,5th D,98,Sansui Devrez,Shevra Devrez,79,66,63,91,85
+TVMS52419,1629,5th A,99,Jaani Bhai,Aalam Bhai,82,91,81,73,76
+TVMS52420,1630,6th B,100,Mohan Dixit,Shobhit Dixit,84,66,63,94,72
