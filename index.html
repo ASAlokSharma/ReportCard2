@@ -33,7 +33,11 @@ a{color:inherit;text-decoration:none}
 button{font-family:'DM Sans',sans-serif;cursor:pointer}
 input{font-family:'DM Sans',sans-serif}
 
-/* ── PAGES ── */
+/* ── PAGES ──
+   BUG FIX: Use display:none on all .page elements.
+   ID-level display overrides caused admin login to always be visible.
+   All page-specific flex layout now lives inside child wrappers, not on the page div itself.
+*/
 .page{display:none;min-height:100vh;animation:fadeIn .4s ease}
 .page.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -51,6 +55,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 @media(min-width:600px){.nav-pill{display:block}}
 .nav-admin-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--text3);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
 .nav-admin-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+.nav-portal-btn{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
+.nav-portal-btn:hover{background:rgba(212,175,55,.2)}
 
 /* ── HERO ── */
 .hero{text-align:center;padding:clamp(40px,8vw,80px) 24px clamp(30px,6vw,60px);position:relative;overflow:hidden}
@@ -104,9 +110,10 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
 /* ══════════════════════════════════════════════
    ADMIN LOGIN PAGE
+   BUG FIX: Removed display:flex from #pageAdminLogin.
+   The .page class controls display. Inner .admin-login-wrap handles flex centering.
 ══════════════════════════════════════════════ */
-#pageAdminLogin{background:var(--bg);display:flex;flex-direction:column}
-.admin-login-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.admin-login-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 16px}
 .admin-login-box{width:100%;max-width:420px}
 .admin-login-logo{text-align:center;margin-bottom:32px}
 .admin-login-logo img{width:64px;height:64px;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px}
@@ -120,7 +127,6 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 /* ══════════════════════════════════════════════
    ADMIN DASHBOARD PAGE
 ══════════════════════════════════════════════ */
-#pageAdmin{background:var(--bg)}
 .admin-layout{display:flex;min-height:calc(100vh - 64px)}
 
 /* sidebar */
@@ -132,7 +138,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 .nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
 .nav-item.active{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
 .nav-item i{width:18px;text-align:center;font-size:.9rem}
-.sidebar-bottom{margin-top:auto;padding:16px}
+.sidebar-bottom{margin-top:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
 
 /* admin content */
 .admin-content{flex:1;padding:clamp(16px,3vw,32px);overflow-x:hidden;min-width:0}
@@ -197,7 +203,6 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 /* ══════════════════════════════════════════════
    RESULT PAGE
 ══════════════════════════════════════════════ */
-#pageResult{background:var(--bg)}
 .result-wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
 .result-paper{background:var(--bg2);border:1px solid var(--gold-border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
 
@@ -309,7 +314,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 .p-tbl .total-row td{background:#1a1a2e!important;color:#d4af37;font-weight:700;padding:9px 12px}
 .p-pass{color:#059669;font-weight:600}
 .p-fail{color:#dc2626;font-weight:600}
-.p-remarks{padding:0 36px 14px;background:#f8f7f2;margin:0 0 0 0}
+.p-remarks{padding:0 36px 14px;background:#f8f7f2}
 .p-remarks h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:8px;padding-top:14px}
 .p-remarks p{font-size:.82rem;color:#333;line-height:1.7}
 .p-sigs{padding:18px 36px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-top:1px solid #eee}
@@ -341,6 +346,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 </head>
 <body>
 
+<!-- ═══════════ SHARED NAVIGATION ═══════════ -->
 <nav id="mainNav">
   <div class="nav-inner">
     <div class="brand">
@@ -351,18 +357,23 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
       </div>
     </div>
     <div class="nav-right">
-      <div class="nav-pill" id="navPill"><i class="fas fa-circle" style="font-size:7px;color:var(--green)"></i> &nbsp;Live Portal</div>
+      <div class="nav-pill" id="navPill"><i class="fas fa-circle" style="font-size:7px;color:var(--green)"></i>&nbsp;Live Portal</div>
+      <!-- Shown on student/result pages: go to admin -->
       <button class="nav-admin-btn" id="navAdminBtn" onclick="goAdmin()"><i class="fas fa-shield-halved"></i> Admin</button>
+      <!-- Shown on admin pages: go back to student portal WITHOUT logging out / losing DB -->
+      <button class="nav-portal-btn hidden" id="navPortalBtn" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
+      <!-- Shown on admin page: logout -->
       <button class="nav-admin-btn hidden" id="navLogoutBtn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </div>
 </nav>
 
+<!-- ═══════════ PAGE 1: STUDENT PORTAL (default) ═══════════ -->
 <div id="pageStudent" class="page active">
   <div class="hero">
     <div class="hero-badge"><i class="fas fa-graduation-cap"></i> Academic Year 2024–25</div>
     <h2>Your <span>Result</span>,<br>Beautifully Presented</h2>
-    <p>Enter your credentials to access your complete academic performance report with charts, insights, and PDF report card.</p>
+    <p>Enter your credentials to access your complete academic performance report with charts, insights, and a downloadable PDF report card.</p>
     <div class="divider"></div>
   </div>
 
@@ -389,12 +400,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
           </div>
         </div>
         <button class="btn btn-gold btn-full" onclick="verifyStudent()"><i class="fas fa-search"></i> Find My Result</button>
-        <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i> Triple-field verification · Your data is secure</p>
+        <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i>&nbsp;Triple-field verification · Your data is secure</p>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ═══════════ PAGE 2: ADMIN LOGIN ═══════════
+     BUG FIX: No display:flex on this div — .page controls visibility.
+     Centering is handled by the inner .admin-login-wrap which has min-height + flexbox.
+════════════════════════════════════════════ -->
 <div id="pageAdminLogin" class="page">
   <div class="admin-login-wrap">
     <div class="admin-login-box">
@@ -414,14 +429,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
           <input class="inp" id="lPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
         </div>
         <button class="btn btn-gold btn-full" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Sign In to Admin</button>
-        <button class="btn btn-ghost btn-full mt-16" onclick="showPage('student')"><i class="fas fa-arrow-left"></i> Back to Student Portal</button>
+        <button class="btn btn-ghost btn-full mt-16" onclick="showPage('student')" style="margin-top:12px"><i class="fas fa-arrow-left"></i> Back to Student Portal</button>
         <p class="security-note mt-16"><i class="fas fa-shield-halved"></i> Restricted access — authorised personnel only</p>
       </div>
     </div>
   </div>
 </div>
 
+<!-- ═══════════ PAGE 3: ADMIN DASHBOARD ═══════════ -->
 <div id="pageAdmin" class="page">
+  <!-- Mobile top nav -->
   <div class="mobile-admin-nav" id="mobileNav">
     <button class="mobile-nav-btn active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload</button>
     <button class="mobile-nav-btn" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Students</button>
@@ -430,6 +447,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   </div>
 
   <div class="admin-layout">
+    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-section">
         <div style="display:flex;align-items:center;gap:10px;padding:10px 8px;margin-bottom:4px">
@@ -448,12 +466,15 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <button class="nav-item" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
       </div>
       <div class="sidebar-bottom">
+        <!-- Back to portal WITHOUT logging out — database is preserved in memory -->
+        <button class="btn btn-outline btn-full btn-sm" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
         <button class="btn btn-ghost btn-full btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
     </aside>
 
     <main class="admin-content">
 
+      <!-- ─ Panel: Upload ─ -->
       <div class="admin-panel active" id="panelUpload">
         <div class="admin-topbar">
           <div><h2>Upload Database</h2><p>Upload the school Excel file to power student results</p></div>
@@ -469,7 +490,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
 
         <div class="format-hint mt-16">
-          <strong>Required Excel columns:</strong> Student ID &bull; Admn. No. &bull; Class &bull; Roll No. &bull; Student Name &bull; Father's Name &bull; [Subject 1] &bull; [Subject 2] &bull; ...
+          <strong>Required Excel columns:</strong> Student ID &bull; Admn. No. &bull; Class &bull; Roll No. &bull; Student Name &bull; Father's Name &bull; [Subject 1] &bull; [Subject 2] &bull; …
           <br><span style="color:var(--text3);margin-top:6px;display:block">Subject columns are auto-detected. Max marks per subject: 100. Pass mark: 40.</span>
         </div>
 
@@ -481,6 +502,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
       </div>
 
+      <!-- ─ Panel: Students ─ -->
       <div class="admin-panel" id="panelStudents">
         <div class="admin-topbar">
           <div><h2>Student Records</h2><p id="recordCount">No database loaded</p></div>
@@ -500,6 +522,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
       </div>
 
+      <!-- ─ Panel: Statistics (BUG FIX: statsCards now populated in buildStatsCharts) ─ -->
       <div class="admin-panel" id="panelStats">
         <div class="admin-topbar"><div><h2>Statistics</h2><p>Overview of loaded database</p></div></div>
         <div class="stats-row" id="statsCards"></div>
@@ -509,6 +532,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
       </div>
 
+      <!-- ─ Panel: Settings ─ -->
       <div class="admin-panel" id="panelSettings">
         <div class="admin-topbar"><div><h2>Settings</h2><p>Portal configuration</p></div></div>
         <div class="settings-grid">
@@ -530,7 +554,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
             <h4><i class="fas fa-info-circle"></i> Admin Access URL</h4>
             <p class="text-muted">Share this URL with admin staff. Students see only the student portal by default.</p>
             <div class="cred-badge mt-16" style="margin-top:12px;word-break:break-all"><code id="adminUrl"></code></div>
-            <p class="text-muted" style="margin-top:8px">Or directly click "Admin" button on the nav bar → enter credentials.</p>
+            <p class="text-muted" style="margin-top:8px">Or directly click the "Admin" button on the nav bar → enter credentials.</p>
+          </div>
+          <div class="settings-section settings-full">
+            <h4><i class="fas fa-circle-info"></i> Navigation Guide</h4>
+            <p class="text-muted" style="line-height:1.8">
+              <strong style="color:var(--text)">Student Portal</strong> — Default view when the page loads. Students verify identity and access their results.<br>
+              <strong style="color:var(--text)">Admin Button (top-right)</strong> — Visible on student portal. Redirects to admin login if not authenticated, or directly to the dashboard if already logged in.<br>
+              <strong style="color:var(--text)">Student Portal Button (top-right or sidebar)</strong> — Takes admin back to student portal <em>without logging out or clearing the database</em>.<br>
+              <strong style="color:var(--text)">Logout</strong> — Ends the admin session and returns to the student portal.
+            </p>
           </div>
         </div>
       </div>
@@ -539,6 +572,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   </div>
 </div>
 
+<!-- ═══════════ PAGE 4: RESULT VIEW ═══════════ -->
 <div id="pageResult" class="page">
   <div class="result-wrap">
     <div class="result-paper">
@@ -617,6 +651,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   </div>
 </div>
 
+<!-- ═══════════ PDF TEMPLATE (off-screen, white) ═══════════ -->
 <div id="pdfTpl">
   <div style="position:relative;flex:1;display:flex;flex-direction:column">
     <div class="p-watermark">OFFICIAL</div>
@@ -652,358 +687,470 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 <script>
 /* ═══════════ CONFIG ═══════════ */
 const ADMIN_CREDS = { user:'admin', pass:'vibemedia@123' };
-const MAX_MARKS = 100;
-const PASS_MARK = 40;
+const MAX_MARKS   = 100;
+const PASS_MARK   = 40;
 
 /* ═══════════ STATE ═══════════ */
 let DB = [], SUBJECTS = [];
 let barChart = null, donutChart = null, classChart = null, gradeChart = null;
 let adminLoggedIn = false;
 
-/* ═══════════ PAGE ROUTING ═══════════ */
-function showPage(name){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page'+cap(name)).classList.add('active');
-  const isAdmin = name==='admin';
-  document.getElementById('navAdminBtn').classList.toggle('hidden', isAdmin||name==='adminLogin');
-  document.getElementById('navLogoutBtn').classList.toggle('hidden', !isAdmin);
-  window.scrollTo(0,0);
-}
-function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+/* ═══════════════════════════════════════════
+   PAGE ROUTING
+   Controls which page is visible and which
+   nav buttons appear.
+   navAdminBtn  — shown on student / result pages
+   navPortalBtn — shown on admin pages (back without logout)
+   navLogoutBtn — shown only on admin dashboard
+═══════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page' + cap(name)).classList.add('active');
 
-function goAdmin(){
-  if(adminLoggedIn){showPage('admin')}else{showPage('adminLogin')}
+  const isAdmin      = name === 'admin';
+  const isAdminLogin = name === 'adminLogin';
+
+  // "Admin" button visible on student + result pages only
+  document.getElementById('navAdminBtn').classList.toggle('hidden', isAdmin || isAdminLogin);
+  // "Student Portal" button visible on admin dashboard + login page
+  document.getElementById('navPortalBtn').classList.toggle('hidden', !(isAdmin || isAdminLogin));
+  // "Logout" button visible ONLY on admin dashboard
+  document.getElementById('navLogoutBtn').classList.toggle('hidden', !isAdmin);
+
+  window.scrollTo(0, 0);
 }
-function adminLogin(){
-  const u=document.getElementById('lUser').value.trim();
-  const p=document.getElementById('lPass').value;
-  if(!u||!p){toast('login','Please enter username and password','warn');return}
-  if(u===ADMIN_CREDS.user && p===ADMIN_CREDS.pass){
-    adminLoggedIn=true;
-    document.getElementById('adminUrl').textContent=location.href;
+
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function goAdmin() {
+  if (adminLoggedIn) { showPage('admin'); } else { showPage('adminLogin'); }
+}
+
+function adminLogin() {
+  const u = document.getElementById('lUser').value.trim();
+  const p = document.getElementById('lPass').value;
+  if (!u || !p) { toast('login', 'Please enter username and password.', 'warn'); return; }
+  if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
+    adminLoggedIn = true;
+    document.getElementById('adminUrl').textContent = location.href;
     showPage('admin');
-    toast('admin','Welcome back, Admin!','success');
-  }else{
-    toast('login','Invalid credentials. Please try again.','error');
-    document.getElementById('lPass').value='';
+    toast('admin', 'Welcome back, Admin! The student database is preserved.', 'success');
+  } else {
+    toast('login', 'Invalid credentials. Please try again.', 'error');
+    document.getElementById('lPass').value = '';
   }
 }
-function adminLogout(){
-  adminLoggedIn=false;
+
+function adminLogout() {
+  adminLoggedIn = false;
   showPage('student');
 }
 
 /* ═══════════ ADMIN PANELS ═══════════ */
-function switchPanel(name,btn){
-  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
-  document.getElementById('panel'+cap(name)).classList.add('active');
-  document.querySelectorAll('.nav-item,.mobile-nav-btn').forEach(b=>b.classList.remove('active'));
-  if(btn){
+function switchPanel(name, btn) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel' + cap(name)).classList.add('active');
+  document.querySelectorAll('.nav-item, .mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) {
     btn.classList.add('active');
-    // also sync sidebar if mobile btn clicked and vice versa
-    document.querySelectorAll('.nav-item').forEach(b=>{if(b.textContent.toLowerCase().includes(name.slice(0,4)))b.classList.add('active')});
-    document.querySelectorAll('.mobile-nav-btn').forEach(b=>{if(b.textContent.toLowerCase().includes(name.slice(0,4)))b.classList.add('active')});
+    document.querySelectorAll('.nav-item').forEach(b => {
+      if (b.textContent.toLowerCase().includes(name.slice(0, 4))) b.classList.add('active');
+    });
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      if (b.textContent.toLowerCase().includes(name.slice(0, 4))) b.classList.add('active');
+    });
   }
-  if(name==='stats')buildStatsCharts();
+  if (name === 'stats') buildStatsCharts();
 }
 
 /* ═══════════ TOAST ═══════════ */
-function toast(target,msg,type){
-  const ids={student:'studentToast',admin:'adminToast',login:'loginToast'};
-  const el=document.getElementById(ids[target]||target);
-  if(!el)return;
-  const icons={success:'fa-circle-check',error:'fa-circle-exclamation',info:'fa-circle-info',warn:'fa-triangle-exclamation'};
-  el.innerHTML=`<i class="fas ${icons[type]||icons.info}"></i>${msg}`;
-  el.className=`toast toast-${type==='warn'?'warn':type} show`;
-  if(type!=='error')setTimeout(()=>el.classList.remove('show'),5000);
+function toast(target, msg, type) {
+  const ids = { student:'studentToast', admin:'adminToast', login:'loginToast' };
+  const el = document.getElementById(ids[target] || target);
+  if (!el) return;
+  const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', info:'fa-circle-info', warn:'fa-triangle-exclamation' };
+  el.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i>${msg}`;
+  el.className = `toast toast-${type === 'warn' ? 'warn' : type} show`;
+  if (type !== 'error') setTimeout(() => el.classList.remove('show'), 5000);
 }
 
-/* ═══════════ EXCEL ═══════════ */
-function dragOver(e){e.preventDefault();document.getElementById('uploadZone').classList.add('drag')}
-function dragLeave(){document.getElementById('uploadZone').classList.remove('drag')}
-function dropFile(e){
-  e.preventDefault();dragLeave();
-  const f=e.dataTransfer.files[0];
-  if(f)processExcel(f);
-}
-function loadExcel(input){if(input.files[0])processExcel(input.files[0])}
-function processExcel(file){
-  const reader=new FileReader();
-  reader.onload=e=>{
-    try{
-      const wb=XLSX.read(e.target.result,{type:'binary',cellFormula:false});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      if(!rows.length){toast('admin','No data in file.','error');return}
-      const skip=['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name"];
-      SUBJECTS=Object.keys(rows[0]).filter(k=>!skip.includes(k)&&k.trim()!=='');
-      DB=rows.filter(r=>r['Student ID']&&r['Student ID'].toString().trim()).map(r=>{
-        const rec={
-          sid:r['Student ID'].toString().trim(),
-          admno:r['Admn. No.'].toString().replace(/\.0$/,'').trim(),
-          cls:r['Class'].toString().trim(),
-          roll:r['Roll No.'].toString().trim(),
-          name:r['Student Name'].toString().trim(),
-          father:r["Father's Name"].toString().trim(),
-          marks:{}
+/* ═══════════ EXCEL UPLOAD ═══════════ */
+function dragOver(e)  { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag'); }
+function dragLeave()  { document.getElementById('uploadZone').classList.remove('drag'); }
+function dropFile(e)  { e.preventDefault(); dragLeave(); const f = e.dataTransfer.files[0]; if (f) processExcel(f); }
+function loadExcel(i) { if (i.files[0]) processExcel(i.files[0]); }
+
+function processExcel(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb   = XLSX.read(e.target.result, { type:'binary', cellFormula:false });
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+      if (!rows.length) { toast('admin', 'No data found in file.', 'error'); return; }
+
+      const skip = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name"];
+      SUBJECTS = Object.keys(rows[0]).filter(k => !skip.includes(k) && k.trim() !== '');
+
+      DB = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => {
+        const rec = {
+          sid:    r['Student ID'].toString().trim(),
+          admno:  r['Admn. No.'].toString().replace(/\.0$/, '').trim(),
+          cls:    r['Class'].toString().trim(),
+          roll:   r['Roll No.'].toString().trim(),
+          name:   r['Student Name'].toString().trim(),
+          father: r["Father's Name"].toString().trim(),
+          marks:  {}
         };
-        SUBJECTS.forEach(s=>{
-          let v=r[s];
-          if(typeof v==='string'&&v.startsWith('='))v=Math.floor(Math.random()*41)+60;
-          rec.marks[s]=Number(v)||0;
+        SUBJECTS.forEach(sub => {
+          let v = r[sub];
+          if (typeof v === 'string' && v.startsWith('=')) v = Math.floor(Math.random() * 41) + 60;
+          rec.marks[sub] = Number(v) || 0;
         });
-        const tot=SUBJECTS.reduce((a,s)=>a+rec.marks[s],0);
-        rec.total=tot;
-        rec.pct=Math.round((tot/(SUBJECTS.length*MAX_MARKS))*100);
-        rec.grade=getGrade(rec.pct).grade;
-        rec.passed=SUBJECTS.every(s=>rec.marks[s]>=PASS_MARK);
+        const tot = SUBJECTS.reduce((a, sub) => a + rec.marks[sub], 0);
+        rec.total  = tot;
+        rec.pct    = Math.round((tot / (SUBJECTS.length * MAX_MARKS)) * 100);
+        rec.grade  = getGrade(rec.pct).grade;
+        rec.passed = SUBJECTS.every(sub => rec.marks[sub] >= PASS_MARK);
         return rec;
       });
-      const classes=[...new Set(DB.map(r=>r.cls))];
-      const passed=DB.filter(r=>r.passed).length;
-      document.getElementById('stStudents').textContent=DB.length;
-      document.getElementById('stSubjects').textContent=SUBJECTS.length;
-      document.getElementById('stClasses').textContent=classes.length;
-      document.getElementById('stPassed').textContent=passed;
-      document.getElementById('stPassPct').textContent=`${Math.round((passed/DB.length)*100)}% pass rate`;
+
+      const classes = [...new Set(DB.map(r => r.cls))];
+      const passed  = DB.filter(r => r.passed).length;
+
+      document.getElementById('stStudents').textContent = DB.length;
+      document.getElementById('stSubjects').textContent = SUBJECTS.length;
+      document.getElementById('stClasses').textContent  = classes.length;
+      document.getElementById('stPassed').textContent   = passed;
+      document.getElementById('stPassPct').textContent  = `${Math.round((passed / DB.length) * 100)}% pass rate`;
       document.getElementById('dbStats').classList.remove('hidden');
       document.getElementById('clearBtn').classList.remove('hidden');
-      const zone=document.getElementById('uploadZone');
+
+      const zone = document.getElementById('uploadZone');
       zone.classList.add('loaded');
-      document.getElementById('uploadTitle').textContent='✓ '+file.name;
-      document.getElementById('uploadSub').textContent=`${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
-      toast('admin',`Database loaded: ${DB.length} students across ${classes.length} classes.`,'success');
+      document.getElementById('uploadTitle').textContent = '✓ ' + file.name;
+      document.getElementById('uploadSub').textContent   = `${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
+      toast('admin', `Database loaded: ${DB.length} students across ${classes.length} classes.`, 'success');
       buildStudentTable();
       updateRecordCount();
-    }catch(err){toast('admin','Error reading file. Please check the format.','error');console.error(err)}
+    } catch (err) {
+      toast('admin', 'Error reading file. Please check the format.', 'error');
+      console.error(err);
+    }
   };
   reader.readAsBinaryString(file);
 }
-function clearDB(){
-  DB=[];SUBJECTS=[];
+
+function clearDB() {
+  DB = []; SUBJECTS = [];
   document.getElementById('dbStats').classList.add('hidden');
   document.getElementById('clearBtn').classList.add('hidden');
-  const zone=document.getElementById('uploadZone');
+  const zone = document.getElementById('uploadZone');
   zone.classList.remove('loaded');
-  document.getElementById('uploadTitle').textContent='Drop Excel file here or click to browse';
-  document.getElementById('uploadSub').textContent='Accepts .xlsx format · School student database file';
-  document.getElementById('xlFile').value='';
-  document.getElementById('studentTbody').innerHTML='';
+  document.getElementById('uploadTitle').textContent = 'Drop Excel file here or click to browse';
+  document.getElementById('uploadSub').textContent   = 'Accepts .xlsx format · School student database file';
+  document.getElementById('xlFile').value = '';
+  document.getElementById('studentTbody').innerHTML = '';
   updateRecordCount();
-  toast('admin','Database cleared.','info');
+  toast('admin', 'Database cleared.', 'info');
 }
 
 /* ═══════════ STUDENT TABLE ═══════════ */
-function buildStudentTable(data){
-  const arr=data||DB;
-  document.getElementById('studentTbody').innerHTML=arr.map((r,i)=>`
+function buildStudentTable(data) {
+  const arr = data || DB;
+  document.getElementById('studentTbody').innerHTML = arr.map((r, i) => `
     <tr>
-      <td>${i+1}</td>
+      <td>${i + 1}</td>
       <td><span class="badge badge-gold">${r.sid}</span></td>
       <td style="color:var(--text);font-weight:500">${r.name}</td>
       <td>${r.father}</td>
       <td>${r.cls}</td>
       <td>${r.roll}</td>
-      <td style="font-weight:600">${r.total}/${SUBJECTS.length*MAX_MARKS}</td>
+      <td style="font-weight:600">${r.total}/${SUBJECTS.length * MAX_MARKS}</td>
       <td style="color:var(--gold);font-weight:700">${r.pct}%</td>
       <td><span class="badge" style="background:${getGrade(r.pct).color}22;color:${getGrade(r.pct).color}">${r.grade}</span></td>
-      <td><span class="badge ${r.passed?'badge-green':'badge-red'}">${r.passed?'Pass':'Fail'}</span></td>
+      <td><span class="badge ${r.passed ? 'badge-green' : 'badge-red'}">${r.passed ? 'Pass' : 'Fail'}</span></td>
     </tr>`).join('');
-  document.getElementById('tableCount').textContent=`${arr.length} records`;
-}
-function filterTable(q){
-  q=q.toLowerCase();
-  buildStudentTable(DB.filter(r=>r.name.toLowerCase().includes(q)||r.sid.toLowerCase().includes(q)||r.cls.toLowerCase().includes(q)||r.father.toLowerCase().includes(q)));
-}
-function updateRecordCount(){
-  document.getElementById('recordCount').textContent=DB.length?`${DB.length} students loaded`:'No database loaded — go to Upload tab';
+  document.getElementById('tableCount').textContent = `${arr.length} records`;
 }
 
-/* ═══════════ STATS CHARTS ═══════════ */
-function buildStatsCharts(){
-  if(!DB.length){document.getElementById('statsCards').innerHTML='<p class="text-muted">Load a database first.</p>';return}
-  // class distribution
-  const classCounts={};
-  DB.forEach(r=>classCounts[r.cls]=(classCounts[r.cls]||0)+1);
-  const grades={A:0,'B+':0,B:0,C:0,D:0,F:0};
-  DB.forEach(r=>grades[r.grade]=(grades[r.grade]||0)+1);
-  grades['A+']=(grades['A+']||0);
-  DB.forEach(r=>{if(r.pct>=90)grades['A+']++;});
+function filterTable(q) {
+  q = q.toLowerCase();
+  buildStudentTable(DB.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    r.sid.toLowerCase().includes(q)  ||
+    r.cls.toLowerCase().includes(q)  ||
+    r.father.toLowerCase().includes(q)
+  ));
+}
 
-  if(classChart)classChart.destroy();
-  const cc=document.getElementById('classChart').getContext('2d');
-  classChart=new Chart(cc,{type:'bar',data:{labels:Object.keys(classCounts),datasets:[{data:Object.values(classCounts),backgroundColor:'rgba(212,175,55,.25)',borderColor:'#d4af37',borderWidth:2,borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{color:'#5c5975',font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}},x:{ticks:{color:'#a8a4b8',font:{size:10}},grid:{display:false}}}}});
+function updateRecordCount() {
+  document.getElementById('recordCount').textContent =
+    DB.length ? `${DB.length} students loaded` : 'No database loaded — go to Upload tab';
+}
 
-  if(gradeChart)gradeChart.destroy();
-  const gc=document.getElementById('gradeChart').getContext('2d');
-  const gc_data=Object.entries(grades).filter(([,v])=>v>0);
-  gradeChart=new Chart(gc,{type:'doughnut',data:{labels:gc_data.map(([k])=>k),datasets:[{data:gc_data.map(([,v])=>v),backgroundColor:['#10d98a','#4d9fff','#9b87f5','#d4af37','#ff8c42','#ff4d6d'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{color:'#a8a4b8',font:{size:11},boxWidth:14}}}}});
+/* ═══════════════════════════════════════════
+   STATS CHARTS
+   BUG FIX: statsCards div is now populated
+   with real summary statistics before charts.
+═══════════════════════════════════════════ */
+function buildStatsCharts() {
+  const el = document.getElementById('statsCards');
+  if (!DB.length) {
+    el.innerHTML = '<p class="text-muted">Load a database first to see statistics.</p>';
+    return;
+  }
+
+  const passed  = DB.filter(r => r.passed).length;
+  const failed  = DB.length - passed;
+  const avg     = (DB.reduce((a, r) => a + r.pct, 0) / DB.length).toFixed(1);
+  const topS    = DB.reduce((a, b) => a.pct > b.pct ? a : b);
+  const classes = [...new Set(DB.map(r => r.cls))].length;
+
+  // Populate stat cards
+  el.innerHTML = `
+    <div class="stat-card"><div class="num">${DB.length}</div><div class="lbl">Total Students</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--green)">${passed}</div><div class="lbl">Passed</div><div class="sub">${Math.round(passed/DB.length*100)}% pass rate</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--red)">${failed}</div><div class="lbl">Failed</div><div class="sub">${Math.round(failed/DB.length*100)}% fail rate</div></div>
+    <div class="stat-card"><div class="num">${avg}%</div><div class="lbl">Class Average</div></div>
+    <div class="stat-card"><div class="num">${SUBJECTS.length}</div><div class="lbl">Subjects</div></div>
+    <div class="stat-card"><div class="num">${classes}</div><div class="lbl">Classes</div></div>
+  `;
+
+  // Class distribution chart
+  const classCounts = {};
+  DB.forEach(r => classCounts[r.cls] = (classCounts[r.cls] || 0) + 1);
+
+  if (classChart) classChart.destroy();
+  classChart = new Chart(document.getElementById('classChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(classCounts),
+      datasets: [{ data: Object.values(classCounts), backgroundColor: 'rgba(212,175,55,.25)', borderColor: '#d4af37', borderWidth: 2, borderRadius: 6 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ color:'#5c5975', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } } }
+  });
+
+  // Grade distribution chart
+  const grades = { 'A+':0, A:0, 'B+':0, B:0, C:0, D:0, F:0 };
+  DB.forEach(r => { grades[r.grade] = (grades[r.grade] || 0) + 1; });
+  // Override A+ (getGrade returns A for 80-89, A+ for 90+, but stored grade uses getGrade)
+  const gc_data = Object.entries(grades).filter(([, v]) => v > 0);
+
+  if (gradeChart) gradeChart.destroy();
+  gradeChart = new Chart(document.getElementById('gradeChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: gc_data.map(([k]) => k),
+      datasets: [{ data: gc_data.map(([, v]) => v), backgroundColor: ['#10d98a','#4d9fff','#9b87f5','#d4af37','#ff8c42','#ff4d6d','#e84393'], borderWidth: 0 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ color:'#a8a4b8', font:{ size:11 }, boxWidth:14 } } } }
+  });
 }
 
 /* ═══════════ GRADE HELPER ═══════════ */
-function getGrade(pct){
-  if(pct>=90)return{grade:'A+',color:'#10d98a',label:'Outstanding'};
-  if(pct>=80)return{grade:'A',color:'#4d9fff',label:'Excellent'};
-  if(pct>=70)return{grade:'B+',color:'#9b87f5',label:'Very Good'};
-  if(pct>=60)return{grade:'B',color:'#d4af37',label:'Good'};
-  if(pct>=50)return{grade:'C',color:'#ff8c42',label:'Average'};
-  if(pct>=40)return{grade:'D',color:'#f59e0b',label:'Below Avg'};
-  return{grade:'F',color:'#ff4d6d',label:'Needs Work'};
+function getGrade(pct) {
+  if (pct >= 90) return { grade:'A+', color:'#10d98a', label:'Outstanding' };
+  if (pct >= 80) return { grade:'A',  color:'#4d9fff', label:'Excellent' };
+  if (pct >= 70) return { grade:'B+', color:'#9b87f5', label:'Very Good' };
+  if (pct >= 60) return { grade:'B',  color:'#d4af37', label:'Good' };
+  if (pct >= 50) return { grade:'C',  color:'#ff8c42', label:'Average' };
+  if (pct >= 40) return { grade:'D',  color:'#f59e0b', label:'Below Avg' };
+  return           { grade:'F',  color:'#ff4d6d', label:'Needs Work' };
 }
 
 /* ═══════════ STUDENT VERIFY ═══════════ */
-function verifyStudent(){
-  const sid=document.getElementById('fSid').value.trim();
-  const father=document.getElementById('fFather').value.trim();
-  const admno=document.getElementById('fAdm').value.trim();
-  if(!sid||!father||!admno){toast('student','Please fill all three fields.','error');return}
-  if(!DB.length){toast('student','Results not published yet. Please check back later.','info');return}
-  const s=DB.find(r=>
-    r.sid.toLowerCase()===sid.toLowerCase()&&
-    r.father.toLowerCase()===father.toLowerCase()&&
-    r.admno===admno.replace(/\.0$/,'')
+function verifyStudent() {
+  const sid    = document.getElementById('fSid').value.trim();
+  const father = document.getElementById('fFather').value.trim();
+  const admno  = document.getElementById('fAdm').value.trim();
+  if (!sid || !father || !admno) { toast('student', 'Please fill all three fields.', 'error'); return; }
+  if (!DB.length) { toast('student', 'Results not yet published. Please check back later.', 'info'); return; }
+  const s = DB.find(r =>
+    r.sid.toLowerCase()    === sid.toLowerCase()    &&
+    r.father.toLowerCase() === father.toLowerCase() &&
+    r.admno                === admno.replace(/\.0$/, '')
   );
-  if(!s){toast('student',"No record found. Please verify your Student ID, Father's Name, and Admission No.",'error');return}
+  if (!s) { toast('student', "No record found. Please verify your Student ID, Father's Name and Admission No.", 'error'); return; }
   renderResult(s);
 }
 
-/* ═══════════ RENDER RESULT ═══════════ */
-function renderResult(s){
-  const subs=Object.keys(s.marks);
-  const marksArr=subs.map(k=>s.marks[k]);
-  const total=marksArr.reduce((a,b)=>a+b,0);
-  const maxTotal=subs.length*MAX_MARKS;
-  const pct=Math.round((total/maxTotal)*100);
-  const{grade,color,label}=getGrade(pct);
-  const passed=marksArr.every(m=>m>=PASS_MARK);
-  const failed=subs.filter(k=>s.marks[k]<PASS_MARK);
-  const topSub=subs.reduce((a,b)=>s.marks[a]>s.marks[b]?a:b);
+/* ═══════════════════════════════════════════
+   RENDER RESULT
+   BUG FIX (line 899): removed shadowing `colors`
+   variable — `s` was reused as arrow-fn param,
+   overwriting the student object reference.
+   The unused `colors` array is eliminated entirely.
+═══════════════════════════════════════════ */
+function renderResult(student) {
+  const s       = student; // explicit alias, no shadowing risk
+  const subs    = Object.keys(s.marks);
+  const marksArr = subs.map(k => s.marks[k]);
+  const total   = marksArr.reduce((a, b) => a + b, 0);
+  const maxTotal = subs.length * MAX_MARKS;
+  const pct     = Math.round((total / maxTotal) * 100);
+  const { grade, color, label } = getGrade(pct);
+  const passed  = marksArr.every(m => m >= PASS_MARK);
+  const failed  = subs.filter(k => s.marks[k] < PASS_MARK);
+  const topSub  = subs.reduce((a, b) => s.marks[a] > s.marks[b] ? a : b);
 
   // Student grid
-  document.getElementById('studentGrid').innerHTML=[
-    {l:'Student Name',v:s.name,g:true},{l:"Father's Name",v:s.father},
-    {l:'Student ID',v:s.sid,g:true},{l:'Admission No.',v:s.admno},
-    {l:'Class & Section',v:s.cls},{l:'Roll Number',v:s.roll}
-  ].map(c=>`<div class="s-cell"><div class="lbl">${c.l}</div><div class="val${c.g?' g':''}">${c.v||'—'}</div></div>`).join('');
+  document.getElementById('studentGrid').innerHTML = [
+    { l:'Student Name',   v:s.name,   g:true },
+    { l:"Father's Name",  v:s.father },
+    { l:'Student ID',     v:s.sid,    g:true },
+    { l:'Admission No.',  v:s.admno },
+    { l:'Class & Section',v:s.cls },
+    { l:'Roll Number',    v:s.roll }
+  ].map(c => `<div class="s-cell"><div class="lbl">${c.l}</div><div class="val${c.g ? ' g' : ''}">${c.v || '—'}</div></div>`).join('');
 
   // Summary bar
-  document.getElementById('summaryBar').innerHTML=[
-    {b:`${pct}%`,c:'var(--gold)',t:'Overall %'},
-    {b:grade,c:color,t:'Final Grade'},
-    {b:passed?'PASS':'FAIL',c:passed?'var(--green)':'var(--red)',t:'Result'},
-    {b:topSub,c:'var(--text)',t:'Best Subject',sz:'1.1rem'}
-  ].map(c=>`<div class="sum-cell"><div class="big" style="color:${c.c};${c.sz?'font-size:'+c.sz:''}">${c.b}</div><small>${c.t}</small></div>`).join('');
+  document.getElementById('summaryBar').innerHTML = [
+    { b:`${pct}%`, c:'var(--gold)',                     t:'Overall %' },
+    { b:grade,     c:color,                              t:'Final Grade' },
+    { b:passed ? 'PASS':'FAIL', c:passed ? 'var(--green)':'var(--red)', t:'Result' },
+    { b:topSub,    c:'var(--text)',                      t:'Best Subject', sz:'1.1rem' }
+  ].map(c => `<div class="sum-cell"><div class="big" style="color:${c.c};${c.sz ? 'font-size:'+c.sz : ''}">${c.b}</div><small>${c.t}</small></div>`).join('');
 
-  // Bar chart
-  if(barChart)barChart.destroy();
-  const colors=subs.map(s=>getGrade(Math.round((s.marks?s.marks[s]:0)/MAX_MARKS*100)).color);
-  const barColors=subs.map(sub=>getGrade(Math.round((s.marks[sub]/MAX_MARKS)*100)).color);
-  barChart=new Chart(document.getElementById('barChart').getContext('2d'),{
-    type:'bar',
-    data:{labels:subs,datasets:[
-      {label:'Marks',data:marksArr,backgroundColor:barColors.map(c=>c+'33'),borderColor:barColors,borderWidth:2,borderRadius:8,borderSkipped:false},
-      {label:'Pass',data:subs.map(()=>PASS_MARK),type:'line',borderColor:'rgba(255,77,109,.5)',borderDash:[5,5],borderWidth:1.5,pointRadius:0,fill:false}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.dataset.label}: ${c.raw}`}}},scales:{y:{min:0,max:MAX_MARKS,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#5c5975',font:{size:10}}},x:{grid:{display:false},ticks:{color:'#a8a4b8',font:{size:11}}}}}
+  // Bar chart — BUG FIX: use `sub` as parameter name, NOT `s`
+  if (barChart) barChart.destroy();
+  const barColors = subs.map(sub => getGrade(Math.round((s.marks[sub] / MAX_MARKS) * 100)).color);
+  barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: subs, datasets: [
+      { label:'Marks', data:marksArr, backgroundColor:barColors.map(c => c + '33'), borderColor:barColors, borderWidth:2, borderRadius:8, borderSkipped:false },
+      { label:'Pass',  data:subs.map(() => PASS_MARK), type:'line', borderColor:'rgba(255,77,109,.5)', borderDash:[5,5], borderWidth:1.5, pointRadius:0, fill:false }
+    ] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => ` ${c.dataset.label}: ${c.raw}` } } }, scales:{ y:{ min:0, max:MAX_MARKS, grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ color:'#5c5975', font:{ size:10 } } }, x:{ grid:{ display:false }, ticks:{ color:'#a8a4b8', font:{ size:11 } } } } }
   });
 
   // Donut
-  if(donutChart)donutChart.destroy();
-  donutChart=new Chart(document.getElementById('donutChart').getContext('2d'),{
-    type:'doughnut',
-    data:{datasets:[{data:[pct,100-pct],backgroundColor:[color,'rgba(255,255,255,.06)'],borderWidth:0,cutout:'76%'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}}}
+  if (donutChart) donutChart.destroy();
+  donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { datasets: [{ data:[pct, 100-pct], backgroundColor:[color, 'rgba(255,255,255,.06)'], borderWidth:0, cutout:'76%' }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ enabled:false } } }
   });
-  document.getElementById('donutLabel').innerHTML=`<div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:${color};font-weight:700">${pct}%</div><div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px">${label}</div>`;
+  document.getElementById('donutLabel').innerHTML =
+    `<div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:${color};font-weight:700">${pct}%</div>
+     <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px">${label}</div>`;
 
   // Subject cards
-  document.getElementById('subjectsGrid').innerHTML=subs.map(sub=>{
-    const m=s.marks[sub];
-    const sp=Math.round((m/MAX_MARKS)*100);
-    const{grade:g,color:c}=getGrade(sp);
-    const p=m>=PASS_MARK;
+  document.getElementById('subjectsGrid').innerHTML = subs.map(sub => {
+    const m  = s.marks[sub];
+    const sp = Math.round((m / MAX_MARKS) * 100);
+    const { grade:g, color:c } = getGrade(sp);
+    const p  = m >= PASS_MARK;
     return `<div class="subj-card" style="--c:${c}">
       <div class="subj-name">${sub}</div>
       <div class="subj-marks">${m}<span>/${MAX_MARKS}</span></div>
       <div class="subj-row">
         <span class="grade-badge">${g}</span>
-        <span class="pass-badge" style="color:${p?'var(--green)':'var(--red)'}">${p?'✓ Pass':'✗ Fail'}</span>
+        <span class="pass-badge" style="color:${p ? 'var(--green)' : 'var(--red)'}">${p ? '✓ Pass' : '✗ Fail'}</span>
       </div>
       <div class="subj-bar"><div class="subj-bar-fill" data-w="${sp}%"></div></div>
     </div>`;
   }).join('');
-  setTimeout(()=>document.querySelectorAll('.subj-bar-fill').forEach(el=>el.style.width=el.dataset.w),120);
+  setTimeout(() => document.querySelectorAll('.subj-bar-fill').forEach(el => el.style.width = el.dataset.w), 120);
 
   // Insights
-  const strengths=subs.filter(sub=>s.marks[sub]>=80);
-  const improve=subs.filter(sub=>s.marks[sub]<60);
-  const avg=(total/subs.length).toFixed(1);
-  let rec='';
-  if(pct>=90)rec='Exceptional performance! You are among the top achievers. Consider advanced coursework or Olympiad participation to challenge yourself further.';
-  else if(pct>=75)rec='Very strong result! Focused revision on your weaker subjects will push you into the top tier. Maintain this momentum.';
-  else if(pct>=60)rec='Good effort overall. Identify the topics you find difficult in each subject and seek targeted teacher guidance.';
-  else if(pct>=40)rec='You have cleared the minimum threshold but significant improvement is possible. Create a structured daily study plan and stick to it consistently.';
-  else rec='This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
+  const strengths = subs.filter(sub => s.marks[sub] >= 80);
+  const improve   = subs.filter(sub => s.marks[sub] < 60);
+  const avg       = (total / subs.length).toFixed(1);
+  let rec = '';
+  if      (pct >= 90) rec = 'Exceptional performance! You are among the top achievers. Consider advanced coursework or Olympiad participation to challenge yourself further.';
+  else if (pct >= 75) rec = 'Very strong result! Focused revision on your weaker subjects will push you into the top tier. Maintain this momentum.';
+  else if (pct >= 60) rec = 'Good effort overall. Identify the topics you find difficult in each subject and seek targeted teacher guidance.';
+  else if (pct >= 40) rec = 'You have cleared the minimum threshold but significant improvement is possible. Create a structured daily study plan and stick to it consistently.';
+  else                rec = 'This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
 
-  document.getElementById('insightsGrid').innerHTML=`
-    <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length?strengths.map(sub=>`<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join(''):'<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
-    <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length?improve.map(sub=>`<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join(''):'<li>No subject below 60% — great balance!</li>'}</ul></div>
-    <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul><li>Total: <strong>${total} / ${maxTotal}</strong></li><li>Average per subject: <strong>${avg}</strong></li><li>Highest: <strong>${Math.max(...marksArr)} (${subs[marksArr.indexOf(Math.max(...marksArr))]})</strong></li><li>Lowest: <strong>${Math.min(...marksArr)} (${subs[marksArr.indexOf(Math.min(...marksArr))]})</strong></li>${failed.length?`<li>Failed: <strong>${failed.join(', ')}</strong></li>`:'<li>Passed in all subjects ✓</li>'}</ul></div>
+  document.getElementById('insightsGrid').innerHTML = `
+    <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length ? strengths.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length ? improve.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>No subject below 60% — great balance!</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul>
+      <li>Total: <strong>${total} / ${maxTotal}</strong></li>
+      <li>Average per subject: <strong>${avg}</strong></li>
+      <li>Highest: <strong>${Math.max(...marksArr)} (${subs[marksArr.indexOf(Math.max(...marksArr))]})</strong></li>
+      <li>Lowest: <strong>${Math.min(...marksArr)} (${subs[marksArr.indexOf(Math.min(...marksArr))]})</strong></li>
+      ${failed.length ? `<li>Failed: <strong>${failed.join(', ')}</strong></li>` : '<li>Passed in all subjects ✓</li>'}
+    </ul></div>
     <div class="insight-card"><h5><i class="fas fa-lightbulb"></i> Recommendation</h5><p>${rec}</p></div>
   `;
 
-  // Sig / footer
-  document.getElementById('sigTeacher').textContent=`Class ${s.cls} Teacher`;
-  const now=new Date();
-  const docId='VM-'+Math.random().toString(36).substr(2,9).toUpperCase();
-  document.getElementById('genDate').textContent=now.toLocaleDateString('en-IN',{year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('genId').textContent=docId;
+  // Signatures & footer
+  document.getElementById('sigTeacher').textContent = `Class ${s.cls} Teacher`;
+  const now   = new Date();
+  const docId = 'VM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  document.getElementById('genDate').textContent = now.toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('genId').textContent   = docId;
 
-  // PDF template
-  document.getElementById('pdfStudent').innerHTML=[
-    {l:'Student Name',v:s.name},{l:'Student ID',v:s.sid},{l:"Father's Name",v:s.father},
-    {l:'Admission No.',v:s.admno},{l:'Class & Section',v:s.cls},{l:'Roll Number',v:s.roll}
-  ].map(f=>`<div class="p-field"><label>${f.l}</label><span>${f.v||'—'}</span></div>`).join('');
-  document.getElementById('pdfSummary').innerHTML=[
-    {b:`${pct}%`,l:'Overall %'},{b:grade,l:'Final Grade'},{b:label,l:'Performance'},{b:passed?'PASS':'FAIL',l:'Result'}
-  ].map(c=>`<div class="p-sum-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
-  document.getElementById('pdfTable').innerHTML=`
+  // Build PDF template
+  document.getElementById('pdfStudent').innerHTML = [
+    { l:'Student Name', v:s.name },    { l:'Student ID',    v:s.sid },
+    { l:"Father's Name",v:s.father },  { l:'Admission No.', v:s.admno },
+    { l:'Class & Section',v:s.cls },   { l:'Roll Number',   v:s.roll }
+  ].map(f => `<div class="p-field"><label>${f.l}</label><span>${f.v || '—'}</span></div>`).join('');
+
+  document.getElementById('pdfSummary').innerHTML = [
+    { b:`${pct}%`, l:'Overall %' }, { b:grade, l:'Final Grade' },
+    { b:label,     l:'Performance' },{ b:passed ? 'PASS':'FAIL', l:'Result' }
+  ].map(c => `<div class="p-sum-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+
+  document.getElementById('pdfTable').innerHTML = `
     <thead><tr><th>Subject</th><th>Max</th><th>Obtained</th><th>%</th><th>Grade</th><th>Status</th></tr></thead>
     <tbody>
-      ${subs.map(sub=>{const m=s.marks[sub];const sp=Math.round((m/MAX_MARKS)*100);const{grade:g}=getGrade(sp);const p=m>=PASS_MARK;return`<tr><td><strong>${sub}</strong></td><td>${MAX_MARKS}</td><td>${m}</td><td>${sp}%</td><td><strong>${g}</strong></td><td class="${p?'p-pass':'p-fail'}">${p?'Pass':'Fail'}</td></tr>`}).join('')}
-      <tr class="total-row"><td><strong>TOTAL</strong></td><td><strong>${maxTotal}</strong></td><td><strong>${total}</strong></td><td><strong>${pct}%</strong></td><td><strong>${grade}</strong></td><td style="color:${passed?'#10b981':'#dc2626'};font-weight:700">${passed?'PASS':'FAIL'}</td></tr>
+      ${subs.map(sub => {
+        const m  = s.marks[sub];
+        const sp = Math.round((m / MAX_MARKS) * 100);
+        const { grade:g } = getGrade(sp);
+        const p  = m >= PASS_MARK;
+        return `<tr><td><strong>${sub}</strong></td><td>${MAX_MARKS}</td><td>${m}</td><td>${sp}%</td><td><strong>${g}</strong></td><td class="${p ? 'p-pass' : 'p-fail'}">${p ? 'Pass' : 'Fail'}</td></tr>`;
+      }).join('')}
+      <tr class="total-row">
+        <td><strong>TOTAL</strong></td><td><strong>${maxTotal}</strong></td><td><strong>${total}</strong></td>
+        <td><strong>${pct}%</strong></td><td><strong>${grade}</strong></td>
+        <td style="color:${passed ? '#10b981' : '#dc2626'};font-weight:700">${passed ? 'PASS' : 'FAIL'}</td>
+      </tr>
     </tbody>`;
-  document.getElementById('pdfRemarks').textContent=rec+(failed.length?` Areas needing attention: ${failed.join(', ')}.`:' Passed in all subjects.');
-  document.getElementById('pdfTeacher').textContent=`Class ${s.cls} Teacher`;
-  document.getElementById('pdfDocId').textContent=docId;
+
+  document.getElementById('pdfRemarks').textContent  = rec + (failed.length ? ` Areas needing attention: ${failed.join(', ')}.` : ' Passed in all subjects.');
+  document.getElementById('pdfTeacher').textContent  = `Class ${s.cls} Teacher`;
+  document.getElementById('pdfDocId').textContent    = docId;
 
   showPage('result');
 }
 
 /* ═══════════ PDF DOWNLOAD ═══════════ */
-async function downloadPDF(){
-  const btn=document.getElementById('pdfBtn');
-  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Generating PDF…';
-  btn.disabled=true;
-  try{
-    const tpl=document.getElementById('pdfTpl');
-    const canvas=await html2canvas(tpl,{scale:2,useCORS:true,backgroundColor:'#ffffff',windowWidth:794,logging:false});
-    const{jsPDF}=window.jspdf;
-    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
-    const W=pdf.internal.pageSize.getWidth();
-    const H=pdf.internal.pageSize.getHeight();
-    const imgData=canvas.toDataURL('image/jpeg',.97);
-    const imgH=(canvas.height*W)/canvas.width;
-    if(imgH<=H){pdf.addImage(imgData,'JPEG',0,0,W,imgH)}
-    else{let y=0;while(y<imgH){pdf.addImage(imgData,'JPEG',0,-y,W,imgH);y+=H;if(y<imgH)pdf.addPage();}}
-    pdf.save(`Result_${document.getElementById('genId').textContent}.pdf`);
-  }catch(e){alert('PDF generation failed. Try again.');}
-  btn.innerHTML='<i class="fas fa-file-pdf"></i> Download Report Card PDF';
-  btn.disabled=false;
+async function downloadPDF() {
+  const btn = document.getElementById('pdfBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF…';
+  btn.disabled  = true;
+  try {
+    const tpl    = document.getElementById('pdfTpl');
+    const canvas = await html2canvas(tpl, { scale:2, useCORS:true, backgroundColor:'#ffffff', windowWidth:794, logging:false });
+    const { jsPDF } = window.jspdf;
+    const pdf   = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
+    const W     = pdf.internal.pageSize.getWidth();
+    const H     = pdf.internal.pageSize.getHeight();
+    const imgData = canvas.toDataURL('image/jpeg', .97);
+    const imgH  = (canvas.height * W) / canvas.width;
+    if (imgH <= H) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, W, imgH);
+    } else {
+      let y = 0;
+      while (y < imgH) { pdf.addImage(imgData, 'JPEG', 0, -y, W, imgH); y += H; if (y < imgH) pdf.addPage(); }
+    }
+    pdf.save(`ReportCard_${document.getElementById('genId').textContent}.pdf`);
+  } catch (e) {
+    alert('PDF generation failed. Please try again.');
+    console.error(e);
+  }
+  btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download Report Card PDF';
+  btn.disabled  = false;
 }
 
 /* ═══════════ INIT ═══════════ */
-document.getElementById('adminUrl').textContent=location.href;
+document.getElementById('adminUrl').textContent = location.href;
 </script>
 </body>
 </html>
