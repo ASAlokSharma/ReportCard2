@@ -269,6 +269,46 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 .insight-card li{padding:2px 0;display:flex;gap:8px;align-items:flex-start}
 .insight-card li::before{content:"›";color:var(--gold);flex-shrink:0}
 
+/* ── ATTENDANCE SECTION ── */
+.attendance-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.attendance-grid{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
+@media(max-width:700px){.attendance-grid{grid-template-columns:1fr}}
+.att-gauge-wrap{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 20px;text-align:center}
+.att-gauge-svg{width:150px;height:150px;display:block;margin:0 auto 12px}
+.att-pct-big{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
+.att-days-txt{font-size:.8rem;color:var(--text3);margin-top:6px}
+.att-status-badge{display:inline-block;padding:5px 16px;border-radius:20px;font-size:.75rem;font-weight:700;margin-top:10px;letter-spacing:.5px}
+.att-right{display:flex;flex-direction:column;gap:12px}
+.att-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:480px){.att-stats-row{grid-template-columns:1fr 1fr}}
+.att-stat{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;text-align:center}
+.att-stat .num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700}
+.att-stat .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
+.att-bar-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
+.att-bar-card h6{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.att-bar-card h6 i{color:var(--gold);font-size:.72rem}
+.att-bar-track{height:14px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden;position:relative;margin-bottom:8px}
+.att-bar-fill{height:100%;border-radius:7px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.att-thresholds{display:flex;justify-content:space-between;font-size:.66rem;color:var(--text3)}
+.att-thresh-mark{position:absolute;top:0;bottom:0;width:2px;opacity:.5}
+.att-remark-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
+.att-remark-card h6{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.att-remark-card p{font-size:.83rem;color:var(--text2);line-height:1.75}
+.att-dot-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.att-dot{width:10px;height:10px;border-radius:50%}
+
+/* PDF attendance */
+.p-att{padding:10px 36px 14px;border-top:1px solid #eee}
+.p-att h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:8px}
+.p-att-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.p-att-cell{background:#fff;border:1px solid #eee;border-radius:6px;padding:10px;text-align:center}
+.p-att-cell .big{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:#1a1a2e}
+.p-att-cell .lab{font-size:.58rem;text-transform:uppercase;letter-spacing:1px;color:#888;margin-top:2px}
+.p-att-bar-wrap{background:#f8f7f2;border:1px solid #eee;border-radius:6px;padding:10px 14px}
+.p-att-bar-track{height:10px;background:#e8e6e0;border-radius:5px;overflow:hidden;margin:6px 0 4px}
+.p-att-bar-fill{height:100%;border-radius:5px}
+.p-att-note{font-size:.72rem;color:#555;margin-top:4px}
+
 /* signatures */
 .sig-section{padding:clamp(18px,3vw,28px);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-bottom:1px solid rgba(255,255,255,.05)}
 @media(max-width:520px){.sig-section{grid-template-columns:1fr}}
@@ -287,7 +327,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 /* ══════════════════════════════════════════════
    PDF TEMPLATE (hidden, white background)
 ══════════════════════════════════════════════ */
-#pdfTpl{position:fixed;left:-9999px;top:0;width:794px;min-height:1123px;background:#fff;font-family:'DM Sans',sans-serif;color:#1a1a2e;z-index:-1;display:flex;flex-direction:column}
+#pdfTpl{position:fixed;left:-9999px;top:0;width:794px;height:auto;background:#fff;font-family:'DM Sans',sans-serif;color:#1a1a2e;z-index:-1;display:flex;flex-direction:column}
 .p-hdr{background:#0c0c1e;color:#fff;padding:24px 36px;display:flex;justify-content:space-between;align-items:center}
 .p-hdr-left{display:flex;align-items:center;gap:14px}
 .p-logo{width:52px;height:52px;background:linear-gradient(135deg,#d4af37,#f0d060);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px}
@@ -492,6 +532,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="format-hint mt-16">
           <strong>Required Excel columns:</strong> Student ID &bull; Admn. No. &bull; Class &bull; Roll No. &bull; Student Name &bull; Father's Name &bull; [Subject 1] &bull; [Subject 2] &bull; …
           <br><span style="color:var(--text3);margin-top:6px;display:block">Subject columns are auto-detected. Max marks per subject: 100. Pass mark: 40.</span>
+          <br><strong>Optional Attendance columns:</strong> <code style="color:var(--gold)">Working Days</code> &bull; <code style="color:var(--gold)">Days Present</code>
+          <span style="color:var(--text3);display:block;margin-top:4px">When present, a rich attendance section is shown on each student's report card and PDF.</span>
         </div>
 
         <div class="stats-row mt-24 hidden" id="dbStats">
@@ -515,7 +557,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
           </div>
           <div class="tbl-wrap">
             <table class="tbl">
-              <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Class</th><th>Roll</th><th>Total</th><th>%</th><th>Grade</th><th>Result</th></tr></thead>
+              <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Class</th><th>Roll</th><th>Total</th><th>%</th><th>Grade</th><th>Attendance</th><th>Result</th></tr></thead>
               <tbody id="studentTbody"></tbody>
             </table>
           </div>
@@ -619,6 +661,47 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="insights-grid" id="insightsGrid"></div>
       </div>
 
+      <!-- Attendance Section — shown only when data is available -->
+      <div class="attendance-section" id="attendanceSection" style="display:none">
+        <div class="sec-label"><i class="fas fa-calendar-check"></i> Attendance Record</div>
+        <div class="attendance-grid">
+          <div class="att-gauge-wrap">
+            <svg class="att-gauge-svg" id="attGaugeSvg" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="75" cy="75" r="58" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+              <circle cx="75" cy="75" r="58" id="attArc" stroke="#10d98a" stroke-width="10"
+                stroke-dasharray="0 364.4" stroke-linecap="round"
+                transform="rotate(-90 75 75)" style="transition:stroke-dasharray 1.2s ease"/>
+              <text x="75" y="70" text-anchor="middle" font-family="Playfair Display,serif" font-size="22" font-weight="700" fill="#f0eee8" id="attPctTxt">0%</text>
+              <text x="75" y="88" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#5c5975" id="attDaysTxt">0/0 days</text>
+            </svg>
+            <div class="att-status-badge" id="attStatusBadge">—</div>
+          </div>
+          <div class="att-right">
+            <div class="att-stats-row">
+              <div class="att-stat"><div class="num" id="attStatTotal" style="color:var(--gold)">—</div><div class="lbl">Working Days</div></div>
+              <div class="att-stat"><div class="num" id="attStatPresent" style="color:var(--green)">—</div><div class="lbl">Days Present</div></div>
+              <div class="att-stat"><div class="num" id="attStatAbsent" style="color:var(--red)">—</div><div class="lbl">Days Absent</div></div>
+            </div>
+            <div class="att-bar-card">
+              <h6><i class="fas fa-chart-bar"></i> Attendance at a glance</h6>
+              <div class="att-bar-track" style="position:relative">
+                <div class="att-bar-fill" id="attBarFill" style="width:0%"></div>
+                <div class="att-thresh-mark" style="left:75%;background:#f59e0b"></div>
+                <div class="att-thresh-mark" style="left:90%;background:#10d98a"></div>
+              </div>
+              <div class="att-thresholds">
+                <span>0%</span><span style="color:#f59e0b">75% min</span><span style="color:#10d98a">90% target</span><span>100%</span>
+              </div>
+              <div class="att-dot-row" id="attDotRow"></div>
+            </div>
+            <div class="att-remark-card">
+              <h6><i class="fas fa-comment-dots"></i> Attendance Remarks</h6>
+              <p id="attRemark">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="sig-section">
         <div class="sig-box">
           <div class="sig-area">[ Signature ]</div>
@@ -669,6 +752,18 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
     <div class="p-summary" id="pdfSummary"></div>
     <div class="p-marks" style="flex:1"><h3>Subject-wise Marks</h3><table class="p-tbl" id="pdfTable"></table></div>
     <div class="p-remarks"><h3>Remarks &amp; Recommendations</h3><p id="pdfRemarks"></p></div>
+    <div class="p-att hidden" id="pdfAttSection">
+      <h3>Attendance Record</h3>
+      <div class="p-att-grid" id="pdfAttGrid"></div>
+      <div class="p-att-bar-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.72rem;color:#555;font-weight:600">Attendance</span>
+          <span style="font-size:.72rem;color:#d4af37;font-weight:700" id="pdfAttPctLabel">—</span>
+        </div>
+        <div class="p-att-bar-track"><div class="p-att-bar-fill" id="pdfAttBarFill" style="width:0%"></div></div>
+        <div class="p-att-note" id="pdfAttNote">—</div>
+      </div>
+    </div>
     <div class="p-sigs">
       <div class="p-sig"><div class="p-sig-area">[ Signature ]</div><h5>Class Teacher</h5><p id="pdfTeacher">—</p></div>
       <div class="p-sig p-seal">
@@ -789,7 +884,7 @@ function processExcel(file) {
       const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
       if (!rows.length) { toast('admin', 'No data found in file.', 'error'); return; }
 
-      const skip = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name"];
+      const skip = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name",'Working Days','Days Present'];
       SUBJECTS = Object.keys(rows[0]).filter(k => !skip.includes(k) && k.trim() !== '');
 
       DB = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => {
@@ -800,7 +895,9 @@ function processExcel(file) {
           roll:   r['Roll No.'].toString().trim(),
           name:   r['Student Name'].toString().trim(),
           father: r["Father's Name"].toString().trim(),
-          marks:  {}
+          marks:  {},
+          workingDays: Number(r['Working Days']) || 0,
+          daysPresent: Number(r['Days Present']) || 0
         };
         SUBJECTS.forEach(sub => {
           let v = r[sub];
@@ -812,6 +909,7 @@ function processExcel(file) {
         rec.pct    = Math.round((tot / (SUBJECTS.length * MAX_MARKS)) * 100);
         rec.grade  = getGrade(rec.pct).grade;
         rec.passed = SUBJECTS.every(sub => rec.marks[sub] >= PASS_MARK);
+        rec.attPct = rec.workingDays > 0 ? Math.round((rec.daysPresent / rec.workingDays) * 100) : null;
         return rec;
       });
 
@@ -858,8 +956,10 @@ function clearDB() {
 /* ═══════════ STUDENT TABLE ═══════════ */
 function buildStudentTable(data) {
   const arr = data || DB;
-  document.getElementById('studentTbody').innerHTML = arr.map((r, i) => `
-    <tr>
+  document.getElementById('studentTbody').innerHTML = arr.map((r, i) => {
+    const attColor = r.attPct === null ? 'var(--text3)' : r.attPct >= 90 ? 'var(--green)' : r.attPct >= 75 ? 'var(--gold)' : r.attPct >= 60 ? '#ff8c42' : 'var(--red)';
+    const attTxt   = r.attPct === null ? '—' : r.attPct + '%';
+    return `<tr>
       <td>${i + 1}</td>
       <td><span class="badge badge-gold">${r.sid}</span></td>
       <td style="color:var(--text);font-weight:500">${r.name}</td>
@@ -869,8 +969,10 @@ function buildStudentTable(data) {
       <td style="font-weight:600">${r.total}/${SUBJECTS.length * MAX_MARKS}</td>
       <td style="color:var(--gold);font-weight:700">${r.pct}%</td>
       <td><span class="badge" style="background:${getGrade(r.pct).color}22;color:${getGrade(r.pct).color}">${r.grade}</span></td>
+      <td style="color:${attColor};font-weight:700">${attTxt}</td>
       <td><span class="badge ${r.passed ? 'badge-green' : 'badge-red'}">${r.passed ? 'Pass' : 'Fail'}</span></td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
   document.getElementById('tableCount').textContent = `${arr.length} records`;
 }
 
@@ -906,6 +1008,9 @@ function buildStatsCharts() {
   const avg     = (DB.reduce((a, r) => a + r.pct, 0) / DB.length).toFixed(1);
   const topS    = DB.reduce((a, b) => a.pct > b.pct ? a : b);
   const classes = [...new Set(DB.map(r => r.cls))].length;
+  const attStudents = DB.filter(r => r.attPct !== null);
+  const avgAtt = attStudents.length ? Math.round(attStudents.reduce((a, r) => a + r.attPct, 0) / attStudents.length) : null;
+  const criticalAtt = attStudents.filter(r => r.attPct < 75).length;
 
   // Populate stat cards
   el.innerHTML = `
@@ -915,6 +1020,8 @@ function buildStatsCharts() {
     <div class="stat-card"><div class="num">${avg}%</div><div class="lbl">Class Average</div></div>
     <div class="stat-card"><div class="num">${SUBJECTS.length}</div><div class="lbl">Subjects</div></div>
     <div class="stat-card"><div class="num">${classes}</div><div class="lbl">Classes</div></div>
+    ${avgAtt !== null ? `<div class="stat-card"><div class="num" style="color:${avgAtt>=75?'var(--green)':'var(--red)'}">${avgAtt}%</div><div class="lbl">Avg Attendance</div></div>` : ''}
+    ${criticalAtt > 0 ? `<div class="stat-card"><div class="num" style="color:var(--red)">${criticalAtt}</div><div class="lbl">Low Attendance</div><div class="sub">Below 75%</div></div>` : ''}
   `;
 
   // Class distribution chart
@@ -946,6 +1053,15 @@ function buildStatsCharts() {
     },
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ color:'#a8a4b8', font:{ size:11 }, boxWidth:14 } } } }
   });
+}
+
+/* ═══════════ ATTENDANCE HELPER ═══════════ */
+function getAttInfo(pct) {
+  if (pct === null) return null;
+  if (pct >= 90) return { label:'Excellent', color:'#10d98a', bg:'rgba(16,217,138,.15)', remark:'Outstanding attendance! Your consistent presence in school reflects great discipline and dedication. Keep it up!' };
+  if (pct >= 75) return { label:'Satisfactory', color:'#d4af37', bg:'rgba(212,175,55,.15)', remark:'Attendance is within acceptable range. However, improving consistency will have a direct positive impact on your academic performance.' };
+  if (pct >= 60) return { label:'Low', color:'#ff8c42', bg:'rgba(255,140,66,.15)', remark:'Attendance is below the recommended 75% mark. Frequent absences may affect learning continuity. Please make regular school attendance a priority.' };
+  return { label:'Critical', color:'#ff4d6d', bg:'rgba(255,77,109,.15)', remark:'Attendance is critically low and falls well below school requirements. Immediate improvement is essential. Please meet the class teacher to discuss a plan.' };
 }
 
 /* ═══════════ GRADE HELPER ═══════════ */
@@ -1077,6 +1193,53 @@ function renderResult(student) {
     <div class="insight-card"><h5><i class="fas fa-lightbulb"></i> Recommendation</h5><p>${rec}</p></div>
   `;
 
+  // ── Attendance ──
+  const attSec = document.getElementById('attendanceSection');
+  const attInfo = getAttInfo(s.attPct);
+  if (s.attPct !== null && s.workingDays > 0) {
+    attSec.style.display = '';
+    const absent = s.workingDays - s.daysPresent;
+    const circ   = 2 * Math.PI * 58; // r=58
+    const dash   = Math.min(s.attPct / 100, 1) * circ;
+    document.getElementById('attArc').setAttribute('stroke', attInfo.color);
+    document.getElementById('attArc').setAttribute('stroke-dasharray', `${dash} ${circ}`);
+    document.getElementById('attPctTxt').textContent = s.attPct + '%';
+    document.getElementById('attPctTxt').setAttribute('fill', attInfo.color);
+    document.getElementById('attDaysTxt').textContent = `${s.daysPresent} / ${s.workingDays} days`;
+    document.getElementById('attStatusBadge').textContent = attInfo.label;
+    document.getElementById('attStatusBadge').style.background = attInfo.bg;
+    document.getElementById('attStatusBadge').style.color      = attInfo.color;
+    document.getElementById('attStatTotal').textContent   = s.workingDays;
+    document.getElementById('attStatPresent').textContent = s.daysPresent;
+    document.getElementById('attStatAbsent').textContent  = absent;
+    document.getElementById('attStatAbsent').style.color  = absent > 0 ? 'var(--red)' : 'var(--green)';
+    const bar = document.getElementById('attBarFill');
+    bar.style.background = attInfo.color;
+    setTimeout(() => { bar.style.width = Math.min(s.attPct, 100) + '%'; }, 150);
+    document.getElementById('attRemark').textContent = attInfo.remark;
+    // Dot visualisation — 1 dot per day (cap at 60 for display)
+    const total60 = Math.min(s.workingDays, 60);
+    const present60 = Math.round((s.daysPresent / s.workingDays) * total60);
+    const dots = Array.from({ length: total60 }, (_, i) =>
+      `<div class="att-dot" style="background:${i < present60 ? attInfo.color : 'rgba(255,255,255,.1)'}"></div>`
+    ).join('');
+    document.getElementById('attDotRow').innerHTML = dots + (s.workingDays > 60 ? `<span style="font-size:.7rem;color:var(--text3);margin-left:4px">+${s.workingDays - 60} more</span>` : '');
+    // PDF attendance
+    document.getElementById('pdfAttSection').classList.remove('hidden');
+    document.getElementById('pdfAttGrid').innerHTML = [
+      { b: s.workingDays, l: 'Working Days' },
+      { b: s.daysPresent, l: 'Days Present' },
+      { b: absent,        l: 'Days Absent'  },
+      { b: s.attPct + '%',l: 'Attendance %' }
+    ].map(c => `<div class="p-att-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+    document.getElementById('pdfAttPctLabel').textContent = s.attPct + '% — ' + attInfo.label;
+    document.getElementById('pdfAttBarFill').style.cssText = `width:${s.attPct}%;background:${attInfo.color}`;
+    document.getElementById('pdfAttNote').textContent = attInfo.remark.substring(0, 100) + '…';
+  } else {
+    attSec.style.display = 'none';
+    document.getElementById('pdfAttSection').classList.add('hidden');
+  }
+
   // Signatures & footer
   document.getElementById('sigTeacher').textContent = `Class ${s.cls} Teacher`;
   const now   = new Date();
@@ -1093,8 +1256,11 @@ function renderResult(student) {
 
   document.getElementById('pdfSummary').innerHTML = [
     { b:`${pct}%`, l:'Overall %' }, { b:grade, l:'Final Grade' },
-    { b:label,     l:'Performance' },{ b:passed ? 'PASS':'FAIL', l:'Result' }
+    { b:label,     l:'Performance' },{ b:passed ? 'PASS':'FAIL', l:'Result' },
+    ...(s.attPct !== null ? [{ b: s.attPct + '%', l: 'Attendance' }] : [])
   ].map(c => `<div class="p-sum-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+  // Update grid columns dynamically
+  document.getElementById('pdfSummary').style.gridTemplateColumns = s.attPct !== null ? 'repeat(5,1fr)' : 'repeat(4,1fr)';
 
   document.getElementById('pdfTable').innerHTML = `
     <thead><tr><th>Subject</th><th>Max</th><th>Obtained</th><th>%</th><th>Grade</th><th>Status</th></tr></thead>
@@ -1134,11 +1300,16 @@ async function downloadPDF() {
     const H     = pdf.internal.pageSize.getHeight();
     const imgData = canvas.toDataURL('image/jpeg', .97);
     const imgH  = (canvas.height * W) / canvas.width;
-    if (imgH <= H) {
-      pdf.addImage(imgData, 'JPEG', 0, 0, W, imgH);
+    const TOLERANCE = 1; // 1mm — prevents sub-pixel ghost page
+    if (imgH <= H + TOLERANCE) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, W, Math.min(imgH, H));
     } else {
       let y = 0;
-      while (y < imgH) { pdf.addImage(imgData, 'JPEG', 0, -y, W, imgH); y += H; if (y < imgH) pdf.addPage(); }
+      while (y < imgH - TOLERANCE) {
+        pdf.addImage(imgData, 'JPEG', 0, -y, W, imgH);
+        y += H;
+        if (y < imgH - TOLERANCE) pdf.addPage();
+      }
     }
     pdf.save(`ReportCard_${document.getElementById('genId').textContent}.pdf`);
   } catch (e) {
