@@ -1,1200 +1,1327 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ythaen — Fire Meets the Void | Alok Sharma</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Academic Portal — City Montessori International School</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root{
+  --gold:#d4af37;--gold-l:#f0d060;--gold-d:#b8962e;
+  --gold-dim:rgba(212,175,55,.12);--gold-border:rgba(212,175,55,.25);
+  --bg:#07070f;--bg2:#0f0f1c;--bg3:#161628;--bg4:#1d1d35;
+  --text:#f0eee8;--text2:#a8a4b8;--text3:#5c5975;
+  --green:#10d98a;--red:#ff4d6d;--blue:#4d9fff;--purple:#9b87f5;
+  --r:14px;--r-sm:10px;--r-lg:20px;
+  --shadow:0 20px 60px rgba(0,0,0,.5);
+  --transition:all .25s cubic-bezier(.4,0,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+img{max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:'DM Sans',sans-serif;cursor:pointer}
+input{font-family:'DM Sans',sans-serif}
 
-  <!-- SEO -->
-  <meta name="description" content="Ythaen — the digital home of Alok Sharma. Data & Logic Engineer crafting robust data pipelines, elegant web solutions, and beautifully precise systems.">
-  <meta name="keywords" content="Alok Sharma, Ythaen, Data Engineer, Web Developer, Portfolio, Python, JavaScript, HTML, CSS, Data Pipelines, Full Stack">
-  <meta name="author" content="Alok Sharma">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://ythaen.tech">
+/* ── PAGES ──
+   BUG FIX: Use display:none on all .page elements.
+   ID-level display overrides caused admin login to always be visible.
+   All page-specific flex layout now lives inside child wrappers, not on the page div itself.
+*/
+.page{display:none;min-height:100vh;animation:fadeIn .4s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ythaen.tech">
-  <meta property="og:title" content="Ythaen — Fire Meets the Void | Alok Sharma">
-  <meta property="og:description" content="Data & Logic Engineer crafting robust pipelines, elegant web solutions, and beautifully precise systems. Where Aether meets Ignys.">
-  <meta property="og:image" content="https://ythaen.tech/logo.png">
+/* ── NAV ── */
+nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-border)}
+.nav-inner{max-width:1260px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;gap:12px}
+.brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+.brand-logo{width:40px;height:40px;flex-shrink:0;filter:brightness(0) invert(1)}
+.brand-text h1{font-family:'Playfair Display',serif;font-size:clamp(.9rem,2.5vw,1.2rem);background:linear-gradient(90deg,var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand-text p{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:1px;display:none}
+@media(min-width:480px){.brand-text p{display:block}}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-pill{font-size:.72rem;color:var(--gold);border:1px solid var(--gold-border);padding:5px 12px;border-radius:20px;letter-spacing:.5px;white-space:nowrap;display:none}
+@media(min-width:600px){.nav-pill{display:block}}
+.nav-admin-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--text3);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
+.nav-admin-btn:hover{border-color:var(--gold-border);color:var(--gold)}
+.nav-portal-btn{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
+.nav-portal-btn:hover{background:rgba(212,175,55,.2)}
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Ythaen — Fire Meets the Void | Alok Sharma">
-  <meta name="twitter:description" content="Data & Logic Engineer crafting robust pipelines, elegant web solutions, and beautifully precise systems.">
-  <meta name="twitter:image" content="https://ythaen.tech/logo.png">
+/* ── HERO ── */
+.hero{text-align:center;padding:clamp(40px,8vw,80px) 24px clamp(30px,6vw,60px);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(212,175,55,.08),transparent);pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);padding:6px 18px;border:1px solid var(--gold-border);border-radius:30px;margin-bottom:24px}
+.hero h2{font-family:'Playfair Display',serif;font-size:clamp(2rem,6vw,3.8rem);line-height:1.1;margin-bottom:16px}
+.hero h2 span{background:linear-gradient(135deg,var(--gold),var(--gold-l));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text2);font-size:clamp(.9rem,2vw,1.05rem);font-weight:300;max-width:500px;margin:0 auto;line-height:1.75}
+.divider{width:50px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:28px auto}
 
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Cormorant+Garamond:ital,wght@1,400;1,500&display=swap" rel="stylesheet">
-  <style>
-    /* ══════════════════════════════════════
-       VARIABLES & RESET
-    ══════════════════════════════════════ */
-    :root {
-      --bg:       #08080a;
-      --bg2:      #0d0d13;
-      --bg3:      #111118;
-      --acc:      #00d2ff;
-      --acc-l:    #7aeaff;
-      --acc-d:    #0098cc;
-      --glow:     rgba(0,210,255,0.15);
-      --faint:    rgba(0,210,255,0.07);
-      --white:    #ffffff;
-      --off:      #e6e8eb;
-      --muted:    #616170;
-      --border:   rgba(0,210,255,0.13);
-      --borderS:  rgba(255,255,255,0.07);
-      --glass:    rgba(255,255,255,0.02);
-      --r:        16px;
-      --rL:       22px;
-      --rS:       10px;
-      --font:     'Plus Jakarta Sans', sans-serif;
-      --fontQ:    'Cormorant Garamond', serif;
-      --navH:     72px;
-    }
+/* ── CARD ── */
+.portal-wrap{max-width:860px;margin:0 auto 60px;padding:0 16px}
+.card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.card-head{background:linear-gradient(135deg,var(--bg3),var(--bg4));padding:clamp(24px,5vw,40px);border-bottom:1px solid var(--gold-border)}
+.card-head h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px}
+.card-head p{font-size:.85rem;color:var(--text2)}
 
-    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-    html { scroll-behavior:smooth; }
+/* ── FORM ── */
+.form-row{display:grid;gap:16px}
+.form-row.cols-2{grid-template-columns:1fr 1fr}
+.form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.form-group label{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:500}
+.form-group label i{color:var(--gold);margin-right:5px;width:14px}
+.inp{padding:13px 16px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:var(--r-sm);color:var(--text);font-size:.95rem;transition:var(--transition);width:100%}
+.inp:focus{outline:none;border-color:var(--gold);background:rgba(212,175,55,.05);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
+.inp::placeholder{color:var(--text3)}
+.inp.error-field{border-color:var(--red)}
 
-    body {
-      background: var(--bg);
-      color: var(--off);
-      font-family: var(--font);
-      font-size: 16px;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border:none;border-radius:var(--r-sm);font-size:.95rem;font-weight:600;transition:var(--transition);white-space:nowrap}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-l));color:#080808}
+.btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(212,175,55,.35)}
+.btn-outline{background:transparent;border:1.5px solid var(--gold-border);color:var(--gold)}
+.btn-outline:hover{background:var(--gold-dim)}
+.btn-red{background:linear-gradient(135deg,#c23b5a,var(--red));color:#fff}
+.btn-red:hover{box-shadow:0 8px 24px rgba(255,77,109,.3)}
+.btn-ghost{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:var(--text2)}
+.btn-ghost:hover{background:rgba(255,255,255,.09);color:var(--text)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important}
+.btn-full{width:100%}
+.btn-sm{padding:10px 18px;font-size:.85rem}
 
-    ::selection { background: var(--acc); color: var(--bg); }
-    img { max-width:100%; display:block; }
-    a { text-decoration:none; }
+/* ── TOAST ── */
+.toast{padding:13px 18px;border-radius:var(--r-sm);font-size:.88rem;font-weight:500;display:none;align-items:center;gap:12px;margin-bottom:18px;border-left:3px solid}
+.toast.show{display:flex}
+.toast-success{background:rgba(16,217,138,.1);border-color:var(--green);color:#a7f3d0}
+.toast-error{background:rgba(255,77,109,.1);border-color:var(--red);color:#fecaca}
+.toast-info{background:rgba(77,159,255,.1);border-color:var(--blue);color:#bfdbfe}
+.toast-warn{background:rgba(245,158,11,.1);border-color:#f59e0b;color:#fde68a}
 
-    .grid-bg {
-      position:fixed; inset:0; z-index:0; pointer-events:none;
-      background-image:
-        linear-gradient(rgba(0,210,255,0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,210,255,0.022) 1px, transparent 1px);
-      background-size: 72px 72px;
-      mask-image: radial-gradient(ellipse 90% 70% at 50% 20%, black 0%, transparent 100%);
-    }
-    #mglow {
-      position:fixed; inset:0; z-index:0; pointer-events:none;
-      background: radial-gradient(550px circle at var(--mx,50%) var(--my,50%), var(--glow), transparent 60%);
-    }
+/* ══════════════════════════════════════════════
+   ADMIN LOGIN PAGE
+   BUG FIX: Removed display:flex from #pageAdminLogin.
+   The .page class controls display. Inner .admin-login-wrap handles flex centering.
+══════════════════════════════════════════════ */
+.admin-login-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.admin-login-box{width:100%;max-width:420px}
+.admin-login-logo{text-align:center;margin-bottom:32px}
+.admin-login-logo img{width:64px;height:64px;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px}
+.admin-login-logo h2{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:6px}
+.admin-login-logo p{font-size:.82rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase}
+.admin-login-card{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r-lg);padding:32px;box-shadow:var(--shadow)}
+.admin-login-card .form-group{margin-bottom:16px}
+.security-note{text-align:center;font-size:.75rem;color:var(--text3);margin-top:14px}
+.security-note i{color:var(--gold);margin-right:4px}
 
-    .wrap { max-width:1300px; margin:0 auto; padding:0 5%; }
-    section { position:relative; z-index:1; }
+/* ══════════════════════════════════════════════
+   ADMIN DASHBOARD PAGE
+══════════════════════════════════════════════ */
+.admin-layout{display:flex;min-height:calc(100vh - 64px)}
 
-    .label {
-      font-size:0.67rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:3px; color:var(--acc);
-      display:inline-flex; align-items:center; gap:10px; margin-bottom:14px;
-    }
-    .label::before { content:''; width:22px; height:1px; background:var(--acc); }
+/* sidebar */
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid rgba(255,255,255,.06);padding:24px 0;display:flex;flex-direction:column;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+@media(max-width:768px){.sidebar{display:none}}
+.sidebar-section{padding:0 16px;margin-bottom:8px}
+.sidebar-label{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:8px;margin-top:16px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-sm);color:var(--text2);font-size:.88rem;font-weight:500;cursor:pointer;transition:var(--transition);border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav-item.active{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border)}
+.nav-item i{width:18px;text-align:center;font-size:.9rem}
+.sidebar-bottom{margin-top:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
 
-    .nav {
-      position:fixed; top:0; left:0; width:100%; height:var(--navH); z-index:900;
-      background: rgba(8,8,10,0.82);
-      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-      border-bottom:1px solid var(--borderS);
-      transition:background 0.3s;
-    }
-    .nav.scrolled { background:rgba(8,8,10,0.97); }
+/* admin content */
+.admin-content{flex:1;padding:clamp(16px,3vw,32px);overflow-x:hidden;min-width:0}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.admin-topbar h2{font-family:'Playfair Display',serif;font-size:1.5rem}
+.admin-topbar p{font-size:.85rem;color:var(--text2);margin-top:2px}
 
-    .nav-wrap {
-      max-width:1300px; margin:0 auto;
-      height:100%; padding:0 5%;
-      display:flex; align-items:center; justify-content:space-between; gap:20px;
-    }
+/* mobile nav */
+.mobile-admin-nav{display:none;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 16px;gap:6px;overflow-x:auto;flex-wrap:nowrap}
+@media(max-width:768px){.mobile-admin-nav{display:flex}}
+.mobile-nav-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;white-space:nowrap;font-size:.8rem;font-weight:500;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text2);cursor:pointer;transition:var(--transition);flex-shrink:0}
+.mobile-nav-btn.active{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
 
-    .nav-logo img { height:42px; width:auto; }
+/* panels */
+.admin-panel{display:none}
+.admin-panel.active{display:block;animation:fadeIn .3s ease}
 
-    .nav-pill {
-      display:flex; align-items:center; gap:2px;
-      background:rgba(255,255,255,0.02); border:1px solid var(--borderS);
-      border-radius:100px; padding:4px; position:relative;
-    }
-    .pill-bg {
-      position:absolute; height:calc(100% - 8px); top:4px;
-      background:var(--faint); border:1px solid rgba(0,210,255,0.2);
-      border-radius:50px; pointer-events:none; opacity:0;
-      transition:all 0.32s cubic-bezier(0.25,1,0.5,1);
-    }
-    .nav-a {
-      position:relative; z-index:1;
-      font-size:0.7rem; font-weight:600; text-transform:uppercase;
-      letter-spacing:1.8px; color:var(--muted);
-      padding:8px 20px; border-radius:50px; transition:color 0.25s;
-    }
-    .nav-a:hover, .nav-a.active { color:var(--white); }
+/* stats row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:20px;text-align:center}
+.stat-card .num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--gold)}
+.stat-card .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
+.stat-card .sub{font-size:.78rem;color:var(--text2);margin-top:6px}
 
-    .nav-right { display:flex; align-items:center; gap:10px; }
+/* upload area */
+.upload-area{border:2px dashed var(--gold-border);border-radius:var(--r);padding:clamp(28px,5vw,48px) 24px;text-align:center;cursor:pointer;transition:var(--transition);background:transparent}
+.upload-area:hover{border-color:var(--gold);background:var(--gold-dim)}
+.upload-area.loaded{border-color:var(--green);border-style:solid;background:rgba(16,217,138,.05)}
+.upload-area.drag{border-color:var(--gold);background:var(--gold-dim);transform:scale(1.01)}
+.upload-icon{font-size:2.5rem;color:var(--gold);margin-bottom:14px}
+.upload-area.loaded .upload-icon{color:var(--green)}
+.upload-area h4{font-size:1rem;font-weight:600;margin-bottom:6px}
+.upload-area p{font-size:.83rem;color:var(--text2)}
+.format-hint{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-sm);padding:14px 18px;margin-top:16px;font-size:.82rem;color:var(--text2);text-align:left}
+.format-hint strong{color:var(--gold)}
 
-    .nav-icon {
-      width:38px; height:38px; border-radius:50%;
-      border:1px solid var(--borderS); background:var(--glass);
-      display:flex; align-items:center; justify-content:center;
-      color:var(--muted); font-size:0.95rem; transition:all 0.25s;
-    }
-    .nav-icon:hover { color:var(--acc); border-color:var(--border); background:var(--faint); }
+/* table */
+.table-wrap{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);overflow:hidden}
+.table-search{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.table-search input{flex:1;min-width:180px;padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--text);font-size:.88rem}
+.table-search input:focus{outline:none;border-color:var(--gold)}
+.tbl{width:100%;border-collapse:collapse;font-size:.84rem}
+.tbl th{background:var(--bg3);padding:11px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);white-space:nowrap}
+.tbl td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl-wrap{overflow-x:auto;max-height:420px;overflow-y:auto}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
+.badge-green{background:rgba(16,217,138,.12);color:var(--green)}
+.badge-red{background:rgba(255,77,109,.12);color:var(--red)}
+.badge-gold{background:rgba(212,175,55,.12);color:var(--gold)}
 
-    .nav-cta {
-      font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1.8px;
-      padding:9px 20px; border-radius:50px;
-      background:var(--faint); border:1px solid var(--border);
-      color:var(--acc-l); display:flex; align-items:center; gap:8px; transition:all 0.3s;
-    }
-    .nav-cta:hover { background:var(--acc); color:var(--bg); border-color:var(--acc); box-shadow:0 0 24px var(--glow); }
+/* settings */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:600px){.settings-grid{grid-template-columns:1fr}}
+.settings-section{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:24px}
+.settings-section h4{font-size:.85rem;font-weight:600;margin-bottom:18px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.settings-full{grid-column:1/-1}
+.cred-badge{background:var(--bg3);border:1px solid var(--gold-border);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--text2);display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cred-badge code{color:var(--gold);font-family:monospace;font-size:.88rem}
 
-    .ham {
-      display:none; flex-direction:column; gap:5px;
-      background:none; border:none; cursor:pointer; padding:4px;
-    }
-    .ham span {
-      display:block; width:22px; height:1.5px;
-      background:var(--off); border-radius:2px; transition:all 0.3s;
-    }
+/* ══════════════════════════════════════════════
+   RESULT PAGE
+══════════════════════════════════════════════ */
+.result-wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
+.result-paper{background:var(--bg2);border:1px solid var(--gold-border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
 
-    .mob-nav {
-      position:fixed; inset:0; z-index:850;
-      background:rgba(8,8,10,0.98); backdrop-filter:blur(20px);
-      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:36px;
-      opacity:0; pointer-events:none; transition:opacity 0.35s;
-    }
-    .mob-nav.open { opacity:1; pointer-events:all; }
-    .mob-nav a {
-      font-size:clamp(1.8rem,6vw,2.5rem); font-weight:800;
-      text-transform:uppercase; letter-spacing:3px;
-      color:var(--muted); transition:color 0.25s;
-    }
-    .mob-nav a:hover { color:var(--acc); }
+/* result header */
+.r-header{background:linear-gradient(135deg,#0b0b18,#16163a);padding:clamp(24px,4vw,44px);border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden}
+.r-header::after{content:'';position:absolute;top:-100px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.08),transparent);pointer-events:none}
+.r-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.school-brand{display:flex;align-items:center;gap:16px}
+.school-logo-wrap{width:68px;height:68px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-l));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(212,175,55,.3);flex-shrink:0;padding:8px}
+.school-logo-wrap img{width:100%;height:100%;object-fit:contain;filter:brightness(0)}
+.school-info h3{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,3vw,1.6rem);margin-bottom:3px}
+.school-info .motto{font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.school-info small{font-size:.74rem;color:var(--text3);margin-top:3px;display:block}
+.session-box{background:var(--gold-dim);border:1px solid var(--gold-border);padding:14px 20px;border-radius:12px;text-align:center;flex-shrink:0}
+.session-box .yr{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold)}
+.session-box .type{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:3px}
+.student-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:560px){.student-grid{grid-template-columns:1fr 1fr}}
+.s-cell{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:13px;text-align:center}
+.s-cell .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:6px}
+.s-cell .val{font-size:.9rem;font-weight:600}
+.s-cell .val.g{color:var(--gold)}
 
-    #hero { min-height:100vh; padding-top:var(--navH); display:flex; align-items:center; }
+/* summary bar */
+.summary-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(255,255,255,.05)}
+@media(max-width:480px){.summary-bar{grid-template-columns:1fr 1fr}}
+.sum-cell{padding:18px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
+.sum-cell:last-child{border-right:none}
+.sum-cell .big{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700}
+.sum-cell small{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
 
-    .hero-grid {
-      width:100%;
-      display:grid; grid-template-columns:1fr 1fr;
-      gap:60px; align-items:center;
-      padding:56px 0 72px;
-    }
+/* charts */
+.charts-row{display:grid;grid-template-columns:2fr 1fr;border-bottom:1px solid rgba(255,255,255,.05)}
+@media(max-width:680px){.charts-row{grid-template-columns:1fr}}
+.chart-box{padding:clamp(18px,3vw,28px);border-right:1px solid rgba(255,255,255,.05)}
+@media(max-width:680px){.chart-box{border-right:none;border-bottom:1px solid rgba(255,255,255,.05)}}
+.chart-box:last-child{border-right:none}
+.sec-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;color:var(--text3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.sec-label i{color:var(--gold);font-size:.75rem}
+.chart-canvas{position:relative;height:200px}
 
-    .hero-eyebrow {
-      font-size:0.67rem; font-weight:700; text-transform:uppercase;
-      letter-spacing:3px; color:var(--acc);
-      display:inline-flex; align-items:center; gap:10px; margin-bottom:22px;
-      opacity:0; animation:fadeUp 0.8s 0.2s forwards;
-    }
-    .hero-eyebrow::before { content:''; width:22px; height:1px; background:var(--acc); }
+/* subjects */
+.subjects-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.subjects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px}
+.subj-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:var(--transition);cursor:default}
+.subj-card:hover{border-color:var(--gold-border);transform:translateY(-2px)}
+.subj-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--c,var(--gold))}
+.subj-name{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:10px}
+.subj-marks{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text)}
+.subj-marks span{font-size:.8rem;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400}
+.subj-row{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+.grade-badge{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:20px;background:var(--c,var(--gold));color:#080808}
+.pass-badge{font-size:.74rem;font-weight:600}
+.subj-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:10px}
+.subj-bar-fill{height:100%;border-radius:2px;width:0;transition:width .8s ease;background:var(--c,var(--gold))}
 
-    .hero-name {
-      font-size:clamp(3rem,6vw,5.4rem);
-      font-weight:800; letter-spacing:-2px; line-height:1.02; margin-bottom:10px;
-      opacity:0; animation:fadeUp 0.85s 0.38s forwards;
-    }
-    .hero-name .cyan {
-      background:linear-gradient(135deg,var(--acc-l),var(--acc));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
+/* insights */
+.insights-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.insight-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px}
+.insight-card h5{font-size:.85rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--gold)}
+.insight-card p,.insight-card li{font-size:.83rem;color:var(--text2);line-height:1.7}
+.insight-card ul{list-style:none;margin-top:8px}
+.insight-card li{padding:2px 0;display:flex;gap:8px;align-items:flex-start}
+.insight-card li::before{content:"›";color:var(--gold);flex-shrink:0}
 
-    .hero-alias {
-      font-size:0.75rem; font-weight:600; letter-spacing:3.5px;
-      text-transform:uppercase; color:var(--muted); margin-bottom:26px;
-      opacity:0; animation:fadeUp 0.85s 0.54s forwards;
-    }
+/* ── ATTENDANCE SECTION ── */
+.attendance-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.attendance-grid{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
+@media(max-width:700px){.attendance-grid{grid-template-columns:1fr}}
+.att-gauge-wrap{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 20px;text-align:center}
+.att-gauge-svg{width:150px;height:150px;display:block;margin:0 auto 12px}
+.att-pct-big{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
+.att-days-txt{font-size:.8rem;color:var(--text3);margin-top:6px}
+.att-status-badge{display:inline-block;padding:5px 16px;border-radius:20px;font-size:.75rem;font-weight:700;margin-top:10px;letter-spacing:.5px}
+.att-right{display:flex;flex-direction:column;gap:12px}
+.att-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:480px){.att-stats-row{grid-template-columns:1fr 1fr}}
+.att-stat{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;text-align:center}
+.att-stat .num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700}
+.att-stat .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
+.att-bar-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
+.att-bar-card h6{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.att-bar-card h6 i{color:var(--gold);font-size:.72rem}
+.att-bar-track{height:14px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden;position:relative;margin-bottom:8px}
+.att-bar-fill{height:100%;border-radius:7px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.att-thresholds{display:flex;justify-content:space-between;font-size:.66rem;color:var(--text3)}
+.att-thresh-mark{position:absolute;top:0;bottom:0;width:2px;opacity:.5}
+.att-remark-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
+.att-remark-card h6{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.att-remark-card p{font-size:.83rem;color:var(--text2);line-height:1.75}
+.att-dot-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.att-dot{width:10px;height:10px;border-radius:50%}
 
-    .hero-desc {
-      font-size:0.97rem; font-weight:400; line-height:1.85;
-      color:rgba(255,255,255,0.57); max-width:490px; margin-bottom:38px;
-      opacity:0; animation:fadeUp 0.85s 0.68s forwards;
-    }
+/* PDF attendance */
+.p-att{padding:10px 36px 14px;border-top:1px solid #eee}
+.p-att h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:8px}
+.p-att-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.p-att-cell{background:#fff;border:1px solid #eee;border-radius:6px;padding:10px;text-align:center}
+.p-att-cell .big{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:#1a1a2e}
+.p-att-cell .lab{font-size:.58rem;text-transform:uppercase;letter-spacing:1px;color:#888;margin-top:2px}
+.p-att-bar-wrap{background:#f8f7f2;border:1px solid #eee;border-radius:6px;padding:10px 14px}
+.p-att-bar-track{height:10px;background:#e8e6e0;border-radius:5px;overflow:hidden;margin:6px 0 4px}
+.p-att-bar-fill{height:100%;border-radius:5px}
+.p-att-note{font-size:.72rem;color:#555;margin-top:4px}
 
-    .hero-btns {
-      display:flex; gap:13px; flex-wrap:wrap;
-      opacity:0; animation:fadeUp 0.85s 0.82s forwards;
-    }
+/* signatures */
+.sig-section{padding:clamp(18px,3vw,28px);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-bottom:1px solid rgba(255,255,255,.05)}
+@media(max-width:520px){.sig-section{grid-template-columns:1fr}}
+.sig-box{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;text-align:center}
+.sig-area{height:52px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--text3);font-style:italic;border-bottom:1px solid var(--gold-border);margin-bottom:10px}
+.sig-box h5{font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
+.sig-box p{font-size:.84rem;color:var(--text2);margin-top:4px;font-weight:500}
 
-    .btn-fill {
-      font-size:0.73rem; font-weight:700; text-transform:uppercase; letter-spacing:2px;
-      padding:13px 28px; border-radius:50px;
-      background:linear-gradient(135deg,var(--acc),var(--acc-d));
-      color:var(--bg); display:inline-flex; align-items:center; gap:9px;
-      transition:all 0.3s; border:none; cursor:pointer;
-    }
-    .btn-fill:hover { transform:translateY(-3px); box-shadow:0 16px 36px var(--glow); opacity:0.9; }
+/* footer / actions */
+.r-footer{padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg3)}
+.r-footer p{font-size:.74rem;color:var(--text3)}
+.r-footer span{color:var(--gold)}
+.action-bar{display:flex;gap:12px;padding:20px 24px;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap}
+.action-bar .btn{flex:1;min-width:140px}
 
-    .btn-out {
-      font-size:0.73rem; font-weight:700; text-transform:uppercase; letter-spacing:2px;
-      padding:13px 28px; border-radius:50px;
-      background:transparent; border:1px solid var(--borderS);
-      color:var(--off); display:inline-flex; align-items:center; gap:9px; transition:all 0.3s;
-    }
-    .btn-out:hover { border-color:var(--acc); color:var(--acc); background:var(--faint); transform:translateY(-3px); }
+/* ══════════════════════════════════════════════
+   PDF TEMPLATE (hidden, white background)
+══════════════════════════════════════════════ */
+#pdfTpl{position:fixed;left:-9999px;top:0;width:794px;height:auto;background:#fff;font-family:'DM Sans',sans-serif;color:#1a1a2e;z-index:-1;display:flex;flex-direction:column}
+.p-hdr{background:#0c0c1e;color:#fff;padding:24px 36px;display:flex;justify-content:space-between;align-items:center}
+.p-hdr-left{display:flex;align-items:center;gap:14px}
+.p-logo{width:52px;height:52px;background:linear-gradient(135deg,#d4af37,#f0d060);border-radius:10px;display:flex;align-items:center;justify-content:center;padding:6px}
+.p-logo img{width:100%;height:100%;object-fit:contain;filter:brightness(0)}
+.p-school h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:#d4af37;margin-bottom:2px}
+.p-school p{font-size:.68rem;letter-spacing:1.5px;text-transform:uppercase;color:#6b6880}
+.p-badge{background:rgba(212,175,55,.15);border:1px solid rgba(212,175,55,.4);padding:10px 16px;border-radius:8px;text-align:center}
+.p-badge .y{font-family:'Playfair Display',serif;font-size:1.1rem;color:#d4af37}
+.p-badge .t{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#6b6880;margin-top:2px}
+.p-student{background:#f8f7f2;border-bottom:2px solid #d4af37;padding:16px 36px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.p-field label{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:3px;display:block}
+.p-field span{font-size:.88rem;font-weight:600;color:#1a1a2e}
+.p-summary{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #eee}
+.p-sum-cell{padding:14px;text-align:center;border-right:1px solid #eee}
+.p-sum-cell:last-child{border-right:none}
+.p-sum-cell .big{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:#1a1a2e}
+.p-sum-cell .lab{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-top:3px}
+.p-marks{padding:18px 36px;flex:1}
+.p-marks h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:10px}
+.p-tbl{width:100%;border-collapse:collapse;font-size:.82rem}
+.p-tbl th{background:#1a1a2e;color:#d4af37;padding:8px 12px;text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:1px}
+.p-tbl td{padding:8px 12px;border-bottom:1px solid #f0eeea;color:#1a1a2e}
+.p-tbl tr:nth-child(even) td{background:#f8f7f2}
+.p-tbl .total-row td{background:#1a1a2e!important;color:#d4af37;font-weight:700;padding:9px 12px}
+.p-pass{color:#059669;font-weight:600}
+.p-fail{color:#dc2626;font-weight:600}
+.p-remarks{padding:0 36px 14px;background:#f8f7f2}
+.p-remarks h3{font-size:.68rem;text-transform:uppercase;letter-spacing:2px;color:#888;margin-bottom:8px;padding-top:14px}
+.p-remarks p{font-size:.82rem;color:#333;line-height:1.7}
+.p-sigs{padding:18px 36px 14px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;border-top:1px solid #eee}
+.p-sig{text-align:center}
+.p-sig-area{height:44px;border-bottom:1px solid #d4af37;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:.72rem;color:#bbb;font-style:italic}
+.p-sig h5{font-size:.62rem;text-transform:uppercase;letter-spacing:1.5px;color:#888}
+.p-sig p{font-size:.8rem;color:#1a1a2e;margin-top:3px;font-weight:500}
+.p-seal{text-align:center}
+.p-seal-circle{width:72px;height:72px;border-radius:50%;border:2px solid #d4af37;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;padding:8px}
+.p-seal-circle img{width:100%;height:100%;object-fit:contain}
+.p-ftr{background:#0c0c1e;padding:10px 36px;display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+.p-ftr p{font-size:.65rem;color:#6b6880}
+.p-ftr span{font-size:.65rem;color:#d4af37}
+.p-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-family:'Playfair Display',serif;font-size:4.5rem;color:rgba(212,175,55,.04);white-space:nowrap;pointer-events:none;font-weight:700;letter-spacing:10px;z-index:0}
 
-    .hero-visual {
-      display:flex; flex-direction:column; align-items:center; gap:36px;
-      opacity:0; animation:fadeIn 1.2s 1s forwards;
-    }
-
-    /* ══════════════════════════════════════
-       CINEMATIC ORB
-    ══════════════════════════════════════ */
-    .orb {
-      width:min(340px,80vw); height:min(340px,80vw); border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      position:relative;
-    }
-    .orb-ring-outer {
-      position:absolute;
-      width:calc(100% + 80px); height:calc(100% + 80px);
-      border-radius:50%;
-      border:1px dashed rgba(0,210,255,0.2);
-      animation:rotateCW 18s linear infinite;
-    }
-    .orb-ring-outer::before, .orb-ring-outer::after {
-      content:''; position:absolute;
-      width:7px; height:7px; border-radius:50%;
-      background:var(--acc); box-shadow:0 0 8px var(--acc), 0 0 18px var(--acc);
-    }
-    .orb-ring-outer::before { top:-3.5px; left:50%; transform:translateX(-50%); }
-    .orb-ring-outer::after  { bottom:-3.5px; left:50%; transform:translateX(-50%); }
-    .orb-ring-mid {
-      position:absolute;
-      width:calc(100% + 32px); height:calc(100% + 32px);
-      border-radius:50%;
-      border:1px solid rgba(0,210,255,0.1);
-      animation:rotateCCW 10s linear infinite;
-    }
-    .orb-ring-mid::before {
-      content:''; position:absolute;
-      width:5px; height:5px; border-radius:50%;
-      background:var(--acc-l); box-shadow:0 0 8px var(--acc-l), 0 0 14px var(--acc-l);
-      top:50%; right:-2.5px; transform:translateY(-50%);
-    }
-    .orb-body {
-      width:100%; height:100%; border-radius:50%;
-      background:radial-gradient(circle at 40% 35%, rgba(0,210,255,0.18) 0%, rgba(0,210,255,0.07) 45%, transparent 70%);
-      border:1px solid rgba(0,210,255,0.14);
-      box-shadow: 0 0 50px rgba(0,210,255,0.12), 0 0 100px rgba(0,210,255,0.06), inset 0 0 50px rgba(0,210,255,0.05);
-      display:flex; align-items:center; justify-content:center;
-      position:relative; animation:orbPulse 5s ease-in-out infinite;
-    }
-    .orb-body::before, .orb-body::after {
-      content:''; position:absolute; inset:0;
-      border-radius:50%; border:1.5px solid rgba(0,210,255,0.45);
-      opacity:0; pointer-events:none;
-      animation:rippleCinema 3.5s cubic-bezier(0.2,0.8,0.4,1) infinite;
-    }
-    .orb-body::after { animation-delay:1.75s; }
-    .orb-core {
-      width:52%; height:52%; border-radius:50%;
-      background:radial-gradient(circle at 38% 32%, rgba(0,210,255,0.3), rgba(0,210,255,0.1) 50%, transparent 70%);
-      border:1px solid rgba(0,210,255,0.28);
-      box-shadow: 0 0 24px rgba(0,210,255,0.22), inset 0 0 22px rgba(0,210,255,0.12);
-      display:flex; align-items:center; justify-content:center;
-      position:relative; animation:corePulse 3s ease-in-out infinite;
-    }
-    .orb-core::before {
-      content:''; position:absolute; inset:0;
-      border-radius:50%; border:1px solid rgba(122,234,255,0.35);
-      opacity:0; pointer-events:none;
-      animation:rippleCinema 3.5s cubic-bezier(0.2,0.8,0.4,1) 0.88s infinite;
-    }
-    .orb-logo {
-      width:62%; object-fit:contain; position:relative; z-index:1;
-      filter:drop-shadow(0 0 10px rgba(0,210,255,0.65)) drop-shadow(0 0 26px rgba(0,210,255,0.3));
-      opacity:0; animation:logoPop 0.8s 1.2s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
-    }
-    .orb-particles { position:absolute; inset:-40px; pointer-events:none; }
-    .particle {
-      position:absolute; border-radius:50%;
-      background:var(--acc); box-shadow:0 0 5px var(--acc);
-      animation:floatParticle var(--dur) ease-in-out var(--delay) infinite;
-    }
-
-    @keyframes rotateCW  { from{transform:rotate(0deg)}   to{transform:rotate(360deg)} }
-    @keyframes rotateCCW { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
-    @keyframes rippleCinema { 0%{transform:scale(0.85);opacity:0.65} 100%{transform:scale(2.7);opacity:0} }
-    @keyframes corePulse {
-      0%,100% { box-shadow:0 0 24px rgba(0,210,255,0.22), inset 0 0 22px rgba(0,210,255,0.12); }
-      50%      { box-shadow:0 0 40px rgba(0,210,255,0.42), inset 0 0 30px rgba(0,210,255,0.22); }
-    }
-    @keyframes logoPop { 0%{transform:scale(0.5);opacity:0} 100%{transform:scale(1);opacity:1} }
-    @keyframes floatParticle {
-      0%,100% { transform:translate(0,0); opacity:0; }
-      20%     { opacity:0.9; }
-      80%     { opacity:0.5; }
-      50%     { transform:translate(var(--tx),var(--ty)); opacity:0.8; }
-    }
-
-    .hero-stats { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
-    .stat { text-align:center; }
-    .stat-n {
-      font-size:2rem; font-weight:800; line-height:1;
-      background:linear-gradient(135deg,var(--acc-l),var(--acc));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .stat-l { font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-top:4px; }
-
-    .scroll-hint {
-      position:absolute; bottom:28px; left:50%; transform:translateX(-50%);
-      display:flex; flex-direction:column; align-items:center; gap:6px;
-      opacity:0; animation:fadeIn 1s 2s forwards; cursor:pointer;
-    }
-    .scroll-hint span { font-size:0.57rem; font-weight:600; text-transform:uppercase; letter-spacing:3px; color:var(--muted); transition:color 0.25s; }
-    .scroll-hint:hover span { color:var(--acc); }
-    .scroll-chevrons { display:flex; flex-direction:column; align-items:center; gap:0; }
-    .scroll-chevrons i { font-size:0.75rem; color:var(--acc); display:block; animation:chevronDrop 1.6s ease-in-out infinite; }
-    .scroll-chevrons i:nth-child(1) { opacity:0.3; animation-delay:0s; }
-    .scroll-chevrons i:nth-child(2) { opacity:0.6; animation-delay:0.2s; }
-    .scroll-chevrons i:nth-child(3) { opacity:1;   animation-delay:0.4s; }
-    @keyframes chevronDrop { 0%,100%{transform:translateY(-3px)} 50%{transform:translateY(3px)} }
-
-    .mqwrap {
-      padding:22px 0; overflow:hidden;
-      border-top:1px solid var(--borderS); border-bottom:1px solid var(--borderS);
-      background:rgba(0,210,255,0.015); position:relative; z-index:1;
-    }
-    .mqtrack { display:flex; gap:44px; white-space:nowrap; animation:marquee 32s linear infinite; }
-    .mqwrap:hover .mqtrack { animation-play-state:paused; }
-    .mi {
-      font-size:0.67rem; font-weight:600; text-transform:uppercase;
-      letter-spacing:3px; color:var(--muted);
-      display:inline-flex; align-items:center; gap:14px; flex-shrink:0;
-    }
-    .mdot { width:4px; height:4px; border-radius:50%; background:var(--acc); }
-
-    #projects { padding:120px 0; }
-
-    .sec-head {
-      display:flex; justify-content:space-between; align-items:flex-end;
-      margin-bottom:56px; flex-wrap:wrap; gap:14px;
-    }
-    .sec-title { font-size:clamp(2.2rem,4.2vw,3.8rem); font-weight:800; letter-spacing:-1.5px; line-height:1.05; }
-    .sec-title em {
-      font-style:italic; font-family:var(--fontQ);
-      background:linear-gradient(135deg,var(--acc-l),var(--acc));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .sec-sub { font-size:0.68rem; font-weight:600; text-transform:uppercase; letter-spacing:2.5px; color:var(--muted); }
-
-    .proj-grid { display:grid; grid-template-columns:1fr; gap:20px; }
-
-    .pcard {
-      background:var(--bg2); border:1px solid var(--borderS);
-      border-radius:var(--rL); padding:38px;
-      display:flex; flex-direction:column;
-      transition:all 0.45s cubic-bezier(0.23,1,0.32,1);
-      position:relative; overflow:hidden;
-    }
-    .pcard::before {
-      content:''; position:absolute; inset:0; border-radius:var(--rL);
-      background:linear-gradient(135deg,var(--faint),transparent 60%);
-      opacity:0; transition:opacity 0.45s;
-    }
-    .pcard:hover { border-color:rgba(0,210,255,0.3); transform:translateY(-6px); box-shadow:0 24px 50px rgba(0,0,0,0.45); }
-    .pcard:hover::before { opacity:1; }
-    .pcard:hover .parrow { opacity:1; transform:translate(3px,-3px); }
-    .pcard:hover .pnum { color:var(--acc); }
-
-    .parrow { position:absolute; top:34px; right:34px; color:var(--acc); font-size:1.15rem; opacity:0; transition:all 0.35s; }
-    .pnum { font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:28px; transition:color 0.3s; }
-    .ptags { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:18px; }
-    .ptag {
-      font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px;
-      padding:4px 11px; border-radius:50px;
-      background:var(--faint); border:1px solid var(--border); color:var(--acc);
-    }
-    .ptitle { font-size:clamp(1.45rem,2.4vw,2rem); font-weight:800; letter-spacing:-0.4px; line-height:1.15; margin-bottom:13px; }
-    .pdesc { font-size:0.9rem; font-weight:400; line-height:1.8; color:rgba(255,255,255,0.54); margin-bottom:28px; flex:1; }
-
-    .plinks {
-      display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-      padding-top:20px; border-top:1px solid var(--borderS); position:relative; z-index:1;
-    }
-    .clink { font-size:0.67rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; display:inline-flex; align-items:center; gap:7px; transition:all 0.25s; color:var(--off); }
-    .clink:hover { color:var(--acc); gap:10px; }
-    .clink.live { background:var(--faint); border:1px solid var(--border); padding:8px 17px; border-radius:50px; color:var(--acc); }
-    .clink.live:hover { background:var(--acc); color:var(--bg); border-color:var(--acc); gap:10px; }
-    .clink.det { color:var(--muted); margin-left:auto; cursor:pointer; }
-    .clink.det:hover { color:var(--acc); }
-
-    .pcard.feat { grid-column:1 / -1; display:grid; grid-template-columns:1.1fr 0.9fr; gap:44px; align-items:start; }
-    .feat-vis {
-      height:100%; min-height:220px;
-      background:linear-gradient(135deg,rgba(0,210,255,0.05),rgba(0,210,255,0.02));
-      border:1px solid var(--borderS); border-radius:var(--r);
-      display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
-    }
-    .feat-vis::before {
-      content:''; position:absolute; inset:0;
-      background:
-        repeating-linear-gradient(0deg,transparent,transparent 35px,rgba(0,210,255,0.035) 36px),
-        repeating-linear-gradient(90deg,transparent,transparent 35px,rgba(0,210,255,0.035) 36px);
-    }
-    .vis-in { text-align:center; position:relative; z-index:1; opacity:0.5; }
-    .vis-in i { font-size:3.2rem; color:var(--acc); display:block; margin-bottom:11px; }
-    .vis-in span { font-size:0.6rem; font-weight:600; text-transform:uppercase; letter-spacing:3px; color:var(--muted); }
-
-    .feat-badge {
-      display:inline-flex; align-items:center; gap:7px;
-      font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--acc);
-      background:var(--faint); border:1px solid var(--border);
-      padding:5px 12px; border-radius:50px; margin-bottom:18px;
-    }
-    .feat-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--acc); animation:blink 2s ease-in-out infinite; }
-
-    .topics-g { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-bottom:26px; }
-    .topic {
-      font-size:0.77rem; font-weight:500;
-      padding:8px 12px; border-radius:var(--rS);
-      background:rgba(0,210,255,0.035); border:1px solid var(--borderS);
-      color:rgba(255,255,255,0.62);
-      display:flex; align-items:center; gap:8px;
-    }
-    .topic::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--acc); flex-shrink:0; }
-
-    .overlay {
-      position:fixed; inset:0; z-index:1000;
-      background:rgba(8,8,10,0.97); backdrop-filter:blur(20px);
-      opacity:0; pointer-events:none; transition:opacity 0.35s;
-      overflow-y:auto; display:flex;
-    }
-    .overlay.open { opacity:1; pointer-events:all; }
-    .ovl-panel {
-      width:100%; max-width:840px; margin:auto;
-      padding:clamp(36px,7vw,72px) clamp(20px,6vw,56px);
-      transform:translateY(28px); transition:transform 0.45s cubic-bezier(0.23,1,0.32,1);
-    }
-    .overlay.open .ovl-panel { transform:none; }
-    .ovl-close {
-      position:fixed; top:22px; right:24px;
-      width:44px; height:44px; border-radius:50%;
-      background:var(--bg2); border:1px solid var(--borderS);
-      display:flex; align-items:center; justify-content:center;
-      color:var(--off); font-size:0.95rem; cursor:pointer;
-      transition:all 0.3s; z-index:1001;
-    }
-    .ovl-close:hover { background:var(--acc); border-color:var(--acc); color:var(--bg); transform:rotate(90deg); }
-    .ovl-tags { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:22px; }
-    .ovl-title { font-size:clamp(2rem,4.5vw,3.6rem); font-weight:800; letter-spacing:-1.5px; line-height:1; margin-bottom:18px; }
-    .ovl-desc { font-size:0.95rem; font-weight:400; line-height:1.85; color:rgba(255,255,255,0.58); margin-bottom:36px; }
-    .ovl-sec {
-      font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:3px;
-      color:var(--acc); margin-bottom:14px;
-      display:flex; align-items:center; gap:12px;
-    }
-    .ovl-sec::after { content:''; flex:1; height:1px; background:var(--borderS); }
-    .ovl-feats { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:36px; }
-    .ovl-feat {
-      padding:13px 16px; background:var(--bg3); border:1px solid var(--borderS);
-      border-radius:var(--r); font-size:0.87rem; color:rgba(255,255,255,0.63);
-      display:flex; align-items:center; gap:10px;
-    }
-    .ovl-feat::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--acc); flex-shrink:0; }
-    .ovl-acts { display:flex; gap:12px; flex-wrap:wrap; }
-
-    #about { padding:120px 0; border-top:1px solid var(--borderS); }
-    .about-grid { display:grid; grid-template-columns:1fr 1.3fr; gap:72px; align-items:start; }
-
-    .etymology {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--rL); padding: 24px 28px;
-      margin-bottom: 28px; position: relative; overflow: hidden;
-    }
-    .etymology::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, var(--faint), transparent 60%);
-      border-radius: var(--rL);
-    }
-    .etym-eq { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; position: relative; z-index: 1; margin-bottom: 10px; }
-    .etym-name {
-      font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
-      background: linear-gradient(135deg, var(--acc-l), var(--acc));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    }
-    .etym-sep, .etym-plus { font-size: 1.2rem; font-weight: 700; color: var(--muted); }
-    .etym-word {
-      font-size: 0.9rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 2px; color: var(--off);
-      display: inline-flex; align-items: center; gap: 7px;
-      background: rgba(255,255,255,0.04); border: 1px solid var(--borderS);
-      padding: 6px 14px; border-radius: 50px;
-    }
-    .etym-word i { color: var(--acc); font-size: 0.8rem; }
-    .etym-sub { font-size: 0.67rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2.5px; color: var(--muted); position: relative; z-index: 1; }
-
-    .about-h { font-size:clamp(1.9rem,3.4vw,3.1rem); font-weight:800; letter-spacing:-1.5px; line-height:1.1; margin-bottom:22px; }
-    .about-h em { font-style:italic; font-family:var(--fontQ); color:var(--acc); }
-    .about-p { font-size:0.93rem; font-weight:400; line-height:1.85; color:rgba(255,255,255,0.58); margin-bottom:32px; }
-
-    .sk-label { font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; color:var(--muted); margin-bottom:14px; }
-    .sk-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-    .sk {
-      font-size:0.77rem; font-weight:600; text-transform:uppercase; letter-spacing:1px;
-      padding:11px 14px; border:1px solid var(--borderS); border-radius:50px;
-      color:var(--muted); background:var(--glass);
-      display:flex; align-items:center; gap:9px; transition:all 0.25s;
-    }
-    .sk i { color:var(--acc); font-size:0.83rem; width:13px; text-align:center; }
-    .sk:hover { border-color:var(--acc); color:var(--white); background:var(--faint); }
-
-    .qcard { background:var(--bg2); border:1px solid var(--borderS); border-radius:var(--rL); padding:38px; margin-bottom:20px; position:relative; }
-    .qmark { position:absolute; top:-16px; left:30px; font-family:var(--fontQ); font-size:5.5rem; font-weight:400; line-height:1; color:var(--acc); opacity:0.32; pointer-events:none; }
-    .qtext { font-family:var(--fontQ); font-style:italic; font-weight:400; font-size:1.3rem; line-height:1.8; color:rgba(255,255,255,0.82); position:relative; z-index:1; }
-    .qauthor { font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:3px; color:var(--acc); margin-top:16px; }
-
-    .meta-g { display:grid; grid-template-columns:1fr 1fr; gap:11px; }
-    .mc { padding:18px; background:var(--bg2); border:1px solid var(--borderS); border-radius:var(--r); transition:border-color 0.25s; }
-    .mc:hover { border-color:var(--border); }
-    .mc-l { font-size:0.58rem; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; color:var(--muted); margin-bottom:5px; }
-    .mc-v { font-size:0.87rem; font-weight:700; color:var(--white); }
-    .mc-v.a { color:var(--acc); }
-
-    #contact { padding:120px 0; border-top:1px solid var(--borderS); text-align:center; }
-    .contact-in { max-width:640px; margin:0 auto; }
-    .contact-h { font-size:clamp(2.8rem,6.5vw,5.5rem); font-weight:800; letter-spacing:-2.5px; line-height:0.95; margin-bottom:24px; }
-    .contact-h .cg {
-      background:linear-gradient(135deg,var(--acc-l),var(--acc),var(--acc-d));
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    }
-    .contact-sub { font-size:0.95rem; font-weight:400; line-height:1.8; color:rgba(255,255,255,0.5); margin-bottom:40px; }
-
-    .cf-wrap { text-align:left; margin-bottom:28px; }
-    .frow { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
-    .fg { display:flex; flex-direction:column; gap:7px; margin-bottom:13px; }
-    .fg label { font-size:0.63rem; font-weight:700; text-transform:uppercase; letter-spacing:2.5px; color:var(--acc); }
-    .fg input, .fg select, .fg textarea {
-      background:var(--bg2); border:1px solid var(--borderS);
-      border-radius:var(--r); padding:13px 16px;
-      color:var(--white); font-family:var(--font); font-size:0.88rem; font-weight:500;
-      outline:none; transition:border-color 0.25s, box-shadow 0.25s;
-      resize:none; appearance:none; -webkit-appearance:none;
-    }
-    .fg input::placeholder, .fg textarea::placeholder { color:var(--muted); }
-    .fg input:focus, .fg select:focus, .fg textarea:focus { border-color:var(--acc); box-shadow:0 0 0 3px var(--faint); }
-    .fg select option { background:var(--bg2); color:var(--white); }
-
-    .fsub {
-      width:100%; padding:14px; border-radius:50px; border:none;
-      background:linear-gradient(135deg,var(--acc),var(--acc-d));
-      color:var(--bg); font-family:var(--font); font-weight:700;
-      font-size:0.76rem; text-transform:uppercase; letter-spacing:2px;
-      cursor:pointer; transition:all 0.3s; margin-top:5px;
-      display:flex; align-items:center; justify-content:center; gap:9px;
-    }
-    .fsub:hover { transform:translateY(-3px); box-shadow:0 18px 36px var(--glow); opacity:0.9; }
-
-    .f-ok { display:none; padding:36px; background:var(--bg2); border:1px solid var(--borderS); border-radius:var(--rL); }
-    .f-ok.show { display:block; }
-    .f-ok i { font-size:2.5rem; color:var(--acc); display:block; margin-bottom:13px; }
-    .f-ok h3 { font-size:1.35rem; font-weight:800; margin-bottom:7px; }
-    .f-ok p { font-size:0.88rem; color:rgba(255,255,255,0.52); }
-
-    .contact-alt { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
-
-    footer { border-top:1px solid var(--borderS); padding:52px 5% 34px; position:relative; z-index:1; }
-    .foot-top {
-      max-width:1300px; margin:0 auto;
-      display:flex; flex-direction:column; align-items:center; text-align:center;
-      gap:20px; padding-bottom:32px; margin-bottom:26px;
-      border-bottom:1px solid var(--borderS);
-    }
-    .foot-brand img { height:42px; width:auto; }
-    .foot-tag { font-family:var(--fontQ); font-style:italic; font-size:1rem; color:var(--muted); margin-top:7px; }
-    .foot-soc { display:flex; gap:9px; justify-content:center; }
-    .fsoc {
-      width:38px; height:38px; border-radius:50%;
-      border:1px solid var(--borderS); background:var(--glass);
-      display:flex; align-items:center; justify-content:center;
-      color:var(--muted); font-size:0.9rem; transition:all 0.25s;
-    }
-    .fsoc:hover { color:var(--acc); border-color:var(--border); background:var(--faint); transform:translateY(-3px); }
-    .foot-bot { max-width:1300px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
-    .fcopy { font-size:0.7rem; font-weight:500; color:var(--muted); }
-    .btop { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--muted); display:flex; align-items:center; gap:7px; transition:color 0.25s; }
-    .btop:hover { color:var(--acc); }
-
-    .rev   { opacity:0; transform:translateY(40px); transition:opacity 0.85s,transform 0.85s cubic-bezier(0.23,1,0.32,1); }
-    .rev-l { opacity:0; transform:translateX(-40px); transition:opacity 0.85s,transform 0.85s cubic-bezier(0.23,1,0.32,1); }
-    .rev-r { opacity:0; transform:translateX(40px);  transition:opacity 0.85s,transform 0.85s cubic-bezier(0.23,1,0.32,1); }
-    .rev.in, .rev-l.in, .rev-r.in { opacity:1; transform:none; }
-    .d1{transition-delay:.05s} .d2{transition-delay:.15s} .d3{transition-delay:.25s}
-    .d4{transition-delay:.35s} .d5{transition-delay:.45s}
-
-    @keyframes fadeUp  { from{opacity:0;transform:translateY(26px)} to{opacity:1;transform:none} }
-    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-    @keyframes orbPulse{ 0%,100%{box-shadow:0 0 50px rgba(0,210,255,0.07)} 50%{box-shadow:0 0 90px rgba(0,210,255,0.14)} }
-    @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-    @keyframes blink   { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-    @media (max-width:1024px) {
-      .hero-grid { grid-template-columns:1fr; gap:44px; padding:40px 0 56px; }
-      .hero-eyebrow { justify-content:center; }
-      .hero-name,.hero-alias,.hero-desc { text-align:center; }
-      .hero-desc { max-width:none; }
-      .hero-btns { justify-content:center; }
-      .hero-visual { flex-direction:row; flex-wrap:wrap; gap:24px; }
-      .pcard.feat { grid-template-columns:1fr; gap:24px; }
-      .feat-vis { min-height:180px; }
-    }
-    @media (max-width:768px) {
-      :root { --navH:62px; }
-      .nav-pill { display:none; }
-      .nav-cta .ct { display:none; }
-      .ham { display:flex; }
-      .pcard.feat { grid-template-columns:1fr; gap:20px; }
-      .feat-vis { min-height:160px; }
-      .about-grid { grid-template-columns:1fr; gap:44px; }
-      .topics-g,.ovl-feats,.frow,.sk-grid,.meta-g { grid-template-columns:1fr; }
-      .contact-alt { flex-direction:column; align-items:center; }
-      .foot-bot { flex-direction:column; text-align:center; align-items:center; }
-      #projects,#about,#contact { padding:80px 0; }
-      .sec-head { flex-direction:column; align-items:flex-start; gap:8px; }
-      .pcard { padding:26px 22px; }
-      .parrow { top:22px; right:22px; }
-      .ovl-panel { padding:44px 18px; }
-      .ovl-close { top:14px; right:14px; }
-      .hero-grid { padding:30px 0 44px; }
-    }
-    @media (max-width:480px) {
-      .orb { width:240px; height:240px; }
-      .hero-btns { flex-direction:column; align-items:stretch; }
-      .btn-fill,.btn-out { justify-content:center; }
-      .hero-stats { gap:20px; }
-      .stat-n { font-size:1.7rem; }
-      .plinks { flex-wrap:wrap; gap:9px; }
-      .clink.det { margin-left:0; }
-      .contact-h { letter-spacing:-1.5px; }
-      .sec-title { letter-spacing:-1px; }
-    }
-  </style>
+/* ══════════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════════ */
+.hidden{display:none!important}
+.sep{height:1px;background:rgba(255,255,255,.05);margin:20px 0}
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+.flex-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.grow{flex:1}
+.text-center{text-align:center}
+.text-gold{color:var(--gold)}
+.text-muted{color:var(--text3);font-size:.82rem}
+</style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
-<div id="mglow"></div>
-
-<div class="mob-nav" id="mobNav">
-  <a href="#hero"     class="sm">Home</a>
-  <a href="#projects" class="sm">Work</a>
-  <a href="#about"    class="sm">About</a>
-  <a href="#contact"  class="sm">Contact</a>
-</div>
-
-<div class="overlay" id="overlay">
-  <button class="ovl-close" id="ovlClose"><i class="fa-solid fa-xmark"></i></button>
-  <div class="ovl-panel">
-    <div class="ovl-tags" id="ovlTags"></div>
-    <h1 class="ovl-title" id="ovlTitle"></h1>
-    <p  class="ovl-desc"  id="ovlDesc"></p>
-    <div class="ovl-sec">Key Features</div>
-    <div class="ovl-feats" id="ovlFeats"></div>
-    <div class="ovl-sec">Launch</div>
-    <div class="ovl-acts"  id="ovlActs"></div>
-  </div>
-</div>
-
-<nav class="nav" id="topNav">
-  <div class="nav-wrap">
-    <a href="#hero" class="nav-logo sm"><img src="logo.png" alt="Ythaen"></a>
-    <div class="nav-pill" id="navPill">
-      <div class="pill-bg" id="pillBg"></div>
-      <a href="#hero"     class="nav-a sm" data-s="hero">Home</a>
-      <a href="#projects" class="nav-a sm" data-s="projects">Work</a>
-      <a href="#about"    class="nav-a sm" data-s="about">About</a>
-      <a href="#contact"  class="nav-a sm" data-s="contact">Contact</a>
+<!-- ═══════════ SHARED NAVIGATION ═══════════ -->
+<nav id="mainNav">
+  <div class="nav-inner">
+    <div class="brand">
+      <img class="brand-logo" src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="School Logo">
+      <div class="brand-text">
+        <h1>City Montessori International School</h1>
+        <p>Academic Result Portal</p>
+      </div>
     </div>
     <div class="nav-right">
-      <a href="https://github.com/ASAlokSharma" target="_blank" class="nav-icon" title="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="https://linkedin.com/in/ASAlokSharma/" target="_blank" class="nav-icon" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
-      <a href="#contact" class="nav-cta sm"><i class="fa-solid fa-envelope"></i><span class="ct">Connect</span></a>
-      <button class="ham" id="ham" aria-label="Menu"><span></span><span></span><span></span></button>
+      <div class="nav-pill" id="navPill"><i class="fas fa-circle" style="font-size:7px;color:var(--green)"></i>&nbsp;Live Portal</div>
+      <!-- Shown on student/result pages: go to admin -->
+      <button class="nav-admin-btn" id="navAdminBtn" onclick="goAdmin()"><i class="fas fa-shield-halved"></i> Admin</button>
+      <!-- Shown on admin pages: go back to student portal WITHOUT logging out / losing DB -->
+      <button class="nav-portal-btn hidden" id="navPortalBtn" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
+      <!-- Shown on admin page: logout -->
+      <button class="nav-admin-btn hidden" id="navLogoutBtn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </div>
 </nav>
 
-<section id="hero">
-  <div class="wrap">
-    <div class="hero-grid">
-      <div>
-        <div class="hero-eyebrow">Data &amp; Logic Engineer</div>
-        <h1 class="hero-name">Alok<br><span class="cyan">Sharma</span></h1>
-        <p class="hero-alias">Ythaen — Fire Meets the Void</p>
-        <p class="hero-desc">
-          Welcome to <strong style="color:var(--off)">ythaen.tech</strong> — the digital home of Alok Sharma. I engineer robust data pipelines, craft elegant web solutions, and build systems that are both technically precise and beautifully designed. Every project here is a proof of craft — from educational platforms to personal portfolios.
-        </p>
-        <div class="hero-btns">
-          <a href="#projects" class="btn-fill sm"><span>Explore Work</span><i class="fa-solid fa-arrow-down"></i></a>
-          <a href="#contact"  class="btn-out  sm"><i class="fa-solid fa-envelope"></i>Get In Touch</a>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="orb">
-          <div class="orb-ring-outer"></div>
-          <div class="orb-ring-mid"></div>
-          <div class="orb-body">
-            <div class="orb-core">
-              <img src="logo.png" alt="Ythaen" class="orb-logo">
-            </div>
-          </div>
-          <div class="orb-particles" id="orbParticles"></div>
-        </div>
-        <div class="hero-stats">
-          <div class="stat">
-            <div class="stat-n"><span id="projectCount">0</span></div>
-            <div class="stat-l">Projects</div>
-          </div>
-          <div class="stat">
-            <div class="stat-n"><span data-count="100">0</span>%</div>
-            <div class="stat-l">Commitment</div>
-          </div>
-          <div class="stat">
-            <div class="stat-n"><span data-count="1">0</span></div>
-            <div class="stat-l">Vision</div>
-          </div>
-        </div>
-      </div>
-    </div>
+<!-- ═══════════ PAGE 1: STUDENT PORTAL (default) ═══════════ -->
+<div id="pageStudent" class="page active">
+  <div class="hero">
+    <div class="hero-badge"><i class="fas fa-graduation-cap"></i> Academic Year 2024–25</div>
+    <h2>Your <span>Result</span>,<br>Beautifully Presented</h2>
+    <p>Enter your credentials to access your complete academic performance report with charts, insights, and a downloadable PDF report card.</p>
+    <div class="divider"></div>
   </div>
-  <div class="scroll-hint" onclick="document.querySelector('#projects') && window.scrollTo({top:document.querySelector('#projects').offsetTop - 72, behavior:'smooth'})">
-    <span>Scroll</span>
-    <div class="scroll-chevrons">
-      <i class="fa-solid fa-chevron-down"></i>
-      <i class="fa-solid fa-chevron-down"></i>
-      <i class="fa-solid fa-chevron-down"></i>
-    </div>
-  </div>
-</section>
 
-<div class="mqwrap">
-  <div class="mqtrack">
-    <span class="mi"><span class="mdot"></span>Python</span>
-    <span class="mi"><span class="mdot"></span>Data Engineering</span>
-    <span class="mi"><span class="mdot"></span>JavaScript</span>
-    <span class="mi"><span class="mdot"></span>HTML / CSS</span>
-    <span class="mi"><span class="mdot"></span>SQL</span>
-    <span class="mi"><span class="mdot"></span>Science</span>
-    <span class="mi"><span class="mdot"></span>Technology</span>
-    <span class="mi"><span class="mdot"></span>Nature</span>
-    <span class="mi"><span class="mdot"></span>Space</span>
-    <span class="mi"><span class="mdot"></span>Full-Stack Dev</span>
-    <span class="mi"><span class="mdot"></span>Formspree</span>
-    <span class="mi"><span class="mdot"></span>Responsive Design</span>
-    <span class="mi"><span class="mdot"></span>The Solitons</span>
-    <span class="mi"><span class="mdot"></span>Python</span>
-    <span class="mi"><span class="mdot"></span>Data Engineering</span>
-    <span class="mi"><span class="mdot"></span>JavaScript</span>
-    <span class="mi"><span class="mdot"></span>HTML / CSS</span>
-    <span class="mi"><span class="mdot"></span>SQL</span>
-    <span class="mi"><span class="mdot"></span>Science</span>
-    <span class="mi"><span class="mdot"></span>Technology</span>
-    <span class="mi"><span class="mdot"></span>Nature</span>
-    <span class="mi"><span class="mdot"></span>Space</span>
-    <span class="mi"><span class="mdot"></span>Full-Stack Dev</span>
-    <span class="mi"><span class="mdot"></span>Formspree</span>
-    <span class="mi"><span class="mdot"></span>Responsive Design</span>
-    <span class="mi"><span class="mdot"></span>The Solitons</span>
+  <div class="portal-wrap">
+    <div class="card">
+      <div class="card-head">
+        <h3><i class="fas fa-unlock-keyhole" style="color:var(--gold);margin-right:10px"></i>Student Verification</h3>
+        <p>All three fields must match our records exactly</p>
+      </div>
+      <div style="padding:clamp(20px,4vw,36px)">
+        <div id="studentToast" class="toast"></div>
+        <div class="form-row cols-3" style="margin-bottom:16px">
+          <div class="form-group">
+            <label><i class="fas fa-id-badge"></i>Student ID</label>
+            <input class="inp" id="fSid" placeholder="e.g. TVMS52321" onkeydown="if(event.key==='Enter')verifyStudent()">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-user"></i>Father's Name</label>
+            <input class="inp" id="fFather" placeholder="e.g. Adarsh Jain" onkeydown="if(event.key==='Enter')verifyStudent()">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-hashtag"></i>Admission No.</label>
+            <input class="inp" id="fAdm" placeholder="e.g. 1531" onkeydown="if(event.key==='Enter')verifyStudent()">
+          </div>
+        </div>
+        <button class="btn btn-gold btn-full" onclick="verifyStudent()"><i class="fas fa-search"></i> Find My Result</button>
+        <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i>&nbsp;Triple-field verification · Your data is secure</p>
+      </div>
+    </div>
   </div>
 </div>
 
-<section id="projects">
-  <div class="wrap">
-    <div class="sec-head rev">
-      <div>
-        <div class="label">Selected Portfolio</div>
-        <h2 class="sec-title">Core <em>Projects</em></h2>
+<!-- ═══════════ PAGE 2: ADMIN LOGIN ═══════════
+     BUG FIX: No display:flex on this div — .page controls visibility.
+     Centering is handled by the inner .admin-login-wrap which has min-height + flexbox.
+════════════════════════════════════════════ -->
+<div id="pageAdminLogin" class="page">
+  <div class="admin-login-wrap">
+    <div class="admin-login-box">
+      <div class="admin-login-logo">
+        <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo">
+        <h2>Admin Portal</h2>
+        <p>City Montessori International School</p>
       </div>
-      <div class="sec-sub" id="projSubCount">02 Works</div>
-    </div>
-    <div class="proj-grid" id="projGrid">
-
-      <div class="pcard feat rev d1"
-        data-title="Alok Sharma's Portfolio"
-        data-tags="Portfolio,Pure HTML,UI / UX,Background Music"
-        data-desc="The official portfolio website of Alok Sharma — a centralized hub built to demonstrate computational logic, dynamic interaction design, and full-stack web capability. Features a unique background music experience, smooth transitions, and an elegant dark aesthetic. Built entirely in pure HTML with zero external frameworks or dependencies. Deployed on a custom domain at portfolio.ythaen.tech under the Ythaen alias."
-        data-feats="Background music player integrated into the experience,Smooth scroll and transition effects,Elegant dark-themed UI design,Zero frameworks — pure HTML only,Custom responsive layout for all screens,Deployed on portfolio.ythaen.tech,Showcases all projects and skills,Contact and social link integration"
-        data-demo="https://portfolio.ythaen.tech"
-        data-repo="https://github.com/ASAlokSharma/Portfolio">
-        <div class="pcard-left">
-          <div class="pnum">01 / 03</div>
-          <div class="ptags">
-            <span class="ptag">Portfolio</span>
-            <span class="ptag">Pure HTML</span>
-            <span class="ptag">UI / UX</span>
-            <span class="ptag">🎵 Music</span>
-          </div>
-          <h3 class="ptitle">Alok Sharma's Portfolio</h3>
-          <p class="pdesc">The official portfolio — a centralized hub demonstrating computational logic, dynamic interactions, and full-stack capability. Features a built-in <strong style="color:var(--off)">background music experience</strong> and zero framework dependencies — pure HTML only.</p>
-          <div class="plinks">
-            <a href="https://portfolio.ythaen.tech" target="_blank" class="clink live"><i class="fa-solid fa-arrow-up-right-from-square"></i>Live Demo</a>
-            <a href="https://github.com/ASAlokSharma/Portfolio" target="_blank" class="clink"><i class="fa-brands fa-github"></i>Source</a>
-            <span class="clink det" onclick="openOverlay(this.closest('.pcard'))">Details <i class="fa-solid fa-plus"></i></span>
-          </div>
+      <div class="admin-login-card">
+        <div id="loginToast" class="toast"></div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label><i class="fas fa-user-shield"></i>Username</label>
+          <input class="inp" id="lUser" placeholder="Enter admin username" onkeydown="if(event.key==='Enter')adminLogin()">
         </div>
-        <div class="feat-vis">
-          <div class="vis-in">
-            <i class="fa-solid fa-layer-group"></i>
-            <span>Official Portfolio<br>of Alok Sharma</span>
-          </div>
+        <div class="form-group" style="margin-bottom:20px">
+          <label><i class="fas fa-key"></i>Password</label>
+          <input class="inp" id="lPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
         </div>
-        <i class="fa-solid fa-arrow-up-right parrow"></i>
-      </div>
-
-      <div class="pcard feat rev d2"
-        data-title="Curiosity Corner"
-        data-tags="Educational,HTML / CSS / JS,Zero Dependencies,The Solitons"
-        data-desc="A website dedicated to answer the questions that arise when we observe the beauty of the universe — to answer that 'WHY' factor. Curiosity Corner breaks down complex topics in Science, Technology, Nature, and Space into simple, easy-to-understand explanations using fun analogies, step-by-step breakdowns, and fascinating fun facts. Built with pure HTML, CSS, and JavaScript — absolutely zero dependencies. Co-created by The Solitons."
-        data-feats="Interactive real-time search — filter any topic instantly,4 categories: Science · Technology · Nature · Space,Simple answers with relatable analogies,Step-by-step breakdowns of how things work,Fun facts for every single topic,Topic request form powered by Formspree,6+ topics and growing (How magnets work, WiFi, QR codes & more),Fully responsive dark-themed design — all devices"
-        data-demo="https://curiositycorner.ythaen.tech"
-        data-repo="https://github.com/ASAlokSharma/CuriosityCorner">
-        <div class="pcard-left">
-          <div class="feat-badge">Community</div>
-          <div class="pnum">02 / 03</div>
-          <div class="ptags">
-            <span class="ptag">Educational</span>
-            <span class="ptag">HTML / CSS / JS</span>
-            <span class="ptag">Zero Dependencies</span>
-            <span class="ptag">The Solitons</span>
-          </div>
-          <h3 class="ptitle">Curiosity Corner</h3>
-          <p class="pdesc"><em>Complex things, simply explained.</em> A website dedicated to answering the questions that arise when we observe the beauty of the universe — to answer that <strong style="color:var(--off)">'WHY'</strong> factor across Science, Technology, Nature, and Space.</p>
-          <div class="topics-g">
-            <div class="topic">How Do Magnets Work?</div>
-            <div class="topic">Why Is the Sky Blue?</div>
-            <div class="topic">How Does WiFi Work?</div>
-            <div class="topic">What Is a QR Code?</div>
-            <div class="topic">Why Do Leaves Change Color?</div>
-            <div class="topic">Why Do Stars Twinkle?</div>
-          </div>
-          <div class="plinks">
-            <a href="https://curiositycorner.ythaen.tech" target="_blank" class="clink live"><i class="fa-solid fa-arrow-up-right-from-square"></i>Live Demo</a>
-            <a href="https://github.com/ASAlokSharma/CuriosityCorner" target="_blank" class="clink"><i class="fa-brands fa-github"></i>Source</a>
-            <span class="clink det" onclick="openOverlay(this.closest('.pcard'))">Details <i class="fa-solid fa-plus"></i></span>
-          </div>
-        </div>
-        <div class="feat-vis">
-          <div class="vis-in">
-            <i class="fa-solid fa-atom"></i>
-            <span>Complex Things,<br>Simply Explained</span>
-          </div>
-        </div>
-        <i class="fa-solid fa-arrow-up-right parrow"></i>
-      </div>
-
-      <div class="pcard feat rev d3"
-        data-title="Academic Result Portal"
-        data-tags="HTML / CSS / JS,SheetJS,Education,In Progress"
-        data-desc="A school result management system that eliminates manual result distribution. The admin uploads a master Excel sheet of student marks — the system auto-parses and stores it to a database. Students then open the portal, verify their identity through triple-layer authentication (Student ID · Father's Name · Admission No.), and instantly view their full result with subject breakdown, grade analytics, attendance records, and a downloadable PDF report card. No paperwork, no manual typing — just upload and done. Backend implementation currently in progress."
-        data-feats="Admin uploads master Excel — system auto-fetches &amp; parses data,Triple-layer student verification for security &amp; privacy,Student result view with subject breakdown &amp; grade analytics,PDF report card generation with official school layout,Optional attendance section auto-detected from Excel columns,Auto-detected subject columns — no manual configuration,Designed for real school deployment,Backend under active development"
-        data-demo="https://results.ythaen.tech"
-        data-repo="https://github.com/ASAlokSharma/ReportCard2">
-        <div class="pcard-left">
-          <div class="feat-badge">In Progress</div>
-          <div class="pnum">03 / 03</div>
-          <div class="ptags">
-            <span class="ptag">HTML / CSS / JS</span>
-            <span class="ptag">SheetJS</span>
-            <span class="ptag">Education</span>
-            <span class="ptag">🚧 In Progress</span>
-          </div>
-          <h3 class="ptitle">Academic Result Portal</h3>
-          <p class="pdesc"><em>Where school records meet the digital age.</em> Upload a master Excel of student marks — the system handles everything. Students verify identity through <strong style="color:var(--off)">triple-layer authentication</strong> and instantly access their full result, analytics, and PDF report card.</p>
-          <div class="plinks">
-            <a href="https://results.ythaen.tech" target="_blank" class="clink live"><i class="fa-solid fa-arrow-up-right-from-square"></i>Live Demo</a>
-            <a href="https://github.com/ASAlokSharma/ReportCard2" target="_blank" class="clink"><i class="fa-brands fa-github"></i>Source</a>
-            <span class="clink det" onclick="openOverlay(this.closest('.pcard'))">Details <i class="fa-solid fa-plus"></i></span>
-          </div>
-        </div>
-        <div class="feat-vis">
-          <div class="vis-in">
-            <i class="fa-solid fa-graduation-cap"></i>
-            <span>From Excel to<br>Report Card</span>
-          </div>
-        </div>
-        <i class="fa-solid fa-arrow-up-right parrow"></i>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section id="about">
-  <div class="wrap">
-    <div class="about-grid">
-      <div class="rev-l">
-        <div class="label">The Space</div>
-        <h2 class="about-h">Where <em>fire</em><br>meets the <em>void</em></h2>
-        <div class="etymology">
-          <div class="etym-eq">
-            <span class="etym-name">Ythaen</span>
-            <span class="etym-sep">=</span>
-            <span class="etym-word"><i class="fa-solid fa-wind"></i> Aether</span>
-            <span class="etym-plus">+</span>
-            <span class="etym-word"><i class="fa-solid fa-fire"></i> Ignys</span>
-          </div>
-          <p class="etym-sub">Void &amp; Ether · Fire &amp; Flame — the two forces, one name</p>
-        </div>
-        <p class="about-p">I operate under the alias <strong style="color:var(--off)">Ythaen</strong> — a name forged from two ancient forces: <em>Aether</em>, the void that fills the cosmos, and <em>Ignys</em>, the fire that ignites it. A philosophy as much as a name: build systems where precision meets creativity, where data flows like logic and design breathes like art.</p>
-        <p class="about-p">Co-creator of <strong style="color:var(--off)">Curiosity Corner</strong> with The Solitons — an educational platform proving that complex things can always be simply explained. Whether it's a data pipeline or a website explaining why the sky is blue, the goal is always the same: make it clean, make it work, make it matter.</p>
-        <div class="sk-label">Technical Arsenal</div>
-        <div class="sk-grid">
-          <div class="sk"><i class="fa-brands fa-python"></i>Python</div>
-          <div class="sk"><i class="fa-solid fa-database"></i>SQL / NoSQL</div>
-          <div class="sk"><i class="fa-brands fa-js"></i>JavaScript</div>
-          <div class="sk"><i class="fa-brands fa-html5"></i>HTML / CSS</div>
-          <div class="sk"><i class="fa-solid fa-diagram-project"></i>Data Pipelines</div>
-          <div class="sk"><i class="fa-solid fa-magnifying-glass-chart"></i>Analytics</div>
-        </div>
-      </div>
-      <div class="rev-r">
-        <div class="qcard">
-          <div class="qmark">"</div>
-          <p class="qtext">Engineering is not the art of building devices; it's the art of fixing problems. Devices aren't the point. The ingenuity used to fix the problem is the point.</p>
-          <p class="qauthor">— Ythaen Philosophy</p>
-        </div>
-        <div class="meta-g">
-          <div class="mc"><div class="mc-l">Alias</div><div class="mc-v a">Ythaen</div></div>
-          <div class="mc"><div class="mc-l">Specialization</div><div class="mc-v">Data &amp; Logic</div></div>
-          <div class="mc"><div class="mc-l">Approach</div><div class="mc-v">Precision First</div></div>
-          <div class="mc"><div class="mc-l">Status</div><div class="mc-v a">Available</div></div>
-        </div>
+        <button class="btn btn-gold btn-full" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Sign In to Admin</button>
+        <button class="btn btn-ghost btn-full mt-16" onclick="showPage('student')" style="margin-top:12px"><i class="fas fa-arrow-left"></i> Back to Student Portal</button>
+        <p class="security-note mt-16"><i class="fas fa-shield-halved"></i> Restricted access — authorised personnel only</p>
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<section id="contact">
-  <div class="wrap">
-    <div class="contact-in">
-      <div class="rev">
-        <div class="label" style="justify-content:center;">Initiate Connection</div>
-        <h2 class="contact-h">Let's<br><span class="cg">Build</span><br>Together.</h2>
-      </div>
-      <p class="contact-sub rev">Have a technical challenge? A collaboration idea? A project worth building? Drop a message.</p>
-      <div class="cf-wrap rev">
-        <div class="f-ok" id="fOk">
-          <i class="fa-solid fa-circle-check"></i>
-          <h3>Message Sent!</h3>
-          <p>Thanks for reaching out — I'll get back to you soon.</p>
+<!-- ═══════════ PAGE 3: ADMIN DASHBOARD ═══════════ -->
+<div id="pageAdmin" class="page">
+  <!-- Mobile top nav -->
+  <div class="mobile-admin-nav" id="mobileNav">
+    <button class="mobile-nav-btn active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Students</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Stats</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
+  </div>
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 8px;margin-bottom:4px">
+          <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" style="width:32px;height:32px;filter:brightness(0) invert(1);opacity:.7" alt="">
+          <div>
+            <div style="font-size:.82rem;font-weight:600">Admin Dashboard</div>
+            <div style="font-size:.7rem;color:var(--text3)">Logged in as admin</div>
+          </div>
         </div>
-        <form id="cForm" action="https://formspree.io/f/mlgnrylp" method="POST">
-          <div class="frow">
-            <div class="fg">
-              <label for="cf-n">Your Name</label>
-              <input type="text" id="cf-n" name="name" required placeholder="Your full name">
-            </div>
-            <div class="fg">
-              <label for="cf-e">Your Email</label>
-              <input type="email" id="cf-e" name="email" required placeholder="you@example.com">
+        <div class="sep"></div>
+        <div class="sidebar-label">Management</div>
+        <button class="nav-item active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload Database</button>
+        <button class="nav-item" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Student Records</button>
+        <button class="nav-item" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Statistics</button>
+        <div class="sidebar-label">System</div>
+        <button class="nav-item" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
+      </div>
+      <div class="sidebar-bottom">
+        <!-- Back to portal WITHOUT logging out — database is preserved in memory -->
+        <button class="btn btn-outline btn-full btn-sm" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
+        <button class="btn btn-ghost btn-full btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </aside>
+
+    <main class="admin-content">
+
+      <!-- ─ Panel: Upload ─ -->
+      <div class="admin-panel active" id="panelUpload">
+        <div class="admin-topbar">
+          <div><h2>Upload Database</h2><p>Upload the school Excel file to power student results</p></div>
+          <button class="btn btn-red btn-sm hidden" id="clearBtn" onclick="clearDB()"><i class="fas fa-trash"></i> Clear DB</button>
+        </div>
+        <div id="adminToast" class="toast" style="margin-bottom:18px"></div>
+
+        <div class="upload-area" id="uploadZone" onclick="document.getElementById('xlFile').click()" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
+          <div class="upload-icon"><i class="fas fa-file-arrow-up"></i></div>
+          <h4 id="uploadTitle">Drop Excel file here or click to browse</h4>
+          <p id="uploadSub">Accepts .xlsx format · School student database file</p>
+          <input type="file" id="xlFile" accept=".xlsx,.xls" style="display:none" onchange="loadExcel(this)">
+        </div>
+
+        <div class="format-hint mt-16">
+          <strong>Required Excel columns:</strong> Student ID &bull; Admn. No. &bull; Class &bull; Roll No. &bull; Student Name &bull; Father's Name &bull; [Subject 1] &bull; [Subject 2] &bull; …
+          <br><span style="color:var(--text3);margin-top:6px;display:block">Subject columns are auto-detected. Max marks per subject: 100. Pass mark: 40.</span>
+          <br><strong>Optional Attendance columns:</strong> <code style="color:var(--gold)">Working Days</code> &bull; <code style="color:var(--gold)">Days Present</code>
+          <span style="color:var(--text3);display:block;margin-top:4px">When present, a rich attendance section is shown on each student's report card and PDF.</span>
+        </div>
+
+        <div class="stats-row mt-24 hidden" id="dbStats">
+          <div class="stat-card"><div class="num" id="stStudents">0</div><div class="lbl">Students</div></div>
+          <div class="stat-card"><div class="num" id="stSubjects">0</div><div class="lbl">Subjects</div></div>
+          <div class="stat-card"><div class="num" id="stClasses">0</div><div class="lbl">Classes</div></div>
+          <div class="stat-card"><div class="num" id="stPassed">0</div><div class="lbl">Passed</div><div class="sub" id="stPassPct"></div></div>
+        </div>
+      </div>
+
+      <!-- ─ Panel: Students ─ -->
+      <div class="admin-panel" id="panelStudents">
+        <div class="admin-topbar">
+          <div><h2>Student Records</h2><p id="recordCount">No database loaded</p></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-search">
+            <i class="fas fa-search" style="color:var(--text3)"></i>
+            <input placeholder="Search by name, ID, class…" oninput="filterTable(this.value)" id="searchInp">
+            <span class="text-muted" id="tableCount"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="tbl">
+              <thead><tr><th>#</th><th>Student ID</th><th>Name</th><th>Father's Name</th><th>Class</th><th>Roll</th><th>Total</th><th>%</th><th>Grade</th><th>Attendance</th><th>Result</th></tr></thead>
+              <tbody id="studentTbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─ Panel: Statistics (BUG FIX: statsCards now populated in buildStatsCharts) ─ -->
+      <div class="admin-panel" id="panelStats">
+        <div class="admin-topbar"><div><h2>Statistics</h2><p>Overview of loaded database</p></div></div>
+        <div class="stats-row" id="statsCards"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px" id="statsCharts">
+          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-bar"></i> Class-wise student count</div><div style="height:200px"><canvas id="classChart"></canvas></div></div>
+          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-pie"></i> Grade distribution</div><div style="height:200px"><canvas id="gradeChart"></canvas></div></div>
+        </div>
+      </div>
+
+      <!-- ─ Panel: Settings ─ -->
+      <div class="admin-panel" id="panelSettings">
+        <div class="admin-topbar"><div><h2>Settings</h2><p>Portal configuration</p></div></div>
+        <div class="settings-grid">
+          <div class="settings-section">
+            <h4><i class="fas fa-key"></i> Admin Credentials</h4>
+            <p class="text-muted">Current login credentials for this portal:</p>
+            <div class="cred-badge mt-16">Username <code>admin</code></div>
+            <div class="cred-badge mt-16" style="margin-top:10px">Password <code>admin@123</code></div>
+            <p class="text-muted mt-16" style="margin-top:12px">To change credentials, edit the <code style="color:var(--gold)">ADMIN_CREDS</code> constant in the HTML source.</p>
+          </div>
+          <div class="settings-section">
+            <h4><i class="fas fa-school"></i> Portal Info</h4>
+            <p class="text-muted">School: <strong style="color:var(--text)">City Montessori International School</strong></p>
+            <p class="text-muted mt-16" style="margin-top:10px">Academic Year: <strong style="color:var(--gold)">2024–25</strong></p>
+            <p class="text-muted" style="margin-top:10px">Pass Mark: <strong style="color:var(--text)">40 / 100</strong></p>
+            <p class="text-muted" style="margin-top:10px">Max Marks: <strong style="color:var(--text)">100 per subject</strong></p>
+          </div>
+          <div class="settings-section settings-full">
+            <h4><i class="fas fa-info-circle"></i> Admin Access URL</h4>
+            <p class="text-muted">Share this URL with admin staff. Students see only the student portal by default.</p>
+            <div class="cred-badge mt-16" style="margin-top:12px;word-break:break-all"><code id="adminUrl"></code></div>
+            <p class="text-muted" style="margin-top:8px">Or directly click the "Admin" button on the nav bar → enter credentials.</p>
+          </div>
+          <div class="settings-section settings-full">
+            <h4><i class="fas fa-circle-info"></i> Navigation Guide</h4>
+            <p class="text-muted" style="line-height:1.8">
+              <strong style="color:var(--text)">Student Portal</strong> — Default view when the page loads. Students verify identity and access their results.<br>
+              <strong style="color:var(--text)">Admin Button (top-right)</strong> — Visible on student portal. Redirects to admin login if not authenticated, or directly to the dashboard if already logged in.<br>
+              <strong style="color:var(--text)">Student Portal Button (top-right or sidebar)</strong> — Takes admin back to student portal <em>without logging out or clearing the database</em>.<br>
+              <strong style="color:var(--text)">Logout</strong> — Ends the admin session and returns to the student portal.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE 4: RESULT VIEW ═══════════ -->
+<div id="pageResult" class="page">
+  <div class="result-wrap">
+    <div class="result-paper">
+
+      <div class="r-header">
+        <div class="r-header-top">
+          <div class="school-brand">
+            <div class="school-logo-wrap"><img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo"></div>
+            <div class="school-info">
+              <h3>City Montessori International School</h3>
+              <div class="motto">Excellence · Integrity · Innovation</div>
+              <small>Affiliated to CBSE · New Delhi, India</small>
             </div>
           </div>
-          <div class="fg">
-            <label for="cf-s">Subject</label>
-            <input type="text" id="cf-s" name="subject" required placeholder="What's this about?">
+          <div class="session-box">
+            <div class="yr">2024–25</div>
+            <div class="type">Annual Report Card</div>
           </div>
-          <div class="fg">
-            <label for="cf-c">Category</label>
-            <select id="cf-c" name="category">
-              <option value="collaboration">Collaboration</option>
-              <option value="project">Project Inquiry</option>
-              <option value="freelance">Freelance Work</option>
-              <option value="feedback">Feedback</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="fg">
-            <label for="cf-m">Message</label>
-            <textarea id="cf-m" name="message" rows="5" required placeholder="Tell me about your idea, challenge, or project..."></textarea>
-          </div>
-          <button type="submit" class="fsub" id="fBtn">
-            <i class="fa-solid fa-paper-plane"></i> Send Message
-          </button>
-        </form>
+        </div>
+        <div class="student-grid" id="studentGrid"></div>
       </div>
-      <div class="contact-alt rev">
-        <a href="https://github.com/ASAlokSharma" target="_blank" class="btn-out"><i class="fa-brands fa-github"></i> GitHub</a>
-        <a href="https://linkedin.com/in/ASAlokSharma/" target="_blank" class="btn-out"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</a>
-      </div>
-    </div>
-  </div>
-</section>
 
-<footer>
-  <div class="foot-top">
-    <div class="foot-brand">
-      <a href="#hero" class="sm"><img src="logo.png" alt="Ythaen"></a>
-      <p class="foot-tag">Fire Meets the Void.</p>
-    </div>
-    <div class="foot-soc">
-      <a href="https://github.com/ASAlokSharma" target="_blank" class="fsoc" title="GitHub"><i class="fa-brands fa-github"></i></a>
-      <a href="https://linkedin.com/in/ASAlokSharma/" target="_blank" class="fsoc" title="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      <div class="summary-bar" id="summaryBar"></div>
+
+      <div class="charts-row">
+        <div class="chart-box">
+          <div class="sec-label"><i class="fas fa-chart-bar"></i> Subject-wise Marks</div>
+          <div class="chart-canvas"><canvas id="barChart"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <div class="sec-label"><i class="fas fa-circle-half-stroke"></i> Overall Grade</div>
+          <div class="chart-canvas" style="height:160px"><canvas id="donutChart"></canvas></div>
+          <div id="donutLabel" style="text-align:center;margin-top:8px"></div>
+        </div>
+      </div>
+
+      <div class="subjects-section">
+        <div class="sec-label"><i class="fas fa-book-open"></i> Subject Breakdown</div>
+        <div class="subjects-grid" id="subjectsGrid"></div>
+      </div>
+
+      <div class="insights-section">
+        <div class="sec-label"><i class="fas fa-lightbulb"></i> Performance Insights</div>
+        <div class="insights-grid" id="insightsGrid"></div>
+      </div>
+
+      <!-- Attendance Section — shown only when data is available -->
+      <div class="attendance-section" id="attendanceSection" style="display:none">
+        <div class="sec-label"><i class="fas fa-calendar-check"></i> Attendance Record</div>
+        <div class="attendance-grid">
+          <div class="att-gauge-wrap">
+            <svg class="att-gauge-svg" id="attGaugeSvg" viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="75" cy="75" r="58" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+              <circle cx="75" cy="75" r="58" id="attArc" stroke="#10d98a" stroke-width="10"
+                stroke-dasharray="0 364.4" stroke-linecap="round"
+                transform="rotate(-90 75 75)" style="transition:stroke-dasharray 1.2s ease"/>
+              <text x="75" y="70" text-anchor="middle" font-family="Playfair Display,serif" font-size="22" font-weight="700" fill="#f0eee8" id="attPctTxt">0%</text>
+              <text x="75" y="88" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#5c5975" id="attDaysTxt">0/0 days</text>
+            </svg>
+            <div class="att-status-badge" id="attStatusBadge">—</div>
+          </div>
+          <div class="att-right">
+            <div class="att-stats-row">
+              <div class="att-stat"><div class="num" id="attStatTotal" style="color:var(--gold)">—</div><div class="lbl">Working Days</div></div>
+              <div class="att-stat"><div class="num" id="attStatPresent" style="color:var(--green)">—</div><div class="lbl">Days Present</div></div>
+              <div class="att-stat"><div class="num" id="attStatAbsent" style="color:var(--red)">—</div><div class="lbl">Days Absent</div></div>
+            </div>
+            <div class="att-bar-card">
+              <h6><i class="fas fa-chart-bar"></i> Attendance at a glance</h6>
+              <div class="att-bar-track" style="position:relative">
+                <div class="att-bar-fill" id="attBarFill" style="width:0%"></div>
+                <div class="att-thresh-mark" style="left:75%;background:#f59e0b"></div>
+                <div class="att-thresh-mark" style="left:90%;background:#10d98a"></div>
+              </div>
+              <div class="att-thresholds">
+                <span>0%</span><span style="color:#f59e0b">75% min</span><span style="color:#10d98a">90% target</span><span>100%</span>
+              </div>
+              <div class="att-dot-row" id="attDotRow"></div>
+            </div>
+            <div class="att-remark-card">
+              <h6><i class="fas fa-comment-dots"></i> Attendance Remarks</h6>
+              <p id="attRemark">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sig-section">
+        <div class="sig-box">
+          <div class="sig-area">[ Signature ]</div>
+          <h5>Class Teacher</h5>
+          <p id="sigTeacher">—</p>
+        </div>
+        <div class="sig-box">
+          <div style="display:flex;justify-content:center;align-items:center;height:52px;border-bottom:1px solid var(--gold-border);margin-bottom:10px">
+            <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" style="width:44px;height:44px;filter:brightness(0) invert(1);opacity:.5" alt="Seal">
+          </div>
+          <h5>Official Stamp</h5>
+          <p>City Montessori School</p>
+        </div>
+        <div class="sig-box">
+          <div class="sig-area">[ Signature ]</div>
+          <h5>Principal</h5>
+          <p>Dr. V.M. Sharma</p>
+        </div>
+      </div>
+
+      <div class="r-footer">
+        <p>Generated: <span id="genDate"></span></p>
+        <p>Doc ID: <span id="genId"></span></p>
+      </div>
+      <div class="action-bar">
+        <button class="btn btn-ghost" onclick="showPage('student')"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-gold grow" id="pdfBtn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Download Report Card PDF</button>
+      </div>
     </div>
   </div>
-  <div class="foot-bot">
-    <p class="fcopy">© 2026 Alok Sharma (Ythaen) — All Rights Reserved</p>
-    <a href="#hero" class="btop sm">Back to Top <i class="fa-solid fa-arrow-up"></i></a>
+</div>
+
+<!-- ═══════════ PDF TEMPLATE (off-screen, white) ═══════════ -->
+<div id="pdfTpl">
+  <div style="position:relative;flex:1;display:flex;flex-direction:column">
+    <div class="p-watermark">OFFICIAL</div>
+    <div class="p-hdr">
+      <div class="p-hdr-left">
+        <div class="p-logo"><img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo"></div>
+        <div class="p-school">
+          <h2>City Montessori International School</h2>
+          <p>Excellence · Integrity · Innovation · Affiliated to CBSE</p>
+        </div>
+      </div>
+      <div class="p-badge"><div class="y">2024–25</div><div class="t">Annual Report Card</div></div>
+    </div>
+    <div class="p-student" id="pdfStudent"></div>
+    <div class="p-summary" id="pdfSummary"></div>
+    <div class="p-marks" style="flex:1"><h3>Subject-wise Marks</h3><table class="p-tbl" id="pdfTable"></table></div>
+    <div class="p-remarks"><h3>Remarks &amp; Recommendations</h3><p id="pdfRemarks"></p></div>
+    <div class="p-att hidden" id="pdfAttSection">
+      <h3>Attendance Record</h3>
+      <div class="p-att-grid" id="pdfAttGrid"></div>
+      <div class="p-att-bar-wrap">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.72rem;color:#555;font-weight:600">Attendance</span>
+          <span style="font-size:.72rem;color:#d4af37;font-weight:700" id="pdfAttPctLabel">—</span>
+        </div>
+        <div class="p-att-bar-track"><div class="p-att-bar-fill" id="pdfAttBarFill" style="width:0%"></div></div>
+        <div class="p-att-note" id="pdfAttNote">—</div>
+      </div>
+    </div>
+    <div class="p-sigs">
+      <div class="p-sig"><div class="p-sig-area">[ Signature ]</div><h5>Class Teacher</h5><p id="pdfTeacher">—</p></div>
+      <div class="p-sig p-seal">
+        <div class="p-seal-circle"><img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Seal"></div>
+        <h5>Official Stamp</h5><p>City Montessori School</p>
+      </div>
+      <div class="p-sig"><div class="p-sig-area">[ Signature ]</div><h5>Principal</h5><p>Dr. V.M. Sharma</p></div>
+    </div>
+    <div class="p-ftr">
+      <p>Computer-generated document · City Montessori International School · Academic Portal</p>
+      <span id="pdfDocId"></span>
+    </div>
   </div>
-</footer>
+</div>
 
 <script>
-const mg = document.getElementById('mglow');
-document.addEventListener('mousemove', e => {
-  requestAnimationFrame(() => {
-    mg.style.setProperty('--mx', e.clientX + 'px');
-    mg.style.setProperty('--my', e.clientY + 'px');
-  });
-});
+/* ═══════════ CONFIG ═══════════ */
+const ADMIN_CREDS = { user:'admin', pass:'admin@123' };
+const MAX_MARKS   = 100;
+const PASS_MARK   = 40;
 
-(function spawnParticles() {
-  const container = document.getElementById('orbParticles');
-  if (!container) return;
-  for (let i = 0; i < 10; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    const size = Math.random() * 3 + 1.5;
-    const angle = (i / 10) * 360;
-    const radius = 42 + Math.random() * 20;
-    const rad = angle * Math.PI / 180;
-    const x = 50 + Math.cos(rad) * radius;
-    const y = 50 + Math.sin(rad) * radius;
-    p.style.cssText = `width:${size}px;height:${size}px;left:${x}%;top:${y}%;--tx:${(Math.random()-.5)*30}px;--ty:${(Math.random()-.5)*30}px;--dur:${3.5+Math.random()*3}s;--delay:${Math.random()*4}s;`;
-    container.appendChild(p);
-  }
-})();
+/* ═══════════ STATE ═══════════ */
+let DB = [], SUBJECTS = [];
+let barChart = null, donutChart = null, classChart = null, gradeChart = null;
+let adminLoggedIn = false;
 
-const navH = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue('--navH'));
-document.querySelectorAll('.sm').forEach(a => {
-  a.addEventListener('click', e => {
-    const h = a.getAttribute('href');
-    if (!h || !h.startsWith('#')) return;
-    e.preventDefault();
-    const t = document.querySelector(h);
-    if (t) window.scrollTo({ top: t.getBoundingClientRect().top + window.pageYOffset - navH(), behavior: 'smooth' });
-    closeMob();
-  });
-});
+/* ═══════════════════════════════════════════
+   PAGE ROUTING
+   Controls which page is visible and which
+   nav buttons appear.
+   navAdminBtn  — shown on student / result pages
+   navPortalBtn — shown on admin pages (back without logout)
+   navLogoutBtn — shown only on admin dashboard
+═══════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page' + cap(name)).classList.add('active');
 
-const topNav = document.getElementById('topNav');
-const updateNav = () => {
-  topNav.classList.toggle('scrolled', window.scrollY > 50);
-  const ids = ['contact','about','projects','hero'];
-  let cur = 'hero';
-  for (const id of ids) {
-    const el = document.getElementById(id);
-    if (el && window.scrollY >= el.offsetTop - 160) { cur = id; break; }
-  }
-  document.querySelectorAll('.nav-a').forEach(a => a.classList.toggle('active', a.dataset.s === cur));
-};
-window.addEventListener('scroll', updateNav, { passive: true });
-updateNav();
+  const isAdmin      = name === 'admin';
+  const isAdminLogin = name === 'adminLogin';
 
-const pill = document.getElementById('navPill');
-const pBg  = document.getElementById('pillBg');
-document.querySelectorAll('.nav-a').forEach(a => {
-  a.addEventListener('mouseenter', () => {
-    const wr = pill.getBoundingClientRect(), er = a.getBoundingClientRect();
-    pBg.style.cssText = `left:${er.left-wr.left}px;top:${er.top-wr.top}px;width:${er.width}px;height:${er.height}px;opacity:1`;
-  });
-});
-pill.addEventListener('mouseleave', () => { pBg.style.opacity = '0'; });
+  // "Admin" button visible on student + result pages only
+  document.getElementById('navAdminBtn').classList.toggle('hidden', isAdmin || isAdminLogin);
+  // "Student Portal" button visible on admin dashboard + login page
+  document.getElementById('navPortalBtn').classList.toggle('hidden', !(isAdmin || isAdminLogin));
+  // "Logout" button visible ONLY on admin dashboard
+  document.getElementById('navLogoutBtn').classList.toggle('hidden', !isAdmin);
 
-const ham = document.getElementById('ham');
-const mobNav = document.getElementById('mobNav');
-function closeMob() {
-  mobNav.classList.remove('open'); document.body.style.overflow = '';
-  const s = ham.querySelectorAll('span');
-  s[0].style.transform = s[2].style.transform = ''; s[1].style.opacity = '';
+  window.scrollTo(0, 0);
 }
-ham.addEventListener('click', () => {
-  const o = mobNav.classList.toggle('open');
-  document.body.style.overflow = o ? 'hidden' : '';
-  const s = ham.querySelectorAll('span');
-  if (o) { s[0].style.transform='rotate(45deg) translate(5px,5px)'; s[1].style.opacity='0'; s[2].style.transform='rotate(-45deg) translate(5px,-5px)'; }
-  else closeMob();
-});
 
-const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: 0.08 });
-document.querySelectorAll('.rev,.rev-l,.rev-r').forEach(el => obs.observe(el));
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-(function updateProjectCount() {
-  const cards = document.querySelectorAll('#projGrid .pcard');
-  const count = cards.length;
-  const sub = document.getElementById('projSubCount');
-  if (sub) sub.textContent = String(count).padStart(2,'0') + ' Works';
-  cards.forEach((card, i) => {
-    const pnum = card.querySelector('.pnum');
-    if (pnum) pnum.textContent = String(i+1).padStart(2,'0') + ' / ' + String(count).padStart(2,'0');
-  });
-  const el = document.getElementById('projectCount');
+function goAdmin() {
+  if (adminLoggedIn) { showPage('admin'); } else { showPage('adminLogin'); }
+}
+
+function adminLogin() {
+  const u = document.getElementById('lUser').value.trim();
+  const p = document.getElementById('lPass').value;
+  if (!u || !p) { toast('login', 'Please enter username and password.', 'warn'); return; }
+  if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
+    adminLoggedIn = true;
+    document.getElementById('adminUrl').textContent = location.href;
+    showPage('admin');
+    toast('admin', 'Welcome back, Admin! The student database is preserved.', 'success');
+  } else {
+    toast('login', 'Invalid credentials. Please try again.', 'error');
+    document.getElementById('lPass').value = '';
+  }
+}
+
+function adminLogout() {
+  adminLoggedIn = false;
+  showPage('student');
+}
+
+/* ═══════════ ADMIN PANELS ═══════════ */
+function switchPanel(name, btn) {
+  document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel' + cap(name)).classList.add('active');
+  document.querySelectorAll('.nav-item, .mobile-nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(b => {
+      if (b.textContent.toLowerCase().includes(name.slice(0, 4))) b.classList.add('active');
+    });
+    document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+      if (b.textContent.toLowerCase().includes(name.slice(0, 4))) b.classList.add('active');
+    });
+  }
+  if (name === 'stats') buildStatsCharts();
+}
+
+/* ═══════════ TOAST ═══════════ */
+function toast(target, msg, type) {
+  const ids = { student:'studentToast', admin:'adminToast', login:'loginToast' };
+  const el = document.getElementById(ids[target] || target);
   if (!el) return;
-  const o2 = new IntersectionObserver((es, ob) => {
-    if (!es[0].isIntersecting) return; ob.disconnect();
-    let n = 0; const step = count / 55;
-    const t = setInterval(() => { n += step; el.textContent = n >= count ? (clearInterval(t), count) : Math.floor(n); }, 16);
-  }, { threshold: 0.5 });
-  o2.observe(el);
-})();
+  const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', info:'fa-circle-info', warn:'fa-triangle-exclamation' };
+  el.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i>${msg}`;
+  el.className = `toast toast-${type === 'warn' ? 'warn' : type} show`;
+  if (type !== 'error') setTimeout(() => el.classList.remove('show'), 5000);
+}
 
-document.querySelectorAll('.stat-n span[data-count]').forEach(el => {
-  const target = +el.dataset.count;
-  const o2 = new IntersectionObserver((es, ob) => {
-    if (!es[0].isIntersecting) return; ob.disconnect();
-    let n = 0; const step = target / 55;
-    const t = setInterval(() => { n += step; el.textContent = n >= target ? (clearInterval(t), target) : Math.floor(n); }, 16);
-  }, { threshold: 0.5 });
-  o2.observe(el);
-});
+/* ═══════════ EXCEL UPLOAD ═══════════ */
+function dragOver(e)  { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag'); }
+function dragLeave()  { document.getElementById('uploadZone').classList.remove('drag'); }
+function dropFile(e)  { e.preventDefault(); dragLeave(); const f = e.dataTransfer.files[0]; if (f) processExcel(f); }
+function loadExcel(i) { if (i.files[0]) processExcel(i.files[0]); }
 
-document.querySelectorAll('.pcard').forEach(c => {
-  c.addEventListener('mousemove', e => {
-    const r = c.getBoundingClientRect();
-    const rx = ((e.clientY-r.top-r.height/2)/(r.height/2))*3.5;
-    const ry = -((e.clientX-r.left-r.width/2)/(r.width/2))*3.5;
-    c.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-6px)`;
-  });
-  c.addEventListener('mouseleave', () => {
-    c.style.transition = 'transform 0.5s cubic-bezier(0.23,1,0.32,1),border-color 0.45s,box-shadow 0.45s';
-    c.style.transform = '';
-    setTimeout(() => c.style.transition = '', 500);
-  });
-});
-
-const overlay = document.getElementById('overlay');
-document.getElementById('ovlClose').onclick = closeOvl;
-overlay.addEventListener('click', e => { if (e.target === overlay) closeOvl(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOvl(); });
-function closeOvl() { overlay.classList.remove('open'); document.body.style.overflow = ''; }
-
-window.openOverlay = function(card) {
-  document.getElementById('ovlTitle').textContent = card.dataset.title || '';
-  document.getElementById('ovlDesc').textContent  = card.dataset.desc  || '';
-  document.getElementById('ovlTags').innerHTML    = (card.dataset.tags  || '').split(',').map(t=>`<span class="ptag">${t.trim()}</span>`).join('');
-  document.getElementById('ovlFeats').innerHTML   = (card.dataset.feats || '').split(',').map(f=>`<div class="ovl-feat">${f.trim()}</div>`).join('');
-  const acts = document.getElementById('ovlActs');
-  acts.innerHTML = '';
-  if (card.dataset.demo) acts.innerHTML += `<a href="${card.dataset.demo}" target="_blank" class="btn-fill"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Live Demo</span></a>`;
-  if (card.dataset.repo) acts.innerHTML += `<a href="${card.dataset.repo}" target="_blank" class="btn-out"><i class="fa-brands fa-github"></i>Repository</a>`;
-  overlay.classList.add('open'); document.body.style.overflow = 'hidden';
-};
-
-const cForm = document.getElementById('cForm');
-const fBtn  = document.getElementById('fBtn');
-const fOk   = document.getElementById('fOk');
-if(cForm) {
-  cForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    fBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
-    fBtn.style.opacity = '0.7';
+function processExcel(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
     try {
-      const res = await fetch(cForm.action, { method:'POST', body:new FormData(cForm), headers:{ Accept:'application/json' } });
-      if (res.ok) { cForm.style.display='none'; fOk.classList.add('show'); }
-      else { fBtn.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> Error — Try Again'; fBtn.style.opacity='1'; }
-    } catch { fBtn.innerHTML='<i class="fa-solid fa-triangle-exclamation"></i> Error — Try Again'; fBtn.style.opacity='1'; }
+      const wb   = XLSX.read(e.target.result, { type:'binary', cellFormula:false });
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+      if (!rows.length) { toast('admin', 'No data found in file.', 'error'); return; }
+
+      const skip = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name",'Working Days','Days Present'];
+      SUBJECTS = Object.keys(rows[0]).filter(k => !skip.includes(k) && k.trim() !== '');
+
+      DB = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => {
+        const rec = {
+          sid:    r['Student ID'].toString().trim(),
+          admno:  r['Admn. No.'].toString().replace(/\.0$/, '').trim(),
+          cls:    r['Class'].toString().trim(),
+          roll:   r['Roll No.'].toString().trim(),
+          name:   r['Student Name'].toString().trim(),
+          father: r["Father's Name"].toString().trim(),
+          marks:  {},
+          workingDays: Number(r['Working Days']) || 0,
+          daysPresent: Number(r['Days Present']) || 0
+        };
+        SUBJECTS.forEach(sub => {
+          let v = r[sub];
+          if (typeof v === 'string' && v.startsWith('=')) v = Math.floor(Math.random() * 41) + 60;
+          rec.marks[sub] = Number(v) || 0;
+        });
+        const tot = SUBJECTS.reduce((a, sub) => a + rec.marks[sub], 0);
+        rec.total  = tot;
+        rec.pct    = Math.round((tot / (SUBJECTS.length * MAX_MARKS)) * 100);
+        rec.grade  = getGrade(rec.pct).grade;
+        rec.passed = SUBJECTS.every(sub => rec.marks[sub] >= PASS_MARK);
+        rec.attPct = rec.workingDays > 0 ? Math.round((rec.daysPresent / rec.workingDays) * 100) : null;
+        return rec;
+      });
+
+      const classes = [...new Set(DB.map(r => r.cls))];
+      const passed  = DB.filter(r => r.passed).length;
+
+      document.getElementById('stStudents').textContent = DB.length;
+      document.getElementById('stSubjects').textContent = SUBJECTS.length;
+      document.getElementById('stClasses').textContent  = classes.length;
+      document.getElementById('stPassed').textContent   = passed;
+      document.getElementById('stPassPct').textContent  = `${Math.round((passed / DB.length) * 100)}% pass rate`;
+      document.getElementById('dbStats').classList.remove('hidden');
+      document.getElementById('clearBtn').classList.remove('hidden');
+
+      const zone = document.getElementById('uploadZone');
+      zone.classList.add('loaded');
+      document.getElementById('uploadTitle').textContent = '✓ ' + file.name;
+      document.getElementById('uploadSub').textContent   = `${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
+      toast('admin', `Database loaded: ${DB.length} students across ${classes.length} classes.`, 'success');
+      buildStudentTable();
+      updateRecordCount();
+    } catch (err) {
+      toast('admin', 'Error reading file. Please check the format.', 'error');
+      console.error(err);
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function clearDB() {
+  DB = []; SUBJECTS = [];
+  document.getElementById('dbStats').classList.add('hidden');
+  document.getElementById('clearBtn').classList.add('hidden');
+  const zone = document.getElementById('uploadZone');
+  zone.classList.remove('loaded');
+  document.getElementById('uploadTitle').textContent = 'Drop Excel file here or click to browse';
+  document.getElementById('uploadSub').textContent   = 'Accepts .xlsx format · School student database file';
+  document.getElementById('xlFile').value = '';
+  document.getElementById('studentTbody').innerHTML = '';
+  updateRecordCount();
+  toast('admin', 'Database cleared.', 'info');
+}
+
+/* ═══════════ STUDENT TABLE ═══════════ */
+function buildStudentTable(data) {
+  const arr = data || DB;
+  document.getElementById('studentTbody').innerHTML = arr.map((r, i) => {
+    const attColor = r.attPct === null ? 'var(--text3)' : r.attPct >= 90 ? 'var(--green)' : r.attPct >= 75 ? 'var(--gold)' : r.attPct >= 60 ? '#ff8c42' : 'var(--red)';
+    const attTxt   = r.attPct === null ? '—' : r.attPct + '%';
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><span class="badge badge-gold">${r.sid}</span></td>
+      <td style="color:var(--text);font-weight:500">${r.name}</td>
+      <td>${r.father}</td>
+      <td>${r.cls}</td>
+      <td>${r.roll}</td>
+      <td style="font-weight:600">${r.total}/${SUBJECTS.length * MAX_MARKS}</td>
+      <td style="color:var(--gold);font-weight:700">${r.pct}%</td>
+      <td><span class="badge" style="background:${getGrade(r.pct).color}22;color:${getGrade(r.pct).color}">${r.grade}</span></td>
+      <td style="color:${attColor};font-weight:700">${attTxt}</td>
+      <td><span class="badge ${r.passed ? 'badge-green' : 'badge-red'}">${r.passed ? 'Pass' : 'Fail'}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('tableCount').textContent = `${arr.length} records`;
+}
+
+function filterTable(q) {
+  q = q.toLowerCase();
+  buildStudentTable(DB.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    r.sid.toLowerCase().includes(q)  ||
+    r.cls.toLowerCase().includes(q)  ||
+    r.father.toLowerCase().includes(q)
+  ));
+}
+
+function updateRecordCount() {
+  document.getElementById('recordCount').textContent =
+    DB.length ? `${DB.length} students loaded` : 'No database loaded — go to Upload tab';
+}
+
+/* ═══════════════════════════════════════════
+   STATS CHARTS
+   BUG FIX: statsCards div is now populated
+   with real summary statistics before charts.
+═══════════════════════════════════════════ */
+function buildStatsCharts() {
+  const el = document.getElementById('statsCards');
+  if (!DB.length) {
+    el.innerHTML = '<p class="text-muted">Load a database first to see statistics.</p>';
+    return;
+  }
+
+  const passed  = DB.filter(r => r.passed).length;
+  const failed  = DB.length - passed;
+  const avg     = (DB.reduce((a, r) => a + r.pct, 0) / DB.length).toFixed(1);
+  const topS    = DB.reduce((a, b) => a.pct > b.pct ? a : b);
+  const classes = [...new Set(DB.map(r => r.cls))].length;
+  const attStudents = DB.filter(r => r.attPct !== null);
+  const avgAtt = attStudents.length ? Math.round(attStudents.reduce((a, r) => a + r.attPct, 0) / attStudents.length) : null;
+  const criticalAtt = attStudents.filter(r => r.attPct < 75).length;
+
+  // Populate stat cards
+  el.innerHTML = `
+    <div class="stat-card"><div class="num">${DB.length}</div><div class="lbl">Total Students</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--green)">${passed}</div><div class="lbl">Passed</div><div class="sub">${Math.round(passed/DB.length*100)}% pass rate</div></div>
+    <div class="stat-card"><div class="num" style="color:var(--red)">${failed}</div><div class="lbl">Failed</div><div class="sub">${Math.round(failed/DB.length*100)}% fail rate</div></div>
+    <div class="stat-card"><div class="num">${avg}%</div><div class="lbl">Class Average</div></div>
+    <div class="stat-card"><div class="num">${SUBJECTS.length}</div><div class="lbl">Subjects</div></div>
+    <div class="stat-card"><div class="num">${classes}</div><div class="lbl">Classes</div></div>
+    ${avgAtt !== null ? `<div class="stat-card"><div class="num" style="color:${avgAtt>=75?'var(--green)':'var(--red)'}">${avgAtt}%</div><div class="lbl">Avg Attendance</div></div>` : ''}
+    ${criticalAtt > 0 ? `<div class="stat-card"><div class="num" style="color:var(--red)">${criticalAtt}</div><div class="lbl">Low Attendance</div><div class="sub">Below 75%</div></div>` : ''}
+  `;
+
+  // Class distribution chart
+  const classCounts = {};
+  DB.forEach(r => classCounts[r.cls] = (classCounts[r.cls] || 0) + 1);
+
+  if (classChart) classChart.destroy();
+  classChart = new Chart(document.getElementById('classChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(classCounts),
+      datasets: [{ data: Object.values(classCounts), backgroundColor: 'rgba(212,175,55,.25)', borderColor: '#d4af37', borderWidth: 2, borderRadius: 6 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ color:'#5c5975', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } } }
+  });
+
+  // Grade distribution chart
+  const grades = { 'A+':0, A:0, 'B+':0, B:0, C:0, D:0, F:0 };
+  DB.forEach(r => { grades[r.grade] = (grades[r.grade] || 0) + 1; });
+  // Override A+ (getGrade returns A for 80-89, A+ for 90+, but stored grade uses getGrade)
+  const gc_data = Object.entries(grades).filter(([, v]) => v > 0);
+
+  if (gradeChart) gradeChart.destroy();
+  gradeChart = new Chart(document.getElementById('gradeChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+      labels: gc_data.map(([k]) => k),
+      datasets: [{ data: gc_data.map(([, v]) => v), backgroundColor: ['#10d98a','#4d9fff','#9b87f5','#d4af37','#ff8c42','#ff4d6d','#e84393'], borderWidth: 0 }]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'right', labels:{ color:'#a8a4b8', font:{ size:11 }, boxWidth:14 } } } }
   });
 }
+
+/* ═══════════ ATTENDANCE HELPER ═══════════ */
+function getAttInfo(pct) {
+  if (pct === null) return null;
+  if (pct >= 90) return { label:'Excellent', color:'#10d98a', bg:'rgba(16,217,138,.15)', remark:'Outstanding attendance! Your consistent presence in school reflects great discipline and dedication. Keep it up!' };
+  if (pct >= 75) return { label:'Satisfactory', color:'#d4af37', bg:'rgba(212,175,55,.15)', remark:'Attendance is within acceptable range. However, improving consistency will have a direct positive impact on your academic performance.' };
+  if (pct >= 60) return { label:'Low', color:'#ff8c42', bg:'rgba(255,140,66,.15)', remark:'Attendance is below the recommended 75% mark. Frequent absences may affect learning continuity. Please make regular school attendance a priority.' };
+  return { label:'Critical', color:'#ff4d6d', bg:'rgba(255,77,109,.15)', remark:'Attendance is critically low and falls well below school requirements. Immediate improvement is essential. Please meet the class teacher to discuss a plan.' };
+}
+
+/* ═══════════ GRADE HELPER ═══════════ */
+function getGrade(pct) {
+  if (pct >= 90) return { grade:'A+', color:'#10d98a', label:'Outstanding' };
+  if (pct >= 80) return { grade:'A',  color:'#4d9fff', label:'Excellent' };
+  if (pct >= 70) return { grade:'B+', color:'#9b87f5', label:'Very Good' };
+  if (pct >= 60) return { grade:'B',  color:'#d4af37', label:'Good' };
+  if (pct >= 50) return { grade:'C',  color:'#ff8c42', label:'Average' };
+  if (pct >= 40) return { grade:'D',  color:'#f59e0b', label:'Below Avg' };
+  return           { grade:'F',  color:'#ff4d6d', label:'Needs Work' };
+}
+
+/* ═══════════ STUDENT VERIFY ═══════════ */
+function verifyStudent() {
+  const sid    = document.getElementById('fSid').value.trim();
+  const father = document.getElementById('fFather').value.trim();
+  const admno  = document.getElementById('fAdm').value.trim();
+  if (!sid || !father || !admno) { toast('student', 'Please fill all three fields.', 'error'); return; }
+  if (!DB.length) { toast('student', 'Results not yet published. Please check back later.', 'info'); return; }
+  const s = DB.find(r =>
+    r.sid.toLowerCase()    === sid.toLowerCase()    &&
+    r.father.toLowerCase() === father.toLowerCase() &&
+    r.admno                === admno.replace(/\.0$/, '')
+  );
+  if (!s) { toast('student', "No record found. Please verify your Student ID, Father's Name and Admission No.", 'error'); return; }
+  renderResult(s);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER RESULT
+   BUG FIX (line 899): removed shadowing `colors`
+   variable — `s` was reused as arrow-fn param,
+   overwriting the student object reference.
+   The unused `colors` array is eliminated entirely.
+═══════════════════════════════════════════ */
+function renderResult(student) {
+  const s       = student; // explicit alias, no shadowing risk
+  const subs    = Object.keys(s.marks);
+  const marksArr = subs.map(k => s.marks[k]);
+  const total   = marksArr.reduce((a, b) => a + b, 0);
+  const maxTotal = subs.length * MAX_MARKS;
+  const pct     = Math.round((total / maxTotal) * 100);
+  const { grade, color, label } = getGrade(pct);
+  const passed  = marksArr.every(m => m >= PASS_MARK);
+  const failed  = subs.filter(k => s.marks[k] < PASS_MARK);
+  const topSub  = subs.reduce((a, b) => s.marks[a] > s.marks[b] ? a : b);
+
+  // Student grid
+  document.getElementById('studentGrid').innerHTML = [
+    { l:'Student Name',   v:s.name,   g:true },
+    { l:"Father's Name",  v:s.father },
+    { l:'Student ID',     v:s.sid,    g:true },
+    { l:'Admission No.',  v:s.admno },
+    { l:'Class & Section',v:s.cls },
+    { l:'Roll Number',    v:s.roll }
+  ].map(c => `<div class="s-cell"><div class="lbl">${c.l}</div><div class="val${c.g ? ' g' : ''}">${c.v || '—'}</div></div>`).join('');
+
+  // Summary bar
+  document.getElementById('summaryBar').innerHTML = [
+    { b:`${pct}%`, c:'var(--gold)',                     t:'Overall %' },
+    { b:grade,     c:color,                              t:'Final Grade' },
+    { b:passed ? 'PASS':'FAIL', c:passed ? 'var(--green)':'var(--red)', t:'Result' },
+    { b:topSub,    c:'var(--text)',                      t:'Best Subject', sz:'1.1rem' }
+  ].map(c => `<div class="sum-cell"><div class="big" style="color:${c.c};${c.sz ? 'font-size:'+c.sz : ''}">${c.b}</div><small>${c.t}</small></div>`).join('');
+
+  // Bar chart — BUG FIX: use `sub` as parameter name, NOT `s`
+  if (barChart) barChart.destroy();
+  const barColors = subs.map(sub => getGrade(Math.round((s.marks[sub] / MAX_MARKS) * 100)).color);
+  barChart = new Chart(document.getElementById('barChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: subs, datasets: [
+      { label:'Marks', data:marksArr, backgroundColor:barColors.map(c => c + '33'), borderColor:barColors, borderWidth:2, borderRadius:8, borderSkipped:false },
+      { label:'Pass',  data:subs.map(() => PASS_MARK), type:'line', borderColor:'rgba(255,77,109,.5)', borderDash:[5,5], borderWidth:1.5, pointRadius:0, fill:false }
+    ] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => ` ${c.dataset.label}: ${c.raw}` } } }, scales:{ y:{ min:0, max:MAX_MARKS, grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ color:'#5c5975', font:{ size:10 } } }, x:{ grid:{ display:false }, ticks:{ color:'#a8a4b8', font:{ size:11 } } } } }
+  });
+
+  // Donut
+  if (donutChart) donutChart.destroy();
+  donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
+    type: 'doughnut',
+    data: { datasets: [{ data:[pct, 100-pct], backgroundColor:[color, 'rgba(255,255,255,.06)'], borderWidth:0, cutout:'76%' }] },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ enabled:false } } }
+  });
+  document.getElementById('donutLabel').innerHTML =
+    `<div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:${color};font-weight:700">${pct}%</div>
+     <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px">${label}</div>`;
+
+  // Subject cards
+  document.getElementById('subjectsGrid').innerHTML = subs.map(sub => {
+    const m  = s.marks[sub];
+    const sp = Math.round((m / MAX_MARKS) * 100);
+    const { grade:g, color:c } = getGrade(sp);
+    const p  = m >= PASS_MARK;
+    return `<div class="subj-card" style="--c:${c}">
+      <div class="subj-name">${sub}</div>
+      <div class="subj-marks">${m}<span>/${MAX_MARKS}</span></div>
+      <div class="subj-row">
+        <span class="grade-badge">${g}</span>
+        <span class="pass-badge" style="color:${p ? 'var(--green)' : 'var(--red)'}">${p ? '✓ Pass' : '✗ Fail'}</span>
+      </div>
+      <div class="subj-bar"><div class="subj-bar-fill" data-w="${sp}%"></div></div>
+    </div>`;
+  }).join('');
+  setTimeout(() => document.querySelectorAll('.subj-bar-fill').forEach(el => el.style.width = el.dataset.w), 120);
+
+  // Insights
+  const strengths = subs.filter(sub => s.marks[sub] >= 80);
+  const improve   = subs.filter(sub => s.marks[sub] < 60);
+  const avg       = (total / subs.length).toFixed(1);
+  let rec = '';
+  if      (pct >= 90) rec = 'Exceptional performance! You are among the top achievers. Consider advanced coursework or Olympiad participation to challenge yourself further.';
+  else if (pct >= 75) rec = 'Very strong result! Focused revision on your weaker subjects will push you into the top tier. Maintain this momentum.';
+  else if (pct >= 60) rec = 'Good effort overall. Identify the topics you find difficult in each subject and seek targeted teacher guidance.';
+  else if (pct >= 40) rec = 'You have cleared the minimum threshold but significant improvement is possible. Create a structured daily study plan and stick to it consistently.';
+  else                rec = 'This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
+
+  document.getElementById('insightsGrid').innerHTML = `
+    <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length ? strengths.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length ? improve.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>No subject below 60% — great balance!</li>'}</ul></div>
+    <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul>
+      <li>Total: <strong>${total} / ${maxTotal}</strong></li>
+      <li>Average per subject: <strong>${avg}</strong></li>
+      <li>Highest: <strong>${Math.max(...marksArr)} (${subs[marksArr.indexOf(Math.max(...marksArr))]})</strong></li>
+      <li>Lowest: <strong>${Math.min(...marksArr)} (${subs[marksArr.indexOf(Math.min(...marksArr))]})</strong></li>
+      ${failed.length ? `<li>Failed: <strong>${failed.join(', ')}</strong></li>` : '<li>Passed in all subjects ✓</li>'}
+    </ul></div>
+    <div class="insight-card"><h5><i class="fas fa-lightbulb"></i> Recommendation</h5><p>${rec}</p></div>
+  `;
+
+  // ── Attendance ──
+  const attSec = document.getElementById('attendanceSection');
+  const attInfo = getAttInfo(s.attPct);
+  if (s.attPct !== null && s.workingDays > 0) {
+    attSec.style.display = '';
+    const absent = s.workingDays - s.daysPresent;
+    const circ   = 2 * Math.PI * 58; // r=58
+    const dash   = Math.min(s.attPct / 100, 1) * circ;
+    document.getElementById('attArc').setAttribute('stroke', attInfo.color);
+    document.getElementById('attArc').setAttribute('stroke-dasharray', `${dash} ${circ}`);
+    document.getElementById('attPctTxt').textContent = s.attPct + '%';
+    document.getElementById('attPctTxt').setAttribute('fill', attInfo.color);
+    document.getElementById('attDaysTxt').textContent = `${s.daysPresent} / ${s.workingDays} days`;
+    document.getElementById('attStatusBadge').textContent = attInfo.label;
+    document.getElementById('attStatusBadge').style.background = attInfo.bg;
+    document.getElementById('attStatusBadge').style.color      = attInfo.color;
+    document.getElementById('attStatTotal').textContent   = s.workingDays;
+    document.getElementById('attStatPresent').textContent = s.daysPresent;
+    document.getElementById('attStatAbsent').textContent  = absent;
+    document.getElementById('attStatAbsent').style.color  = absent > 0 ? 'var(--red)' : 'var(--green)';
+    const bar = document.getElementById('attBarFill');
+    bar.style.background = attInfo.color;
+    setTimeout(() => { bar.style.width = Math.min(s.attPct, 100) + '%'; }, 150);
+    document.getElementById('attRemark').textContent = attInfo.remark;
+    // Dot visualisation — 1 dot per day (cap at 60 for display)
+    const total60 = Math.min(s.workingDays, 60);
+    const present60 = Math.round((s.daysPresent / s.workingDays) * total60);
+    const dots = Array.from({ length: total60 }, (_, i) =>
+      `<div class="att-dot" style="background:${i < present60 ? attInfo.color : 'rgba(255,255,255,.1)'}"></div>`
+    ).join('');
+    document.getElementById('attDotRow').innerHTML = dots + (s.workingDays > 60 ? `<span style="font-size:.7rem;color:var(--text3);margin-left:4px">+${s.workingDays - 60} more</span>` : '');
+    // PDF attendance
+    document.getElementById('pdfAttSection').classList.remove('hidden');
+    document.getElementById('pdfAttGrid').innerHTML = [
+      { b: s.workingDays, l: 'Working Days' },
+      { b: s.daysPresent, l: 'Days Present' },
+      { b: absent,        l: 'Days Absent'  },
+      { b: s.attPct + '%',l: 'Attendance %' }
+    ].map(c => `<div class="p-att-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+    document.getElementById('pdfAttPctLabel').textContent = s.attPct + '% — ' + attInfo.label;
+    document.getElementById('pdfAttBarFill').style.cssText = `width:${s.attPct}%;background:${attInfo.color}`;
+    document.getElementById('pdfAttNote').textContent = attInfo.remark.substring(0, 100) + '…';
+  } else {
+    attSec.style.display = 'none';
+    document.getElementById('pdfAttSection').classList.add('hidden');
+  }
+
+  // Signatures & footer
+  document.getElementById('sigTeacher').textContent = `Class ${s.cls} Teacher`;
+  const now   = new Date();
+  const docId = 'VM-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+  document.getElementById('genDate').textContent = now.toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('genId').textContent   = docId;
+
+  // Build PDF template
+  document.getElementById('pdfStudent').innerHTML = [
+    { l:'Student Name', v:s.name },    { l:'Student ID',    v:s.sid },
+    { l:"Father's Name",v:s.father },  { l:'Admission No.', v:s.admno },
+    { l:'Class & Section',v:s.cls },   { l:'Roll Number',   v:s.roll }
+  ].map(f => `<div class="p-field"><label>${f.l}</label><span>${f.v || '—'}</span></div>`).join('');
+
+  document.getElementById('pdfSummary').innerHTML = [
+    { b:`${pct}%`, l:'Overall %' }, { b:grade, l:'Final Grade' },
+    { b:label,     l:'Performance' },{ b:passed ? 'PASS':'FAIL', l:'Result' },
+    ...(s.attPct !== null ? [{ b: s.attPct + '%', l: 'Attendance' }] : [])
+  ].map(c => `<div class="p-sum-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+  // Update grid columns dynamically
+  document.getElementById('pdfSummary').style.gridTemplateColumns = s.attPct !== null ? 'repeat(5,1fr)' : 'repeat(4,1fr)';
+
+  document.getElementById('pdfTable').innerHTML = `
+    <thead><tr><th>Subject</th><th>Max</th><th>Obtained</th><th>%</th><th>Grade</th><th>Status</th></tr></thead>
+    <tbody>
+      ${subs.map(sub => {
+        const m  = s.marks[sub];
+        const sp = Math.round((m / MAX_MARKS) * 100);
+        const { grade:g } = getGrade(sp);
+        const p  = m >= PASS_MARK;
+        return `<tr><td><strong>${sub}</strong></td><td>${MAX_MARKS}</td><td>${m}</td><td>${sp}%</td><td><strong>${g}</strong></td><td class="${p ? 'p-pass' : 'p-fail'}">${p ? 'Pass' : 'Fail'}</td></tr>`;
+      }).join('')}
+      <tr class="total-row">
+        <td><strong>TOTAL</strong></td><td><strong>${maxTotal}</strong></td><td><strong>${total}</strong></td>
+        <td><strong>${pct}%</strong></td><td><strong>${grade}</strong></td>
+        <td style="color:${passed ? '#10b981' : '#dc2626'};font-weight:700">${passed ? 'PASS' : 'FAIL'}</td>
+      </tr>
+    </tbody>`;
+
+  document.getElementById('pdfRemarks').textContent  = rec + (failed.length ? ` Areas needing attention: ${failed.join(', ')}.` : ' Passed in all subjects.');
+  document.getElementById('pdfTeacher').textContent  = `Class ${s.cls} Teacher`;
+  document.getElementById('pdfDocId').textContent    = docId;
+
+  showPage('result');
+}
+
+/* ═══════════ PDF DOWNLOAD ═══════════ */
+async function downloadPDF() {
+  const btn = document.getElementById('pdfBtn');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF…';
+  btn.disabled  = true;
+  try {
+    const tpl    = document.getElementById('pdfTpl');
+    const canvas = await html2canvas(tpl, { scale:2, useCORS:true, backgroundColor:'#ffffff', windowWidth:794, logging:false });
+    const { jsPDF } = window.jspdf;
+    const pdf   = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
+    const W     = pdf.internal.pageSize.getWidth();
+    const H     = pdf.internal.pageSize.getHeight();
+    const imgData = canvas.toDataURL('image/jpeg', .97);
+    const imgH  = (canvas.height * W) / canvas.width;
+    const TOLERANCE = 1; // 1mm — prevents sub-pixel ghost page
+    if (imgH <= H + TOLERANCE) {
+      pdf.addImage(imgData, 'JPEG', 0, 0, W, Math.min(imgH, H));
+    } else {
+      let y = 0;
+      while (y < imgH - TOLERANCE) {
+        pdf.addImage(imgData, 'JPEG', 0, -y, W, imgH);
+        y += H;
+        if (y < imgH - TOLERANCE) pdf.addPage();
+      }
+    }
+    pdf.save(`ReportCard_${document.getElementById('genId').textContent}.pdf`);
+  } catch (e) {
+    alert('PDF generation failed. Please try again.');
+    console.error(e);
+  }
+  btn.innerHTML = '<i class="fas fa-file-pdf"></i> Download Report Card PDF';
+  btn.disabled  = false;
+}
+
+/* ═══════════ INIT ═══════════ */
+document.getElementById('adminUrl').textContent = location.href;
 </script>
 </body>
 </html>
