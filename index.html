@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Academic Portal — City Montessori International School</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -461,8 +462,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
       <div class="admin-login-card">
         <div id="loginToast" class="toast"></div>
         <div class="form-group" style="margin-bottom:16px">
-          <label><i class="fas fa-user-shield"></i>Username</label>
-          <input class="inp" id="lUser" placeholder="Enter admin username" onkeydown="if(event.key==='Enter')adminLogin()">
+          <label><i class="fas fa-user-shield"></i>Admin Email</label>
+          <input class="inp" id="lUser" placeholder="admin@yourschool.com" onkeydown="if(event.key==='Enter')adminLogin()">
         </div>
         <div class="form-group" style="margin-bottom:20px">
           <label><i class="fas fa-key"></i>Password</label>
@@ -580,10 +581,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="settings-grid">
           <div class="settings-section">
             <h4><i class="fas fa-key"></i> Admin Credentials</h4>
-            <p class="text-muted">Current login credentials for this portal:</p>
-            <div class="cred-badge mt-16">Username <code>admin</code></div>
-            <div class="cred-badge mt-16" style="margin-top:10px">Password <code>admin@123</code></div>
-            <p class="text-muted mt-16" style="margin-top:12px">To change credentials, edit the <code style="color:var(--gold)">ADMIN_CREDS</code> constant in the HTML source.</p>
+            <p class="text-muted">Admin login is managed securely through Supabase Auth — no password is stored in this page's code.</p>
+            <p class="text-muted mt-16" style="margin-top:12px">To add or change admin accounts: go to your Supabase project → <strong style="color:var(--text)">Authentication → Users</strong> → Add user (email + password).</p>
           </div>
           <div class="settings-section">
             <h4><i class="fas fa-school"></i> Portal Info</h4>
@@ -780,15 +779,37 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 </div>
 
 <script>
-/* ═══════════ CONFIG ═══════════ */
-const ADMIN_CREDS = { user:'admin', pass:'admin@123' };
+/* ═══════════ CONFIG ═══════════
+   Paste your Supabase project values here.
+   Find them in: Supabase Dashboard → Project Settings → API
+   These two values are SAFE to expose publicly — they only allow
+   what your Row Level Security policies (set up in supabase_setup.sql)
+   permit. They are not secret admin keys.
+═══════════════════════════════════════════ */
+const SUPABASE_URL      = 'https://imrkclaqojthtnuakujv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcmtjbGFxb2p0aHRudWFrdWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzE4NzYsImV4cCI6MjA5OTc0Nzg3Nn0.OCynnmr7QE9Z61_s6UiMUXK3LPeFIA3wIL37B_NMJEo';
+
 const MAX_MARKS   = 100;
 const PASS_MARK   = 40;
 
-/* ═══════════ STATE ═══════════ */
+/* ═══════════ STATE ═══════════
+   Declared BEFORE the Supabase client is created, so that even if
+   the client fails to initialize (e.g. CDN blocked), the rest of
+   the page's variables still exist and buttons don't go dead. */
 let DB = [], SUBJECTS = [];
 let barChart = null, donutChart = null, classChart = null, gradeChart = null;
 let adminLoggedIn = false;
+
+let sb = null;
+try {
+  if (!window.supabase) throw new Error('Supabase library failed to load from CDN.');
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.error('Supabase init failed:', e);
+  window.addEventListener('DOMContentLoaded', () => {
+    alert('Could not connect to the database service. Please refresh the page. If this keeps happening, check your internet connection or ad-blocker settings.');
+  });
+}
 
 /* ═══════════════════════════════════════════
    PAGE ROUTING
@@ -817,29 +838,48 @@ function showPage(name) {
 
 function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-function goAdmin() {
-  if (adminLoggedIn) { showPage('admin'); } else { showPage('adminLogin'); }
+async function goAdmin() {
+  if (adminLoggedIn) { showPage('admin'); if (!DB.length) await loadStudentsFromDB(); }
+  else { showPage('adminLogin'); }
 }
 
-function adminLogin() {
+async function adminLogin() {
   const u = document.getElementById('lUser').value.trim();
   const p = document.getElementById('lPass').value;
-  if (!u || !p) { toast('login', 'Please enter username and password.', 'warn'); return; }
-  if (u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass) {
-    adminLoggedIn = true;
-    document.getElementById('adminUrl').textContent = location.href;
-    showPage('admin');
-    toast('admin', 'Welcome back, Admin! The student database is preserved.', 'success');
-  } else {
+  if (!u || !p) { toast('login', 'Please enter email and password.', 'warn'); return; }
+
+  const { data, error } = await sb.auth.signInWithPassword({ email: u, password: p });
+
+  if (error) {
     toast('login', 'Invalid credentials. Please try again.', 'error');
     document.getElementById('lPass').value = '';
+    return;
   }
+
+  adminLoggedIn = true;
+  document.getElementById('adminUrl').textContent = location.href;
+  showPage('admin');
+  toast('admin', 'Welcome back, Admin! Loading student database…', 'success');
+  await loadStudentsFromDB();
 }
 
-function adminLogout() {
+async function adminLogout() {
+  await sb.auth.signOut();
   adminLoggedIn = false;
+  DB = []; SUBJECTS = [];
   showPage('student');
 }
+
+/* Restore session on page load/refresh so admin isn't logged out
+   just because they reloaded the tab. */
+async function restoreSession() {
+  if (!sb) return;
+  const { data } = await sb.auth.getSession();
+  if (data && data.session) {
+    adminLoggedIn = true;
+  }
+}
+restoreSession();
 
 /* ═══════════ ADMIN PANELS ═══════════ */
 function switchPanel(name, btn) {
@@ -877,7 +917,7 @@ function loadExcel(i) { if (i.files[0]) processExcel(i.files[0]); }
 
 function processExcel(file) {
   const reader = new FileReader();
-  reader.onload = e => {
+  reader.onload = async e => {
     try {
       const wb   = XLSX.read(e.target.result, { type:'binary', cellFormula:false });
       const ws   = wb.Sheets[wb.SheetNames[0]];
@@ -887,50 +927,50 @@ function processExcel(file) {
       const skip = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name",'Working Days','Days Present'];
       SUBJECTS = Object.keys(rows[0]).filter(k => !skip.includes(k) && k.trim() !== '');
 
-      DB = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => {
-        const rec = {
-          sid:    r['Student ID'].toString().trim(),
-          admno:  r['Admn. No.'].toString().replace(/\.0$/, '').trim(),
-          cls:    r['Class'].toString().trim(),
-          roll:   r['Roll No.'].toString().trim(),
-          name:   r['Student Name'].toString().trim(),
-          father: r["Father's Name"].toString().trim(),
-          marks:  {},
-          workingDays: Number(r['Working Days']) || 0,
-          daysPresent: Number(r['Days Present']) || 0
-        };
+      const parsed = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => {
+        const marks = {};
         SUBJECTS.forEach(sub => {
           let v = r[sub];
           if (typeof v === 'string' && v.startsWith('=')) v = Math.floor(Math.random() * 41) + 60;
-          rec.marks[sub] = Number(v) || 0;
+          marks[sub] = Number(v) || 0;
         });
-        const tot = SUBJECTS.reduce((a, sub) => a + rec.marks[sub], 0);
-        rec.total  = tot;
-        rec.pct    = Math.round((tot / (SUBJECTS.length * MAX_MARKS)) * 100);
-        rec.grade  = getGrade(rec.pct).grade;
-        rec.passed = SUBJECTS.every(sub => rec.marks[sub] >= PASS_MARK);
-        rec.attPct = rec.workingDays > 0 ? Math.round((rec.daysPresent / rec.workingDays) * 100) : null;
-        return rec;
+        return {
+          sid:    r['Student ID'].toString().trim(),
+          admno:  r['Admn. No.'].toString().replace(/\.0$/, '').trim(),
+          class:  r['Class'].toString().trim(),
+          roll:   r['Roll No.'].toString().trim(),
+          name:   r['Student Name'].toString().trim(),
+          father: r["Father's Name"].toString().trim(),
+          marks:  marks,
+          working_days: Number(r['Working Days']) || 0,
+          days_present: Number(r['Days Present']) || 0
+        };
       });
 
+      if (!parsed.length) { toast('admin', 'No valid student rows found.', 'error'); return; }
+
+      toast('admin', `Uploading ${parsed.length} records to the database…`, 'info');
+
+      // Upload in batches of 200 to avoid oversized requests
+      const BATCH = 200;
+      for (let i = 0; i < parsed.length; i += BATCH) {
+        const chunk = parsed.slice(i, i + BATCH);
+        const { error } = await sb.from('students').upsert(chunk, { onConflict: 'sid' });
+        if (error) {
+          toast('admin', 'Upload failed: ' + error.message, 'error');
+          console.error(error);
+          return;
+        }
+      }
+
+      await loadStudentsFromDB();
+
       const classes = [...new Set(DB.map(r => r.cls))];
-      const passed  = DB.filter(r => r.passed).length;
-
-      document.getElementById('stStudents').textContent = DB.length;
-      document.getElementById('stSubjects').textContent = SUBJECTS.length;
-      document.getElementById('stClasses').textContent  = classes.length;
-      document.getElementById('stPassed').textContent   = passed;
-      document.getElementById('stPassPct').textContent  = `${Math.round((passed / DB.length) * 100)}% pass rate`;
-      document.getElementById('dbStats').classList.remove('hidden');
-      document.getElementById('clearBtn').classList.remove('hidden');
-
       const zone = document.getElementById('uploadZone');
       zone.classList.add('loaded');
       document.getElementById('uploadTitle').textContent = '✓ ' + file.name;
       document.getElementById('uploadSub').textContent   = `${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
-      toast('admin', `Database loaded: ${DB.length} students across ${classes.length} classes.`, 'success');
-      buildStudentTable();
-      updateRecordCount();
+      toast('admin', `Database updated: ${DB.length} students across ${classes.length} classes.`, 'success');
     } catch (err) {
       toast('admin', 'Error reading file. Please check the format.', 'error');
       console.error(err);
@@ -939,7 +979,54 @@ function processExcel(file) {
   reader.readAsBinaryString(file);
 }
 
-function clearDB() {
+/* Pull every record down from Supabase and rebuild local view-state
+   (DB / SUBJECTS) used by the table, stats, and charts. */
+async function loadStudentsFromDB() {
+  const { data, error } = await sb.from('students').select('*').order('id', { ascending: true });
+  if (error) { toast('admin', 'Could not load database: ' + error.message, 'error'); return; }
+
+  SUBJECTS = [...new Set(data.flatMap(r => Object.keys(r.marks || {})))];
+
+  DB = data.map(r => {
+    const tot = SUBJECTS.reduce((a, sub) => a + (Number(r.marks[sub]) || 0), 0);
+    const pct = Math.round((tot / (SUBJECTS.length * MAX_MARKS)) * 100);
+    return {
+      sid: r.sid, admno: r.admno, cls: r.class, roll: r.roll,
+      name: r.name, father: r.father, marks: r.marks,
+      total: tot, pct: pct, grade: getGrade(pct).grade,
+      passed: SUBJECTS.every(sub => (Number(r.marks[sub]) || 0) >= PASS_MARK),
+      workingDays: r.working_days || 0,
+      daysPresent: r.days_present || 0,
+      attPct: r.working_days > 0 ? Math.round((r.days_present / r.working_days) * 100) : null
+    };
+  });
+
+  const classes = [...new Set(DB.map(r => r.cls))];
+  const passed  = DB.filter(r => r.passed).length;
+
+  if (DB.length) {
+    document.getElementById('stStudents').textContent = DB.length;
+    document.getElementById('stSubjects').textContent = SUBJECTS.length;
+    document.getElementById('stClasses').textContent  = classes.length;
+    document.getElementById('stPassed').textContent   = passed;
+    document.getElementById('stPassPct').textContent  = `${Math.round((passed / DB.length) * 100)}% pass rate`;
+    document.getElementById('dbStats').classList.remove('hidden');
+    document.getElementById('clearBtn').classList.remove('hidden');
+    const zone = document.getElementById('uploadZone');
+    zone.classList.add('loaded');
+    document.getElementById('uploadTitle').textContent = `✓ ${DB.length} students in database`;
+    document.getElementById('uploadSub').textContent   = `${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
+  }
+
+  buildStudentTable();
+  updateRecordCount();
+}
+
+async function clearDB() {
+  if (!confirm('This will permanently delete ALL student records from the live database for every visitor. Continue?')) return;
+  const { error } = await sb.from('students').delete().neq('sid', '__never__');
+  if (error) { toast('admin', 'Could not clear database: ' + error.message, 'error'); return; }
+
   DB = []; SUBJECTS = [];
   document.getElementById('dbStats').classList.add('hidden');
   document.getElementById('clearBtn').classList.add('hidden');
@@ -1076,18 +1163,29 @@ function getGrade(pct) {
 }
 
 /* ═══════════ STUDENT VERIFY ═══════════ */
-function verifyStudent() {
+async function verifyStudent() {
   const sid    = document.getElementById('fSid').value.trim();
   const father = document.getElementById('fFather').value.trim();
   const admno  = document.getElementById('fAdm').value.trim();
   if (!sid || !father || !admno) { toast('student', 'Please fill all three fields.', 'error'); return; }
-  if (!DB.length) { toast('student', 'Results not yet published. Please check back later.', 'info'); return; }
-  const s = DB.find(r =>
-    r.sid.toLowerCase()    === sid.toLowerCase()    &&
-    r.father.toLowerCase() === father.toLowerCase() &&
-    r.admno                === admno.replace(/\.0$/, '')
-  );
-  if (!s) { toast('student', "No record found. Please verify your Student ID, Father's Name and Admission No.", 'error'); return; }
+
+  toast('student', 'Looking up your result…', 'info');
+
+  const { data, error } = await sb.rpc('verify_student', {
+    p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '')
+  });
+
+  if (error) { toast('student', 'Something went wrong. Please try again shortly.', 'error'); console.error(error); return; }
+  if (!data || !data.length) { toast('student', "No record found. Please verify your Student ID, Father's Name and Admission No.", 'error'); return; }
+
+  const r = data[0];
+  const s = {
+    sid: r.sid, admno: r.admno, cls: r.class, roll: r.roll,
+    name: r.name, father: r.father, marks: r.marks,
+    workingDays: r.working_days || 0,
+    daysPresent: r.days_present || 0,
+    attPct: r.working_days > 0 ? Math.round((r.days_present / r.working_days) * 100) : null
+  };
   renderResult(s);
 }
 
