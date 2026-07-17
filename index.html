@@ -419,29 +419,48 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   </div>
 
   <div class="portal-wrap">
-    <div class="card">
-      <div class="card-head">
-        <h3><i class="fas fa-unlock-keyhole" style="color:var(--gold);margin-right:10px"></i>Student Verification</h3>
-        <p>All three fields must match our records exactly</p>
+
+    <!-- Shown while no results are published yet -->
+    <div class="card hidden" id="notLiveCard">
+      <div style="padding:clamp(32px,6vw,56px) 24px;text-align:center">
+        <div style="font-size:2.4rem;color:var(--gold);margin-bottom:18px"><i class="fas fa-hourglass-half"></i></div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:10px">Results Not Yet Declared</h3>
+        <p style="color:var(--text2);font-size:.9rem;max-width:380px;margin:0 auto">The academic results for this session have not been published yet. Please check back later — this page will update automatically once results are declared.</p>
       </div>
-      <div style="padding:clamp(20px,4vw,36px)">
-        <div id="studentToast" class="toast"></div>
-        <div class="form-row cols-3" style="margin-bottom:16px">
-          <div class="form-group">
-            <label><i class="fas fa-id-badge"></i>Student ID</label>
-            <input class="inp" id="fSid" placeholder="e.g. TVMS52321" onkeydown="if(event.key==='Enter')verifyStudent()">
-          </div>
-          <div class="form-group">
-            <label><i class="fas fa-user"></i>Father's Name</label>
-            <input class="inp" id="fFather" placeholder="e.g. Adarsh Jain" onkeydown="if(event.key==='Enter')verifyStudent()">
-          </div>
-          <div class="form-group">
-            <label><i class="fas fa-hashtag"></i>Admission No.</label>
-            <input class="inp" id="fAdm" placeholder="e.g. 1531" onkeydown="if(event.key==='Enter')verifyStudent()">
-          </div>
+    </div>
+
+    <!-- Shown once an admin has published a session -->
+    <div class="hidden" id="liveCard">
+      <div class="card" style="margin-bottom:16px">
+        <div style="padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span class="badge badge-green"><i class="fas fa-circle-check"></i>&nbsp;Results Declared</span>
+          <span style="color:var(--text2);font-size:.88rem">Session: <strong id="liveSessionName" style="color:var(--gold)">—</strong></span>
         </div>
-        <button class="btn btn-gold btn-full" onclick="verifyStudent()"><i class="fas fa-search"></i> Find My Result</button>
-        <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i>&nbsp;Triple-field verification · Your data is secure</p>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h3><i class="fas fa-unlock-keyhole" style="color:var(--gold);margin-right:10px"></i>Student Verification</h3>
+          <p>All three fields must match our records exactly</p>
+        </div>
+        <div style="padding:clamp(20px,4vw,36px)">
+          <div id="studentToast" class="toast"></div>
+          <div class="form-row cols-3" style="margin-bottom:16px">
+            <div class="form-group">
+              <label><i class="fas fa-id-badge"></i>Student ID</label>
+              <input class="inp" id="fSid" placeholder="e.g. TVMS52321" onkeydown="if(event.key==='Enter')verifyStudent()">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-user"></i>Father's Name</label>
+              <input class="inp" id="fFather" placeholder="e.g. Adarsh Jain" onkeydown="if(event.key==='Enter')verifyStudent()">
+            </div>
+            <div class="form-group">
+              <label><i class="fas fa-hashtag"></i>Admission No.</label>
+              <input class="inp" id="fAdm" placeholder="e.g. 1531" onkeydown="if(event.key==='Enter')verifyStudent()">
+            </div>
+          </div>
+          <button class="btn btn-gold btn-full" onclick="verifyStudent()"><i class="fas fa-search"></i> Find My Result</button>
+          <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i>&nbsp;Triple-field verification · Your data is secure</p>
+        </div>
       </div>
     </div>
   </div>
@@ -523,6 +542,20 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
         <div id="adminToast" class="toast" style="margin-bottom:18px"></div>
 
+        <!-- Current publish status -->
+        <div class="card mt-16" style="margin-bottom:20px">
+          <div style="padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+              <span class="badge" id="statusBadge" style="background:rgba(255,255,255,.08);color:var(--text2)">Loading…</span>
+              <div>
+                <div style="font-size:.88rem;color:var(--text)" id="statusSessionLine">—</div>
+                <div style="font-size:.74rem;color:var(--text3)" id="statusDateLine"></div>
+              </div>
+            </div>
+            <button class="btn btn-ghost btn-sm hidden" id="takeOfflineBtn" onclick="takeResultsOffline()"><i class="fas fa-eye-slash"></i> Take Offline</button>
+          </div>
+        </div>
+
         <div class="upload-area" id="uploadZone" onclick="document.getElementById('xlFile').click()" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
           <div class="upload-icon"><i class="fas fa-file-arrow-up"></i></div>
           <h4 id="uploadTitle">Drop Excel file here or click to browse</h4>
@@ -535,6 +568,32 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
           <br><span style="color:var(--text3);margin-top:6px;display:block">Subject columns are auto-detected. Max marks per subject: 100. Pass mark: 40.</span>
           <br><strong>Optional Attendance columns:</strong> <code style="color:var(--gold)">Working Days</code> &bull; <code style="color:var(--gold)">Days Present</code>
           <span style="color:var(--text3);display:block;margin-top:4px">When present, a rich attendance section is shown on each student's report card and PDF.</span>
+        </div>
+
+        <!-- Review & Publish — appears only after a file has been parsed, nothing goes live until confirmed here -->
+        <div class="card hidden mt-24" id="reviewCard" style="border-color:var(--gold-border)">
+          <div class="card-head">
+            <h3><i class="fas fa-clipboard-check" style="color:var(--gold);margin-right:10px"></i>Review Before Publishing</h3>
+            <p>Nothing is live yet — check the details below, then confirm to publish</p>
+          </div>
+          <div style="padding:clamp(20px,4vw,28px)">
+            <div class="stats-row" id="reviewStats" style="margin-bottom:20px"></div>
+
+            <div class="form-group" style="margin-bottom:18px">
+              <label><i class="fas fa-calendar-days"></i>Session / Exam Name</label>
+              <input class="inp" id="sessionNameInput" placeholder="e.g. Annual Exam 2025–26, Term 1 2025–26">
+            </div>
+
+            <label style="display:flex;align-items:flex-start;gap:10px;font-size:.85rem;color:var(--text2);cursor:pointer;margin-bottom:20px">
+              <input type="checkbox" id="confirmCheckbox" style="margin-top:3px;width:16px;height:16px;flex-shrink:0" onchange="updatePublishBtnState()">
+              I have reviewed this data and confirm it is accurate and ready to be published live to the student portal.
+            </label>
+
+            <div class="flex-row">
+              <button class="btn btn-gold grow" id="publishBtn" onclick="publishResults()" disabled><i class="fas fa-globe"></i> Publish Results Live</button>
+              <button class="btn btn-ghost" onclick="discardStaged()"><i class="fas fa-xmark"></i> Discard</button>
+            </div>
+          </div>
         </div>
 
         <div class="stats-row mt-24 hidden" id="dbStats">
@@ -861,6 +920,7 @@ async function adminLogin() {
   showPage('admin');
   toast('admin', 'Welcome back, Admin! Loading student database…', 'success');
   await loadStudentsFromDB();
+  await loadPortalStatus();
 }
 
 async function adminLogout() {
@@ -880,6 +940,7 @@ async function restoreSession() {
   }
 }
 restoreSession();
+loadPortalStatus();
 
 /* ═══════════ ADMIN PANELS ═══════════ */
 function switchPanel(name, btn) {
@@ -909,15 +970,21 @@ function toast(target, msg, type) {
   if (type !== 'error') setTimeout(() => el.classList.remove('show'), 5000);
 }
 
-/* ═══════════ EXCEL UPLOAD ═══════════ */
+/* ═══════════ EXCEL UPLOAD (STAGED — nothing goes live until Publish) ═══════════ */
+let stagedRecords = [];   // parsed rows, waiting for admin confirmation
+let stagedFileName = '';
+
 function dragOver(e)  { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag'); }
 function dragLeave()  { document.getElementById('uploadZone').classList.remove('drag'); }
 function dropFile(e)  { e.preventDefault(); dragLeave(); const f = e.dataTransfer.files[0]; if (f) processExcel(f); }
 function loadExcel(i) { if (i.files[0]) processExcel(i.files[0]); }
 
+/* Parses the Excel file into memory only. Nothing is sent to
+   Supabase here — it just populates the Review card so the admin
+   can check everything before it goes live. */
 function processExcel(file) {
   const reader = new FileReader();
-  reader.onload = async e => {
+  reader.onload = e => {
     try {
       const wb   = XLSX.read(e.target.result, { type:'binary', cellFormula:false });
       const ws   = wb.Sheets[wb.SheetNames[0]];
@@ -925,11 +992,11 @@ function processExcel(file) {
       if (!rows.length) { toast('admin', 'No data found in file.', 'error'); return; }
 
       const skip = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name",'Working Days','Days Present'];
-      SUBJECTS = Object.keys(rows[0]).filter(k => !skip.includes(k) && k.trim() !== '');
+      const subjects = Object.keys(rows[0]).filter(k => !skip.includes(k) && k.trim() !== '');
 
       const parsed = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => {
         const marks = {};
-        SUBJECTS.forEach(sub => {
+        subjects.forEach(sub => {
           let v = r[sub];
           if (typeof v === 'string' && v.startsWith('=')) v = Math.floor(Math.random() * 41) + 60;
           marks[sub] = Number(v) || 0;
@@ -949,34 +1016,141 @@ function processExcel(file) {
 
       if (!parsed.length) { toast('admin', 'No valid student rows found.', 'error'); return; }
 
-      toast('admin', `Uploading ${parsed.length} records to the database…`, 'info');
+      stagedRecords  = parsed;
+      stagedFileName = file.name;
 
-      // Upload in batches of 200 to avoid oversized requests
-      const BATCH = 200;
-      for (let i = 0; i < parsed.length; i += BATCH) {
-        const chunk = parsed.slice(i, i + BATCH);
-        const { error } = await sb.from('students').upsert(chunk, { onConflict: 'sid' });
-        if (error) {
-          toast('admin', 'Upload failed: ' + error.message, 'error');
-          console.error(error);
-          return;
-        }
-      }
-
-      await loadStudentsFromDB();
-
-      const classes = [...new Set(DB.map(r => r.cls))];
+      const classes = [...new Set(parsed.map(r => r.class))];
       const zone = document.getElementById('uploadZone');
       zone.classList.add('loaded');
-      document.getElementById('uploadTitle').textContent = '✓ ' + file.name;
-      document.getElementById('uploadSub').textContent   = `${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
-      toast('admin', `Database updated: ${DB.length} students across ${classes.length} classes.`, 'success');
+      document.getElementById('uploadTitle').textContent = '✓ ' + file.name + ' (staged — not live yet)';
+      document.getElementById('uploadSub').textContent   = `${parsed.length} students · ${subjects.length} subjects · ${classes.length} classes parsed`;
+
+      document.getElementById('reviewStats').innerHTML = `
+        <div class="stat-card"><div class="num">${parsed.length}</div><div class="lbl">Students Parsed</div></div>
+        <div class="stat-card"><div class="num">${subjects.length}</div><div class="lbl">Subjects</div></div>
+        <div class="stat-card"><div class="num">${classes.length}</div><div class="lbl">Classes</div></div>
+      `;
+      document.getElementById('sessionNameInput').value = '';
+      document.getElementById('confirmCheckbox').checked = false;
+      updatePublishBtnState();
+      document.getElementById('reviewCard').classList.remove('hidden');
+      document.getElementById('reviewCard').scrollIntoView({ behavior:'smooth', block:'nearest' });
+      toast('admin', `Parsed ${parsed.length} records. Review below before publishing.`, 'info');
     } catch (err) {
       toast('admin', 'Error reading file. Please check the format.', 'error');
       console.error(err);
     }
   };
   reader.readAsBinaryString(file);
+}
+
+function updatePublishBtnState() {
+  const sessionOk = document.getElementById('sessionNameInput').value.trim().length > 0;
+  const checked   = document.getElementById('confirmCheckbox').checked;
+  document.getElementById('publishBtn').disabled = !(sessionOk && checked);
+}
+document.addEventListener('input', e => { if (e.target && e.target.id === 'sessionNameInput') updatePublishBtnState(); });
+
+function discardStaged() {
+  stagedRecords = []; stagedFileName = '';
+  document.getElementById('reviewCard').classList.add('hidden');
+  document.getElementById('xlFile').value = '';
+  const zone = document.getElementById('uploadZone');
+  zone.classList.remove('loaded');
+  document.getElementById('uploadTitle').textContent = 'Drop Excel file here or click to browse';
+  document.getElementById('uploadSub').textContent   = 'Accepts .xlsx format · School student database file';
+  toast('admin', 'Staged upload discarded. Nothing was changed.', 'info');
+}
+
+/* The ONLY place that actually writes to Supabase and makes
+   results visible to the public. Requires the session name +
+   confirmation checkbox, enforced by the disabled Publish button. */
+async function publishResults() {
+  const sessionName = document.getElementById('sessionNameInput').value.trim();
+  const confirmed    = document.getElementById('confirmCheckbox').checked;
+  if (!stagedRecords.length || !sessionName || !confirmed) return;
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing…';
+
+  try {
+    const BATCH = 200;
+    for (let i = 0; i < stagedRecords.length; i += BATCH) {
+      const chunk = stagedRecords.slice(i, i + BATCH);
+      const { error } = await sb.from('students').upsert(chunk, { onConflict: 'sid' });
+      if (error) throw error;
+    }
+
+    const { error: statusErr } = await sb.from('portal_status').upsert({
+      id: 1, is_live: true, session_name: sessionName, published_at: new Date().toISOString()
+    });
+    if (statusErr) throw statusErr;
+
+    await loadStudentsFromDB();
+    await loadPortalStatus();
+
+    document.getElementById('reviewCard').classList.add('hidden');
+    stagedRecords = []; stagedFileName = '';
+    toast('admin', `Published live: "${sessionName}" — ${DB.length} students.`, 'success');
+  } catch (err) {
+    toast('admin', 'Publish failed: ' + err.message, 'error');
+    console.error(err);
+  }
+  btn.innerHTML = '<i class="fas fa-globe"></i> Publish Results Live';
+  updatePublishBtnState();
+}
+
+/* Hides results from the public WITHOUT deleting data — useful if
+   something needs correcting after publishing. */
+async function takeResultsOffline() {
+  if (!confirm('This will hide results from all students immediately. The data itself is kept — you can re-publish anytime. Continue?')) return;
+  const { error } = await sb.from('portal_status').update({ is_live:false }).eq('id', 1);
+  if (error) { toast('admin', 'Could not update status: ' + error.message, 'error'); return; }
+  await loadPortalStatus();
+  toast('admin', 'Results are now hidden from the public portal.', 'info');
+}
+
+/* Reads the public portal_status row and updates both the student
+   portal banners and the admin status card. Anyone can call this —
+   it's a public read, no login required. */
+async function loadPortalStatus() {
+  if (!sb) return;
+  const { data, error } = await sb.from('portal_status').select('*').eq('id', 1).maybeSingle();
+  if (error) { console.error(error); return; }
+
+  const isLive = !!(data && data.is_live);
+  const session = data && data.session_name;
+  const publishedAt = data && data.published_at;
+
+  // Student-facing banners
+  const notLiveCard = document.getElementById('notLiveCard');
+  const liveCard    = document.getElementById('liveCard');
+  if (notLiveCard && liveCard) {
+    notLiveCard.classList.toggle('hidden', isLive);
+    liveCard.classList.toggle('hidden', !isLive);
+    if (isLive) document.getElementById('liveSessionName').textContent = session || 'Current Session';
+  }
+
+  // Admin status card (only present once admin dashboard is in the DOM)
+  const badge = document.getElementById('statusBadge');
+  if (badge) {
+    if (isLive) {
+      badge.textContent = 'LIVE';
+      badge.style.background = 'rgba(16,217,138,.15)';
+      badge.style.color = 'var(--green)';
+      document.getElementById('statusSessionLine').textContent = `Session: ${session || '—'}`;
+      document.getElementById('statusDateLine').textContent = publishedAt ? `Published ${new Date(publishedAt).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}` : '';
+      document.getElementById('takeOfflineBtn').classList.remove('hidden');
+    } else {
+      badge.textContent = 'NOT LIVE';
+      badge.style.background = 'rgba(255,77,109,.12)';
+      badge.style.color = 'var(--red)';
+      document.getElementById('statusSessionLine').textContent = 'Results are not visible to students yet';
+      document.getElementById('statusDateLine').textContent = '';
+      document.getElementById('takeOfflineBtn').classList.add('hidden');
+    }
+  }
 }
 
 /* Pull every record down from Supabase and rebuild local view-state
@@ -1012,10 +1186,6 @@ async function loadStudentsFromDB() {
     document.getElementById('stPassPct').textContent  = `${Math.round((passed / DB.length) * 100)}% pass rate`;
     document.getElementById('dbStats').classList.remove('hidden');
     document.getElementById('clearBtn').classList.remove('hidden');
-    const zone = document.getElementById('uploadZone');
-    zone.classList.add('loaded');
-    document.getElementById('uploadTitle').textContent = `✓ ${DB.length} students in database`;
-    document.getElementById('uploadSub').textContent   = `${DB.length} students · ${SUBJECTS.length} subjects · ${classes.length} classes`;
   }
 
   buildStudentTable();
@@ -1023,9 +1193,12 @@ async function loadStudentsFromDB() {
 }
 
 async function clearDB() {
-  if (!confirm('This will permanently delete ALL student records from the live database for every visitor. Continue?')) return;
+  if (!confirm('This will permanently delete ALL student records from the live database for every visitor, and take results offline. Continue?')) return;
   const { error } = await sb.from('students').delete().neq('sid', '__never__');
   if (error) { toast('admin', 'Could not clear database: ' + error.message, 'error'); return; }
+
+  await sb.from('portal_status').upsert({ id: 1, is_live: false, session_name: null, published_at: null });
+  await loadPortalStatus();
 
   DB = []; SUBJECTS = [];
   document.getElementById('dbStats').classList.add('hidden');
@@ -1037,7 +1210,7 @@ async function clearDB() {
   document.getElementById('xlFile').value = '';
   document.getElementById('studentTbody').innerHTML = '';
   updateRecordCount();
-  toast('admin', 'Database cleared.', 'info');
+  toast('admin', 'Database cleared and results taken offline.', 'info');
 }
 
 /* ═══════════ STUDENT TABLE ═══════════ */
