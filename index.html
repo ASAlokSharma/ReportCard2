@@ -398,7 +398,6 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
       </div>
     </div>
     <div class="nav-right">
-      <div class="nav-pill" id="navPill"><i class="fas fa-circle" style="font-size:7px;color:var(--green)"></i>&nbsp;Live Portal</div>
       <!-- Shown on student/result pages: go to admin -->
       <button class="nav-admin-btn" id="navAdminBtn" onclick="goAdmin()"><i class="fas fa-shield-halved"></i> Admin</button>
       <!-- Shown on admin pages: go back to student portal WITHOUT logging out / losing DB -->
@@ -412,7 +411,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 <!-- ═══════════ PAGE 1: STUDENT PORTAL (default) ═══════════ -->
 <div id="pageStudent" class="page active">
   <div class="hero">
-    <div class="hero-badge"><i class="fas fa-graduation-cap"></i> Academic Year 2024–25</div>
+    <div class="hero-badge" id="heroBadge"><i class="fas fa-graduation-cap"></i>&nbsp;<span id="heroBadgeText">Academic Result Portal</span></div>
     <h2>Your <span>Result</span>,<br>Beautifully Presented</h2>
     <p>Enter your credentials to access your complete academic performance report with charts, insights, and a downloadable PDF report card.</p>
     <div class="divider"></div>
@@ -549,10 +548,14 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
               <span class="badge" id="statusBadge" style="background:rgba(255,255,255,.08);color:var(--text2)">Loading…</span>
               <div>
                 <div style="font-size:.88rem;color:var(--text)" id="statusSessionLine">—</div>
+                <div style="font-size:.74rem;color:var(--text3)" id="statusFileLine"></div>
                 <div style="font-size:.74rem;color:var(--text3)" id="statusDateLine"></div>
               </div>
             </div>
-            <button class="btn btn-ghost btn-sm hidden" id="takeOfflineBtn" onclick="takeResultsOffline()"><i class="fas fa-eye-slash"></i> Take Offline</button>
+            <div class="flex-row" style="gap:8px">
+              <button class="btn btn-gold btn-sm hidden" id="goLiveBtn" onclick="goLiveAgain()"><i class="fas fa-tower-broadcast"></i> Go Live Again</button>
+              <button class="btn btn-ghost btn-sm hidden" id="takeOfflineBtn" onclick="takeResultsOffline()"><i class="fas fa-eye-slash"></i> Take Offline</button>
+            </div>
           </div>
         </div>
 
@@ -608,6 +611,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
       <div class="admin-panel" id="panelStudents">
         <div class="admin-topbar">
           <div><h2>Student Records</h2><p id="recordCount">No database loaded</p></div>
+          <button class="btn btn-outline btn-sm" onclick="exportToExcel()"><i class="fas fa-file-export"></i> Export to Excel</button>
         </div>
         <div class="table-wrap">
           <div class="table-search">
@@ -646,7 +650,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
           <div class="settings-section">
             <h4><i class="fas fa-school"></i> Portal Info</h4>
             <p class="text-muted">School: <strong style="color:var(--text)">Ythaen</strong></p>
-            <p class="text-muted mt-16" style="margin-top:10px">Academic Year: <strong style="color:var(--gold)">2024–25</strong></p>
+            <p class="text-muted mt-16" style="margin-top:10px">Current Session: <strong id="settingsSessionName" style="color:var(--gold)">—</strong></p>
             <p class="text-muted" style="margin-top:10px">Pass Mark: <strong style="color:var(--text)">40 / 100</strong></p>
             <p class="text-muted" style="margin-top:10px">Max Marks: <strong style="color:var(--text)">100 per subject</strong></p>
           </div>
@@ -688,8 +692,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
             </div>
           </div>
           <div class="session-box">
-            <div class="yr">2024–25</div>
-            <div class="type">Annual Report Card</div>
+            <div class="yr" id="resultSessionYr">—</div>
+            <div class="type">Report Card</div>
           </div>
         </div>
         <div class="student-grid" id="studentGrid"></div>
@@ -804,7 +808,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
           <p>Excellence · Integrity · Innovation · Affiliated to CBSE</p>
         </div>
       </div>
-      <div class="p-badge"><div class="y">2024–25</div><div class="t">Annual Report Card</div></div>
+      <div class="p-badge"><div class="y" id="pdfBadgeYr">—</div><div class="t">Report Card</div></div>
     </div>
     <div class="p-student" id="pdfStudent"></div>
     <div class="p-summary" id="pdfSummary"></div>
@@ -858,6 +862,7 @@ const PASS_MARK   = 40;
 let DB = [], SUBJECTS = [];
 let barChart = null, donutChart = null, classChart = null, gradeChart = null;
 let adminLoggedIn = false;
+let CURRENT_SESSION_NAME = null;
 
 let sb = null;
 try {
@@ -1083,7 +1088,7 @@ async function publishResults() {
     }
 
     const { error: statusErr } = await sb.from('portal_status').upsert({
-      id: 1, is_live: true, session_name: sessionName, published_at: new Date().toISOString()
+      id: 1, is_live: true, session_name: sessionName, published_at: new Date().toISOString(), file_name: stagedFileName
     });
     if (statusErr) throw statusErr;
 
@@ -1122,6 +1127,9 @@ async function loadPortalStatus() {
   const isLive = !!(data && data.is_live);
   const session = data && data.session_name;
   const publishedAt = data && data.published_at;
+  const fileName = data && data.file_name;
+
+  CURRENT_SESSION_NAME = session || null;
 
   // Student-facing banners
   const notLiveCard = document.getElementById('notLiveCard');
@@ -1132,25 +1140,51 @@ async function loadPortalStatus() {
     if (isLive) document.getElementById('liveSessionName').textContent = session || 'Current Session';
   }
 
+  // Homepage hero badge
+  const heroText = document.getElementById('heroBadgeText');
+  if (heroText) heroText.textContent = isLive ? (session || 'Results Declared').toUpperCase() : 'Academic Result Portal';
+
+  // Settings panel
+  const settingsSession = document.getElementById('settingsSessionName');
+  if (settingsSession) settingsSession.textContent = session ? session + (isLive ? '' : ' (offline)') : 'Not declared yet';
+
   // Admin status card (only present once admin dashboard is in the DOM)
   const badge = document.getElementById('statusBadge');
   if (badge) {
+    const fileLine = document.getElementById('statusFileLine');
+    const goLiveBtn = document.getElementById('goLiveBtn');
     if (isLive) {
       badge.textContent = 'LIVE';
       badge.style.background = 'rgba(16,217,138,.15)';
       badge.style.color = 'var(--green)';
       document.getElementById('statusSessionLine').textContent = `Session: ${session || '—'}`;
+      fileLine.textContent = fileName ? `Document: ${fileName}` : '';
       document.getElementById('statusDateLine').textContent = publishedAt ? `Published ${new Date(publishedAt).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}` : '';
       document.getElementById('takeOfflineBtn').classList.remove('hidden');
+      goLiveBtn.classList.add('hidden');
     } else {
       badge.textContent = 'NOT LIVE';
       badge.style.background = 'rgba(255,77,109,.12)';
       badge.style.color = 'var(--red)';
-      document.getElementById('statusSessionLine').textContent = 'Results are not visible to students yet';
-      document.getElementById('statusDateLine').textContent = '';
+      document.getElementById('statusSessionLine').textContent = session ? `Last session: ${session} (currently hidden)` : 'Results are not visible to students yet';
+      fileLine.textContent = fileName ? `Document: ${fileName}` : '';
+      document.getElementById('statusDateLine').textContent = publishedAt ? `Last published ${new Date(publishedAt).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}` : '';
       document.getElementById('takeOfflineBtn').classList.add('hidden');
+      // Only offer "Go Live Again" if there's an existing published session to restore
+      goLiveBtn.classList.toggle('hidden', !session);
     }
   }
+}
+
+/* Re-activates the most recently published session WITHOUT
+   requiring a fresh Excel upload — for when an admin took results
+   offline temporarily and wants to restore them as-is. */
+async function goLiveAgain() {
+  if (!confirm('This will make the existing results visible to students again, using the same session name as before. Continue?')) return;
+  const { error } = await sb.from('portal_status').update({ is_live: true, published_at: new Date().toISOString() }).eq('id', 1);
+  if (error) { toast('admin', 'Could not go live: ' + error.message, 'error'); return; }
+  await loadPortalStatus();
+  toast('admin', 'Results are live again.', 'success');
 }
 
 /* Pull every record down from Supabase and rebuild local view-state
@@ -1197,7 +1231,7 @@ async function clearDB() {
   const { error } = await sb.from('students').delete().neq('sid', '__never__');
   if (error) { toast('admin', 'Could not clear database: ' + error.message, 'error'); return; }
 
-  await sb.from('portal_status').upsert({ id: 1, is_live: false, session_name: null, published_at: null });
+  await sb.from('portal_status').upsert({ id: 1, is_live: false, session_name: null, published_at: null, file_name: null });
   await loadPortalStatus();
 
   DB = []; SUBJECTS = [];
@@ -1244,6 +1278,29 @@ function filterTable(q) {
     r.cls.toLowerCase().includes(q)  ||
     r.father.toLowerCase().includes(q)
   ));
+}
+
+/* Lets the admin download the currently loaded database as an
+   .xlsx file — useful for backups or offline record-keeping. */
+function exportToExcel() {
+  if (!DB.length) { toast('admin', 'No records to export.', 'warn'); return; }
+  const rows = DB.map(r => {
+    const row = {
+      'Student ID': r.sid, 'Admn. No.': r.admno, 'Class': r.cls, 'Roll No.': r.roll,
+      'Student Name': r.name, "Father's Name": r.father
+    };
+    SUBJECTS.forEach(sub => row[sub] = r.marks[sub]);
+    row['Total'] = r.total; row['Percentage'] = r.pct; row['Grade'] = r.grade;
+    row['Result'] = r.passed ? 'Pass' : 'Fail';
+    if (r.workingDays) { row['Working Days'] = r.workingDays; row['Days Present'] = r.daysPresent; }
+    return row;
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Students');
+  const sessionPart = CURRENT_SESSION_NAME ? CURRENT_SESSION_NAME.replace(/[^a-z0-9]+/gi, '_') : 'export';
+  XLSX.writeFile(wb, `StudentRecords_${sessionPart}.xlsx`);
+  toast('admin', 'Export downloaded.', 'success');
 }
 
 function updateRecordCount() {
@@ -1380,6 +1437,10 @@ function renderResult(student) {
   const passed  = marksArr.every(m => m >= PASS_MARK);
   const failed  = subs.filter(k => s.marks[k] < PASS_MARK);
   const topSub  = subs.reduce((a, b) => s.marks[a] > s.marks[b] ? a : b);
+
+  // Session name (result page header + PDF badge)
+  document.getElementById('resultSessionYr').textContent = CURRENT_SESSION_NAME || 'Current Session';
+  document.getElementById('pdfBadgeYr').textContent = CURRENT_SESSION_NAME || 'Current Session';
 
   // Student grid
   document.getElementById('studentGrid').innerHTML = [
