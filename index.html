@@ -1492,8 +1492,8 @@ async function verifyStudent() {
   // Fetch progress history + class averages in parallel — best effort,
   // neither should block showing the core result if they fail.
   const [historyRes, classAvgRes] = await Promise.all([
-    sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '') }).catch(() => ({ data: null })),
-    sb.rpc('get_class_averages', { p_class: r.class }).catch(() => ({ data: null }))
+    Promise.resolve(sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '') })).catch(() => ({ data: null })),
+    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class })).catch(() => ({ data: null }))
   ]);
 
   renderResult(s, historyRes.data || [], classAvgRes.data || {});
