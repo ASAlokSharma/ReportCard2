@@ -402,12 +402,17 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
       </div>
     </div>
     <div class="nav-right">
+      <!-- Shown on student/result pages: parent account entry points -->
+      <button class="nav-portal-btn" id="navParentLoginBtn" onclick="showPage('parentLogin')"><i class="fas fa-user"></i> Login</button>
+      <button class="nav-portal-btn hidden" id="navParentDashBtn" onclick="showPage('parentDashboard')"><i class="fas fa-address-card"></i> My Dashboard</button>
       <!-- Shown on student/result pages: go to admin -->
       <button class="nav-admin-btn" id="navAdminBtn" onclick="goAdmin()"><i class="fas fa-shield-halved"></i> Admin</button>
-      <!-- Shown on admin pages: go back to student portal WITHOUT logging out / losing DB -->
+      <!-- Shown on admin/parent pages: go back to student portal WITHOUT logging out / losing DB -->
       <button class="nav-portal-btn hidden" id="navPortalBtn" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
       <!-- Shown on admin page: logout -->
       <button class="nav-admin-btn hidden" id="navLogoutBtn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      <!-- Shown on parent dashboard: logout -->
+      <button class="nav-admin-btn hidden" id="navParentLogoutBtn" onclick="parentLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </div>
 </nav>
@@ -494,6 +499,89 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <button class="btn btn-gold btn-full" onclick="adminLogin()"><i class="fas fa-sign-in-alt"></i> Sign In to Admin</button>
         <button class="btn btn-ghost btn-full mt-16" onclick="showPage('student')" style="margin-top:12px"><i class="fas fa-arrow-left"></i> Back to Student Portal</button>
         <p class="security-note mt-16"><i class="fas fa-shield-halved"></i> Restricted access — authorised personnel only</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE: PARENT LOGIN / SIGN UP ═══════════ -->
+<div id="pageParentLogin" class="page">
+  <div class="admin-login-wrap">
+    <div class="admin-login-box">
+      <div class="admin-login-logo">
+        <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo">
+        <h2 id="parentAuthTitle">Parent / Student Login</h2>
+        <p>Save your children's details securely and unlock deeper insights</p>
+      </div>
+      <div class="admin-login-card">
+        <div id="parentToast" class="toast"></div>
+
+        <div id="parentSignInFields">
+          <div class="form-group" style="margin-bottom:16px">
+            <label><i class="fas fa-envelope"></i>Email</label>
+            <input class="inp" id="pEmail" placeholder="you@example.com" onkeydown="if(event.key==='Enter')parentAuthSubmit()">
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label><i class="fas fa-key"></i>Password</label>
+            <input class="inp" id="pPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')parentAuthSubmit()">
+          </div>
+        </div>
+
+        <button class="btn btn-gold btn-full" id="parentAuthBtn" onclick="parentAuthSubmit()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+        <p class="text-center text-muted mt-16">
+          <span id="parentAuthToggleText">New here?</span>
+          <a href="#" onclick="toggleParentAuthMode();return false;" style="color:var(--gold)" id="parentAuthToggleLink">Create an account</a>
+        </p>
+        <button class="btn btn-ghost btn-full mt-16" onclick="showPage('student')" style="margin-top:12px"><i class="fas fa-arrow-left"></i> Back to Student Portal</button>
+        <p class="security-note mt-16"><i class="fas fa-shield-halved"></i> Your account only ever sees children you've personally verified</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ PAGE: PARENT DASHBOARD ═══════════ -->
+<div id="pageParentDashboard" class="page">
+  <div class="hero" style="padding-bottom:20px">
+    <div class="hero-badge"><i class="fas fa-address-card"></i>&nbsp;Parent Dashboard</div>
+    <h2>Your <span>Children</span></h2>
+    <p id="parentWelcomeLine">Manage linked children and view their full results anytime.</p>
+    <div class="divider"></div>
+  </div>
+
+  <div class="portal-wrap">
+    <div id="parentDashToast" class="toast"></div>
+
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-head">
+        <h3><i class="fas fa-users" style="color:var(--gold);margin-right:10px"></i>Linked Children</h3>
+        <p>Click a child to view their full result instantly — no retyping needed</p>
+      </div>
+      <div id="linkedChildrenList" style="padding:8px 0">
+        <p class="text-muted" style="padding:20px 24px">Loading…</p>
+      </div>
+    </div>
+
+    <div class="card" id="addChildCard">
+      <div class="card-head">
+        <h3><i class="fas fa-user-plus" style="color:var(--gold);margin-right:10px"></i>Link a Child</h3>
+        <p>Verify once with their details — this is a one-time step per child</p>
+      </div>
+      <div style="padding:clamp(20px,4vw,32px)">
+        <div class="form-row cols-3" style="margin-bottom:16px">
+          <div class="form-group">
+            <label><i class="fas fa-id-badge"></i>Student ID</label>
+            <input class="inp" id="linkSid" placeholder="e.g. TVMS52321" onkeydown="if(event.key==='Enter')linkChild()">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-user"></i>Father's Name</label>
+            <input class="inp" id="linkFather" placeholder="e.g. Adarsh Jain" onkeydown="if(event.key==='Enter')linkChild()">
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-hashtag"></i>Admission No.</label>
+            <input class="inp" id="linkAdmno" placeholder="e.g. 1531" onkeydown="if(event.key==='Enter')linkChild()">
+          </div>
+        </div>
+        <button class="btn btn-gold btn-full" onclick="linkChild()"><i class="fas fa-link"></i> Verify &amp; Add Child</button>
       </div>
     </div>
   </div>
@@ -808,7 +896,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <p>Doc ID: <span id="genId"></span></p>
       </div>
       <div class="action-bar">
-        <button class="btn btn-ghost" onclick="showPage('student')"><i class="fas fa-arrow-left"></i> Back</button>
+        <button class="btn btn-ghost" onclick="goBackFromResult()"><i class="fas fa-arrow-left"></i> Back</button>
         <button class="btn btn-gold grow" id="pdfBtn" onclick="downloadPDF()"><i class="fas fa-file-pdf"></i> Download Report Card PDF</button>
       </div>
     </div>
@@ -881,6 +969,9 @@ const PASS_MARK   = 40;
 let DB = [], SUBJECTS = [];
 let barChart = null, donutChart = null, classChart = null, gradeChart = null, progressChart = null;
 let adminLoggedIn = false;
+let parentLoggedIn = false;
+let parentEmail = null;
+let resultCameFromDashboard = false;
 let LIVE_SESSION = null;      // {id, name, published_at, file_name} — currently public session, or null
 let ALL_SESSIONS = [];        // full history, newest first
 let VIEW_SESSION_ID = null;   // which session admin is currently viewing in Students/Stats
@@ -900,23 +991,29 @@ try {
    PAGE ROUTING
    Controls which page is visible and which
    nav buttons appear.
-   navAdminBtn  — shown on student / result pages
-   navPortalBtn — shown on admin pages (back without logout)
-   navLogoutBtn — shown only on admin dashboard
+   navAdminBtn         — shown on student / result pages (when not parent-logged-in context)
+   navParentLoginBtn   — shown on student/result pages when no parent session
+   navParentDashBtn    — shown on student/result pages when a parent IS logged in
+   navPortalBtn        — shown on admin/parent pages (back without logout)
+   navLogoutBtn        — shown only on admin dashboard
+   navParentLogoutBtn  — shown only on parent dashboard
 ═══════════════════════════════════════════ */
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page' + cap(name)).classList.add('active');
 
-  const isAdmin      = name === 'admin';
-  const isAdminLogin = name === 'adminLogin';
+  const isAdmin        = name === 'admin';
+  const isAdminLogin   = name === 'adminLogin';
+  const isParentLogin  = name === 'parentLogin';
+  const isParentDash   = name === 'parentDashboard';
+  const isBackPage     = isAdmin || isAdminLogin || isParentLogin || isParentDash;
 
-  // "Admin" button visible on student + result pages only
-  document.getElementById('navAdminBtn').classList.toggle('hidden', isAdmin || isAdminLogin);
-  // "Student Portal" button visible on admin dashboard + login page
-  document.getElementById('navPortalBtn').classList.toggle('hidden', !(isAdmin || isAdminLogin));
-  // "Logout" button visible ONLY on admin dashboard
+  document.getElementById('navAdminBtn').classList.toggle('hidden', isBackPage);
+  document.getElementById('navParentLoginBtn').classList.toggle('hidden', isBackPage || parentLoggedIn);
+  document.getElementById('navParentDashBtn').classList.toggle('hidden', isBackPage || !parentLoggedIn);
+  document.getElementById('navPortalBtn').classList.toggle('hidden', !isBackPage);
   document.getElementById('navLogoutBtn').classList.toggle('hidden', !isAdmin);
+  document.getElementById('navParentLogoutBtn').classList.toggle('hidden', !isParentDash);
 
   window.scrollTo(0, 0);
 }
@@ -941,6 +1038,13 @@ async function adminLogin() {
     return;
   }
 
+  const isAdmin = await checkIsAdmin(data.user.id);
+  if (!isAdmin) {
+    await sb.auth.signOut();
+    toast('login', 'This account does not have admin access.', 'error');
+    return;
+  }
+
   adminLoggedIn = true;
   document.getElementById('adminUrl').textContent = location.href;
   showPage('admin');
@@ -956,17 +1060,182 @@ async function adminLogout() {
   showPage('student');
 }
 
-/* Restore session on page load/refresh so admin isn't logged out
-   just because they reloaded the tab. */
+/* Checks the profiles table (not just "is someone logged in") to
+   confirm this specific user has the admin role. */
+async function checkIsAdmin(userId) {
+  const { data, error } = await sb.from('profiles').select('role').eq('id', userId).maybeSingle();
+  if (error || !data) return false;
+  return data.role === 'admin';
+}
+
+/* Restore session on page load/refresh so nobody is logged out
+   just because they reloaded the tab. Determines whether the
+   restored session belongs to an admin or a parent account. */
 async function restoreSession() {
   if (!sb) return;
   const { data } = await sb.auth.getSession();
   if (data && data.session) {
-    adminLoggedIn = true;
+    const user = data.session.user;
+    const isAdmin = await checkIsAdmin(user.id);
+    if (isAdmin) {
+      adminLoggedIn = true;
+    } else {
+      parentLoggedIn = true;
+      parentEmail = user.email;
+    }
+    const loginBtn = document.getElementById('navParentLoginBtn');
+    const dashBtn  = document.getElementById('navParentDashBtn');
+    if (loginBtn && dashBtn) {
+      loginBtn.classList.toggle('hidden', parentLoggedIn);
+      dashBtn.classList.toggle('hidden', !parentLoggedIn);
+    }
   }
 }
 restoreSession();
 loadSessionsAndStatus();
+
+/* ═══════════ PARENT / STUDENT ACCOUNTS ═══════════ */
+let parentAuthMode = 'signin'; // 'signin' | 'signup'
+
+function toggleParentAuthMode() {
+  parentAuthMode = parentAuthMode === 'signin' ? 'signup' : 'signin';
+  const isSignup = parentAuthMode === 'signup';
+  document.getElementById('parentAuthTitle').textContent = isSignup ? 'Create Your Account' : 'Parent / Student Login';
+  document.getElementById('parentAuthBtn').innerHTML = isSignup
+    ? '<i class="fas fa-user-plus"></i> Create Account'
+    : '<i class="fas fa-sign-in-alt"></i> Sign In';
+  document.getElementById('parentAuthToggleText').textContent = isSignup ? 'Already have an account?' : 'New here?';
+  document.getElementById('parentAuthToggleLink').textContent = isSignup ? 'Sign in' : 'Create an account';
+}
+
+async function parentAuthSubmit() {
+  const email = document.getElementById('pEmail').value.trim();
+  const pass  = document.getElementById('pPass').value;
+  if (!email || !pass) { toast('parent', 'Please enter both email and password.', 'warn'); return; }
+  if (pass.length < 6) { toast('parent', 'Password must be at least 6 characters.', 'warn'); return; }
+
+  if (parentAuthMode === 'signup') {
+    const { data, error } = await sb.auth.signUp({ email, password: pass });
+    if (error) { toast('parent', error.message, 'error'); return; }
+    if (data.user && !data.session) {
+      toast('parent', 'Account created! Check your email to confirm, then sign in.', 'success');
+      toggleParentAuthMode();
+      return;
+    }
+    await enterParentDashboard(email);
+  } else {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (error) { toast('parent', 'Invalid email or password.', 'error'); return; }
+    const isAdmin = await checkIsAdmin(data.user.id);
+    if (isAdmin) { toast('parent', 'This is an admin account — use the Admin login instead.', 'warn'); await sb.auth.signOut(); return; }
+    await enterParentDashboard(email);
+  }
+}
+
+async function enterParentDashboard(email) {
+  parentLoggedIn = true;
+  parentEmail = email;
+  document.getElementById('parentWelcomeLine').textContent = `Signed in as ${email} — manage linked children and view their full results anytime.`;
+  showPage('parentDashboard');
+  await loadLinkedChildren();
+}
+
+async function parentLogout() {
+  await sb.auth.signOut();
+  parentLoggedIn = false;
+  parentEmail = null;
+  showPage('student');
+}
+
+async function loadLinkedChildren() {
+  const listEl = document.getElementById('linkedChildrenList');
+  const { data, error } = await sb.from('linked_children').select('*').order('linked_at', { ascending:true });
+  if (error) { listEl.innerHTML = `<p class="text-muted" style="padding:20px 24px">Could not load: ${error.message}</p>`; return; }
+
+  if (!data.length) {
+    listEl.innerHTML = '<p class="text-muted" style="padding:20px 24px">No children linked yet — add one below.</p>';
+    return;
+  }
+
+  listEl.innerHTML = data.map(c => `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div>
+        <div style="font-size:.92rem;color:var(--text);font-weight:500">${c.name || c.sid}</div>
+        <div style="font-size:.74rem;color:var(--text3)">Class ${c.class || '—'} · ID: ${c.sid}</div>
+      </div>
+      <div class="flex-row" style="gap:6px">
+        <button class="btn btn-gold btn-sm" onclick="viewChildResult('${c.sid.replace(/'/g,"\\'")}', '${c.father.replace(/'/g,"\\'")}', '${c.admno.replace(/'/g,"\\'")}')"><i class="fas fa-eye"></i> View Result</button>
+        <button class="btn btn-red btn-sm" onclick="unlinkChild(${c.id})"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function linkChild() {
+  const sid    = document.getElementById('linkSid').value.trim();
+  const father = document.getElementById('linkFather').value.trim();
+  const admno  = document.getElementById('linkAdmno').value.trim();
+  if (!sid || !father || !admno) { toast('parentDash', 'Please fill all three fields.', 'warn'); return; }
+
+  const { data, error } = await sb.rpc('link_child', { p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '') });
+  if (error) { toast('parentDash', 'Something went wrong. Please try again.', 'error'); console.error(error); return; }
+
+  if (!data.success) { toast('parentDash', data.message || 'No matching student found.', 'error'); return; }
+
+  toast('parentDash', `${data.name || 'Child'} linked successfully!`, 'success');
+  document.getElementById('linkSid').value = '';
+  document.getElementById('linkFather').value = '';
+  document.getElementById('linkAdmno').value = '';
+  await loadLinkedChildren();
+}
+
+async function unlinkChild(id) {
+  if (!confirm('Remove this child from your account? You can re-link them anytime by verifying again.')) return;
+  const { error } = await sb.from('linked_children').delete().eq('id', id);
+  if (error) { toast('parentDash', 'Could not remove: ' + error.message, 'error'); return; }
+  await loadLinkedChildren();
+  toast('parentDash', 'Child removed.', 'info');
+}
+
+/* Fetches a full result (used by both the anonymous 3-field form
+   and the parent dashboard's "View Result" click) and renders it. */
+async function fetchAndRenderResult(sid, father, admno) {
+  const { data, error } = await sb.rpc('verify_student', { p_sid: sid, p_father: father, p_admno: admno });
+  if (error) { toast(parentLoggedIn ? 'parentDash' : 'student', 'Something went wrong. Please try again shortly.', 'error'); console.error(error); return; }
+  if (!data || !data.length) { toast(parentLoggedIn ? 'parentDash' : 'student', "No record found for this session yet.", 'error'); return; }
+
+  const r = data[0];
+  const s = {
+    sid: r.sid, admno: r.admno, cls: r.class, roll: r.roll,
+    name: r.name, father: r.father, marks: r.marks,
+    workingDays: r.working_days || 0,
+    daysPresent: r.days_present || 0,
+    attPct: r.working_days > 0 ? Math.round((r.days_present / r.working_days) * 100) : null
+  };
+
+  const [historyRes, classAvgRes, rankRes] = await Promise.all([
+    Promise.resolve(sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: admno })).catch(() => ({ data: null })),
+    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class })).catch(() => ({ data: null })),
+    Promise.resolve(sb.rpc('get_class_rank', { p_sid: sid, p_father: father, p_admno: admno })).catch(() => ({ data: null }))
+  ]);
+
+  const rankInfo = (rankRes.data && rankRes.data[0]) || null;
+  renderResult(s, historyRes.data || [], classAvgRes.data || {}, rankInfo);
+}
+
+async function viewChildResult(sid, father, admno) {
+  resultCameFromDashboard = true;
+  await fetchAndRenderResult(sid, father, admno);
+}
+
+function goBackFromResult() {
+  if (resultCameFromDashboard) {
+    resultCameFromDashboard = false;
+    showPage('parentDashboard');
+  } else {
+    showPage('student');
+  }
+}
 
 /* ═══════════ ADMIN PANELS ═══════════ */
 function switchPanel(name, btn) {
@@ -987,7 +1256,7 @@ function switchPanel(name, btn) {
 
 /* ═══════════ TOAST ═══════════ */
 function toast(target, msg, type) {
-  const ids = { student:'studentToast', admin:'adminToast', login:'loginToast' };
+  const ids = { student:'studentToast', admin:'adminToast', login:'loginToast', parent:'parentToast', parentDash:'parentDashToast' };
   const el = document.getElementById(ids[target] || target);
   if (!el) return;
   const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', info:'fa-circle-info', warn:'fa-triangle-exclamation' };
@@ -1472,31 +1741,8 @@ async function verifyStudent() {
   if (!sid || !father || !admno) { toast('student', 'Please fill all three fields.', 'error'); return; }
 
   toast('student', 'Looking up your result…', 'info');
-
-  const { data, error } = await sb.rpc('verify_student', {
-    p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '')
-  });
-
-  if (error) { toast('student', 'Something went wrong. Please try again shortly.', 'error'); console.error(error); return; }
-  if (!data || !data.length) { toast('student', "No record found. Please verify your Student ID, Father's Name and Admission No.", 'error'); return; }
-
-  const r = data[0];
-  const s = {
-    sid: r.sid, admno: r.admno, cls: r.class, roll: r.roll,
-    name: r.name, father: r.father, marks: r.marks,
-    workingDays: r.working_days || 0,
-    daysPresent: r.days_present || 0,
-    attPct: r.working_days > 0 ? Math.round((r.days_present / r.working_days) * 100) : null
-  };
-
-  // Fetch progress history + class averages in parallel — best effort,
-  // neither should block showing the core result if they fail.
-  const [historyRes, classAvgRes] = await Promise.all([
-    Promise.resolve(sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '') })).catch(() => ({ data: null })),
-    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class })).catch(() => ({ data: null }))
-  ]);
-
-  renderResult(s, historyRes.data || [], classAvgRes.data || {});
+  resultCameFromDashboard = false;
+  await fetchAndRenderResult(sid, father, admno.replace(/\.0$/, ''));
 }
 
 /* ═══════════════════════════════════════════
@@ -1506,7 +1752,7 @@ async function verifyStudent() {
    overwriting the student object reference.
    The unused `colors` array is eliminated entirely.
 ═══════════════════════════════════════════ */
-function renderResult(student, history, classAverages) {
+function renderResult(student, history, classAverages, rankInfo) {
   const s       = student; // explicit alias, no shadowing risk
   history = history || [];
   classAverages = classAverages || {};
@@ -1600,6 +1846,7 @@ function renderResult(student, history, classAverages) {
   else                rec = 'This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
 
   document.getElementById('insightsGrid').innerHTML = `
+    ${rankInfo && rankInfo.rank ? `<div class="insight-card" style="border-color:var(--gold-border)"><h5><i class="fas fa-ranking-star"></i> Class Rank</h5><p style="font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--gold);font-weight:700">#${rankInfo.rank} <span style="font-size:.85rem;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400">of ${rankInfo.out_of} in Class ${s.cls}</span></p></div>` : ''}
     <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length ? strengths.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
     <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length ? improve.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>No subject below 60% — great balance!</li>'}</ul></div>
     <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul>
