@@ -74,14 +74,6 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
 /* ── CARD ── */
 .portal-wrap{max-width:860px;margin:0 auto 60px;padding:0 16px}
-.how-it-works{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:860px;margin:36px auto 0;padding:0 16px}
-.hiw-step{display:flex;gap:14px;align-items:flex-start;padding:18px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px}
-.hiw-num{flex-shrink:0;width:32px;height:32px;border-radius:50%;border:1.5px solid var(--gold-border);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem}
-.hiw-step h5{font-size:.88rem;color:var(--text);margin-bottom:4px}
-.hiw-step p{font-size:.76rem;color:var(--text3);line-height:1.5}
-@media(max-width:720px){.how-it-works{grid-template-columns:1fr}}
-.fade-swap{animation:fadeSwap .35s ease both}
-@keyframes fadeSwap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
 .card-head{background:linear-gradient(135deg,var(--bg3),var(--bg4));padding:clamp(24px,5vw,40px);border-bottom:1px solid var(--gold-border)}
 .card-head h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px}
@@ -425,7 +417,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   <div class="hero">
     <div class="hero-badge" id="heroBadge"><i class="fas fa-graduation-cap"></i>&nbsp;<span id="heroBadgeText">Academic Result Portal</span></div>
     <h2>Your <span>Result</span>,<br>Beautifully Presented</h2>
-    <p>Check whether results are declared, then verify your credentials to unlock your complete report — charts, class rank, progress trends, and a downloadable PDF.</p>
+    <p>Enter your credentials to access your complete academic performance report with charts, insights, and a downloadable PDF report card.</p>
     <div class="divider"></div>
   </div>
 
@@ -442,31 +434,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
     <!-- Shown once an admin has published a session -->
     <div class="hidden" id="liveCard">
-
-      <!-- Stage 1: status hub — session info, aggregate stats, and the CTA -->
-      <div class="card fade-swap" id="statusHubCard">
-        <div style="padding:clamp(28px,5vw,40px) clamp(20px,4vw,36px)">
-          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-            <span class="badge badge-green"><i class="fas fa-circle-check"></i>&nbsp;Results Declared</span>
-            <span style="color:var(--text2);font-size:.9rem">Session: <strong id="liveSessionName" style="color:var(--gold)">—</strong></span>
-          </div>
-          <p style="color:var(--text3);font-size:.78rem;margin-bottom:26px" id="livePublishedLine"></p>
-
-          <div class="stats-row" id="liveStatsGrid" style="margin-bottom:30px"></div>
-
-          <button class="btn btn-gold btn-full" onclick="showCheckForm()"><i class="fas fa-magnifying-glass"></i> Check My Result</button>
-          <p class="text-center text-muted mt-16"><i class="fas fa-lock text-gold"></i>&nbsp;Triple-field verification · Your data is secure</p>
+      <div class="card" style="margin-bottom:16px">
+        <div style="padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span class="badge badge-green"><i class="fas fa-circle-check"></i>&nbsp;Results Declared</span>
+          <span style="color:var(--text2);font-size:.88rem">Session: <strong id="liveSessionName" style="color:var(--gold)">—</strong></span>
         </div>
       </div>
-
-      <!-- Stage 2: verification form — revealed only when the button above is clicked -->
-      <div class="card hidden" id="checkFormCard">
-        <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <div>
-            <h3><i class="fas fa-unlock-keyhole" style="color:var(--gold);margin-right:10px"></i>Student Verification</h3>
-            <p>All three fields must match our records exactly</p>
-          </div>
-          <button class="btn btn-ghost btn-sm" onclick="hideCheckForm()"><i class="fas fa-arrow-left"></i> Back</button>
+      <div class="card">
+        <div class="card-head">
+          <h3><i class="fas fa-unlock-keyhole" style="color:var(--gold);margin-right:10px"></i>Student Verification</h3>
+          <p>All three fields must match our records exactly</p>
         </div>
         <div style="padding:clamp(20px,4vw,36px)">
           <div id="studentToast" class="toast"></div>
@@ -489,12 +466,6 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="how-it-works">
-    <div class="hiw-step"><div class="hiw-num">1</div><div><h5>Enter Your Details</h5><p>Student ID, Father's Name & Admission Number — exactly as on your admission form.</p></div></div>
-    <div class="hiw-step"><div class="hiw-num">2</div><div><h5>Instant Verification</h5><p>All three fields are matched securely — no accounts, no passwords needed.</p></div></div>
-    <div class="hiw-step"><div class="hiw-num">3</div><div><h5>View &amp; Download</h5><p>See charts, class rank, progress trends, and download your PDF report card.</p></div></div>
   </div>
 </div>
 
@@ -1245,14 +1216,7 @@ async function loadSessionsAndStatus() {
   if (notLiveCard && liveCard) {
     notLiveCard.classList.toggle('hidden', !!LIVE_SESSION);
     liveCard.classList.toggle('hidden', !LIVE_SESSION);
-    if (LIVE_SESSION) {
-      document.getElementById('liveSessionName').textContent = LIVE_SESSION.name;
-      document.getElementById('livePublishedLine').textContent = `Published ${new Date(LIVE_SESSION.published_at).toLocaleString('en-IN', { dateStyle:'long', timeStyle:'short' })}`;
-      // Always land back on the status hub (not the form) when a new session becomes visible
-      document.getElementById('statusHubCard').classList.remove('hidden');
-      document.getElementById('checkFormCard').classList.add('hidden');
-      loadHomepageSummary();
-    }
+    if (LIVE_SESSION) document.getElementById('liveSessionName').textContent = LIVE_SESSION.name;
   }
 
   // Homepage hero badge
@@ -1321,46 +1285,6 @@ async function loadSessionsAndStatus() {
       const target = VIEW_SESSION_ID || (LIVE_SESSION ? LIVE_SESSION.id : ALL_SESSIONS[0].id);
       sel.value = target;
     }
-  }
-}
-
-/* Reveals the verification form (Stage 2), hiding the status hub (Stage 1). */
-function showCheckForm() {
-  document.getElementById('statusHubCard').classList.add('hidden');
-  const formCard = document.getElementById('checkFormCard');
-  formCard.classList.remove('hidden');
-  formCard.classList.add('fade-swap');
-  formCard.scrollIntoView({ behavior:'smooth', block:'start' });
-  setTimeout(() => document.getElementById('fSid').focus(), 300);
-}
-
-/* Returns to the status hub (Stage 1) from the verification form. */
-function hideCheckForm() {
-  document.getElementById('checkFormCard').classList.add('hidden');
-  const hub = document.getElementById('statusHubCard');
-  hub.classList.remove('hidden');
-  hub.classList.add('fade-swap');
-}
-
-/* Public aggregate stats for the live session — total students,
-   classes, pass rate, average % — shown on the homepage before
-   anyone looks anything up. Purely aggregate, never individual data. */
-async function loadHomepageSummary() {
-  const grid = document.getElementById('liveStatsGrid');
-  if (!grid || !sb) return;
-  try {
-    const { data, error } = await sb.rpc('get_session_summary');
-    if (error) throw error;
-    const s = (data && data[0]) || {};
-    grid.innerHTML = `
-      <div class="stat-card"><div class="num">${s.total_students ?? '—'}</div><div class="lbl">Students</div></div>
-      <div class="stat-card"><div class="num">${s.total_classes ?? '—'}</div><div class="lbl">Classes</div></div>
-      <div class="stat-card"><div class="num">${s.pass_rate != null ? s.pass_rate + '%' : '—'}</div><div class="lbl">Pass Rate</div></div>
-      <div class="stat-card"><div class="num">${s.avg_pct != null ? s.avg_pct + '%' : '—'}</div><div class="lbl">Average Score</div></div>
-    `;
-  } catch (e) {
-    grid.innerHTML = '';
-    console.error(e);
   }
 }
 
@@ -1565,16 +1489,14 @@ async function verifyStudent() {
     attPct: r.working_days > 0 ? Math.round((r.days_present / r.working_days) * 100) : null
   };
 
-  // Fetch progress history + class averages + class rank in parallel —
-  // best effort, none should block showing the core result if they fail.
-  const [historyRes, classAvgRes, rankRes] = await Promise.all([
+  // Fetch progress history + class averages in parallel — best effort,
+  // neither should block showing the core result if they fail.
+  const [historyRes, classAvgRes] = await Promise.all([
     Promise.resolve(sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '') })).catch(() => ({ data: null })),
-    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class })).catch(() => ({ data: null })),
-    Promise.resolve(sb.rpc('get_class_rank', { p_sid: sid, p_father: father, p_admno: admno.replace(/\.0$/, '') })).catch(() => ({ data: null }))
+    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class })).catch(() => ({ data: null }))
   ]);
 
-  const rankInfo = (rankRes.data && rankRes.data[0]) || null;
-  renderResult(s, historyRes.data || [], classAvgRes.data || {}, rankInfo);
+  renderResult(s, historyRes.data || [], classAvgRes.data || {});
 }
 
 /* ═══════════════════════════════════════════
@@ -1584,7 +1506,7 @@ async function verifyStudent() {
    overwriting the student object reference.
    The unused `colors` array is eliminated entirely.
 ═══════════════════════════════════════════ */
-function renderResult(student, history, classAverages, rankInfo) {
+function renderResult(student, history, classAverages) {
   const s       = student; // explicit alias, no shadowing risk
   history = history || [];
   classAverages = classAverages || {};
@@ -1678,7 +1600,6 @@ function renderResult(student, history, classAverages, rankInfo) {
   else                rec = 'This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
 
   document.getElementById('insightsGrid').innerHTML = `
-    ${rankInfo && rankInfo.rank ? `<div class="insight-card" style="border-color:var(--gold-border)"><h5><i class="fas fa-ranking-star"></i> Class Rank</h5><p style="font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--gold);font-weight:700">#${rankInfo.rank} <span style="font-size:.85rem;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400">of ${rankInfo.out_of} in Class ${s.cls}</span></p></div>` : ''}
     <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length ? strengths.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
     <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length ? improve.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>No subject below 60% — great balance!</li>'}</ul></div>
     <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul>
