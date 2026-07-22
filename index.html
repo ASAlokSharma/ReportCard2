@@ -18,7 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════
-   TOKENS & ANIMATIONS
+   TOKENS
 ══════════════════════════════════════════════ */
 :root{
   --gold:#d4af37;--gold-l:#f0d060;--gold-d:#b8962e;
@@ -38,19 +38,17 @@ a{color:inherit;text-decoration:none}
 button{font-family:'DM Sans',sans-serif;cursor:pointer}
 input{font-family:'DM Sans',sans-serif}
 
-@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideFadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.stagger-1 { animation: slideFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; opacity: 0; animation-delay: 0.1s; }
-.stagger-2 { animation: slideFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; opacity: 0; animation-delay: 0.2s; }
-.stagger-3 { animation: slideFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; opacity: 0; animation-delay: 0.3s; }
-
-/* ── PAGES ── */
+/* ── PAGES ──
+   BUG FIX: Use display:none on all .page elements.
+   ID-level display overrides caused admin login to always be visible.
+   All page-specific flex layout now lives inside child wrappers, not on the page div itself.
+*/
 .page{display:none;min-height:100vh;animation:fadeIn .4s ease}
 .page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── NAV ── */
-nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,175,55,.15)}
+nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-border)}
 .nav-inner{max-width:1260px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;gap:12px}
 .brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .brand-logo{width:40px;height:40px;flex-shrink:0;filter:brightness(0) invert(1)}
@@ -58,6 +56,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .brand-text p{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-top:1px;display:none}
 @media(min-width:480px){.brand-text p{display:block}}
 .nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-pill{font-size:.72rem;color:var(--gold);border:1px solid var(--gold-border);padding:5px 12px;border-radius:20px;letter-spacing:.5px;white-space:nowrap;display:none}
+@media(min-width:600px){.nav-pill{display:block}}
 .nav-admin-btn{background:transparent;border:1px solid rgba(255,255,255,.1);color:var(--text3);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
 .nav-admin-btn:hover{border-color:var(--gold-border);color:var(--gold)}
 .nav-portal-btn{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);padding:6px 14px;border-radius:8px;font-size:.78rem;transition:var(--transition)}
@@ -72,31 +72,10 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .hero p{color:var(--text2);font-size:clamp(.9rem,2vw,1.05rem);font-weight:300;max-width:500px;margin:0 auto;line-height:1.75}
 .divider{width:50px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:28px auto}
 
-/* ── CARD (TRUE GLASSMORPHISM) ── */
+/* ── CARD ── */
 .portal-wrap{max-width:860px;margin:0 auto 60px;padding:0 16px}
-.card {
-  background: rgba(15, 15, 28, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: var(--r-lg);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  position: relative;
-  border: none;
-  overflow: hidden;
-}
-.card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgba(212,175,55,0.4), rgba(255,255,255,0.05) 40%, transparent 60%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-.card-head{background:linear-gradient(135deg,rgba(22,22,40,0.5),rgba(29,29,53,0.3));padding:clamp(24px,5vw,40px);border-bottom:1px solid rgba(212,175,55,.15)}
+.card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.card-head{background:linear-gradient(135deg,var(--bg3),var(--bg4));padding:clamp(24px,5vw,40px);border-bottom:1px solid var(--gold-border)}
 .card-head h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px}
 .card-head p{font-size:.85rem;color:var(--text2)}
 
@@ -108,18 +87,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .form-group{display:flex;flex-direction:column;gap:8px}
 .form-group label{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:500}
 .form-group label i{color:var(--gold);margin-right:5px;width:14px}
-.inp {
-  padding: 13px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--r-sm);
-  color: var(--text);
-  font-size: 0.95rem;
-  transition: var(--transition);
-  width: 100%;
-}
+.inp{padding:13px 16px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:var(--r-sm);color:var(--text);font-size:.95rem;transition:var(--transition);width:100%}
 .inp:focus{outline:none;border-color:var(--gold);background:rgba(212,175,55,.05);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
 .inp::placeholder{color:var(--text3)}
 .inp.error-field{border-color:var(--red)}
@@ -147,6 +115,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 
 /* ══════════════════════════════════════════════
    ADMIN LOGIN PAGE
+   BUG FIX: Removed display:flex from #pageAdminLogin.
+   The .page class controls display. Inner .admin-login-wrap handles flex centering.
 ══════════════════════════════════════════════ */
 .admin-login-wrap{min-height:calc(100vh - 64px);display:flex;align-items:center;justify-content:center;padding:40px 16px}
 .admin-login-box{width:100%;max-width:420px}
@@ -154,7 +124,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .admin-login-logo img{width:64px;height:64px;filter:brightness(0) invert(1);opacity:.8;margin-bottom:16px}
 .admin-login-logo h2{font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:6px}
 .admin-login-logo p{font-size:.82rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase}
-.admin-login-card{background:rgba(15,15,28,0.5);backdrop-filter:blur(15px);border:1px solid rgba(255,255,255,.07);border-radius:var(--r-lg);padding:32px;box-shadow:var(--shadow)}
+.admin-login-card{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:var(--r-lg);padding:32px;box-shadow:var(--shadow)}
 .admin-login-card .form-group{margin-bottom:16px}
 .security-note{text-align:center;font-size:.75rem;color:var(--text3);margin-top:14px}
 .security-note i{color:var(--gold);margin-right:4px}
@@ -163,7 +133,9 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
    ADMIN DASHBOARD PAGE
 ══════════════════════════════════════════════ */
 .admin-layout{display:flex;min-height:calc(100vh - 64px)}
-.sidebar{width:240px;flex-shrink:0;background:rgba(15,15,28,.6);backdrop-filter:blur(10px);border-right:1px solid rgba(255,255,255,.06);padding:24px 0;display:flex;flex-direction:column;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
+
+/* sidebar */
+.sidebar{width:240px;flex-shrink:0;background:var(--bg2);border-right:1px solid rgba(255,255,255,.06);padding:24px 0;display:flex;flex-direction:column;position:sticky;top:64px;height:calc(100vh - 64px);overflow-y:auto}
 @media(max-width:768px){.sidebar{display:none}}
 .sidebar-section{padding:0 16px;margin-bottom:8px}
 .sidebar-label{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:8px;margin-top:16px}
@@ -173,25 +145,30 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .nav-item i{width:18px;text-align:center;font-size:.9rem}
 .sidebar-bottom{margin-top:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
 
+/* admin content */
 .admin-content{flex:1;padding:clamp(16px,3vw,32px);overflow-x:hidden;min-width:0}
 .admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
 .admin-topbar h2{font-family:'Playfair Display',serif;font-size:1.5rem}
 .admin-topbar p{font-size:.85rem;color:var(--text2);margin-top:2px}
 
+/* mobile nav */
 .mobile-admin-nav{display:none;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,.06);padding:8px 16px;gap:6px;overflow-x:auto;flex-wrap:nowrap}
 @media(max-width:768px){.mobile-admin-nav{display:flex}}
 .mobile-nav-btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:20px;white-space:nowrap;font-size:.8rem;font-weight:500;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--text2);cursor:pointer;transition:var(--transition);flex-shrink:0}
 .mobile-nav-btn.active{background:var(--gold-dim);border-color:var(--gold-border);color:var(--gold)}
 
+/* panels */
 .admin-panel{display:none}
 .admin-panel.active{display:block;animation:fadeIn .3s ease}
 
+/* stats row */
 .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:rgba(255,255,255,0.03);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:20px;text-align:center}
+.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:20px;text-align:center}
 .stat-card .num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--gold)}
 .stat-card .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
 .stat-card .sub{font-size:.78rem;color:var(--text2);margin-top:6px}
 
+/* upload area */
 .upload-area{border:2px dashed var(--gold-border);border-radius:var(--r);padding:clamp(28px,5vw,48px) 24px;text-align:center;cursor:pointer;transition:var(--transition);background:transparent}
 .upload-area:hover{border-color:var(--gold);background:var(--gold-dim)}
 .upload-area.loaded{border-color:var(--green);border-style:solid;background:rgba(16,217,138,.05)}
@@ -200,39 +177,42 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .upload-area.loaded .upload-icon{color:var(--green)}
 .upload-area h4{font-size:1rem;font-weight:600;margin-bottom:6px}
 .upload-area p{font-size:.83rem;color:var(--text2)}
-.format-hint{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-sm);padding:14px 18px;margin-top:16px;font-size:.82rem;color:var(--text2);text-align:left}
+.format-hint{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-sm);padding:14px 18px;margin-top:16px;font-size:.82rem;color:var(--text2);text-align:left}
 .format-hint strong{color:var(--gold)}
 
-.table-wrap{background:rgba(255,255,255,.02);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);overflow:hidden}
+/* table */
+.table-wrap{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);overflow:hidden}
 .table-search{padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .table-search input{flex:1;min-width:180px;padding:9px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--text);font-size:.88rem}
 .table-search input:focus{outline:none;border-color:var(--gold)}
 .tbl{width:100%;border-collapse:collapse;font-size:.84rem}
-.tbl th{background:rgba(255,255,255,.03);padding:11px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);white-space:nowrap}
+.tbl th{background:var(--bg3);padding:11px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);white-space:nowrap}
 .tbl td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2);white-space:nowrap}
 .tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:rgba(255,255,255,.05)}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
 .tbl-wrap{overflow-x:auto;max-height:420px;overflow-y:auto}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
 .badge-green{background:rgba(16,217,138,.12);color:var(--green)}
 .badge-red{background:rgba(255,77,109,.12);color:var(--red)}
 .badge-gold{background:rgba(212,175,55,.12);color:var(--gold)}
 
+/* settings */
 .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:600px){.settings-grid{grid-template-columns:1fr}}
-.settings-section{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:24px}
+.settings-section{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:24px}
 .settings-section h4{font-size:.85rem;font-weight:600;margin-bottom:18px;color:var(--gold);display:flex;align-items:center;gap:8px}
 .settings-full{grid-column:1/-1}
-.cred-badge{background:rgba(0,0,0,.2);border:1px solid var(--gold-border);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--text2);display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.cred-badge{background:var(--bg3);border:1px solid var(--gold-border);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--text2);display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .cred-badge code{color:var(--gold);font-family:monospace;font-size:.88rem}
 
 /* ══════════════════════════════════════════════
    RESULT PAGE
 ══════════════════════════════════════════════ */
 .result-wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px}
-.result-paper{background:rgba(15, 15, 28, 0.45);backdrop-filter:blur(20px);border:1px solid var(--gold-border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
+.result-paper{background:var(--bg2);border:1px solid var(--gold-border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow)}
 
-.r-header{background:linear-gradient(135deg,rgba(11,11,24,.6),rgba(22,22,58,.5));padding:clamp(24px,4vw,44px);border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden}
+/* result header */
+.r-header{background:linear-gradient(135deg,#0b0b18,#16163a);padding:clamp(24px,4vw,44px);border-bottom:1px solid var(--gold-border);position:relative;overflow:hidden}
 .r-header::after{content:'';position:absolute;top:-100px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.08),transparent);pointer-events:none}
 .r-header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:24px}
 .school-brand{display:flex;align-items:center;gap:16px}
@@ -251,6 +231,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .s-cell .val{font-size:.9rem;font-weight:600}
 .s-cell .val.g{color:var(--gold)}
 
+/* summary bar */
 .summary-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(255,255,255,.05)}
 @media(max-width:480px){.summary-bar{grid-template-columns:1fr 1fr}}
 .sum-cell{padding:18px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
@@ -258,6 +239,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .sum-cell .big{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700}
 .sum-cell small{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
 
+/* charts */
 .charts-row{display:grid;grid-template-columns:2fr 1fr;border-bottom:1px solid rgba(255,255,255,.05)}
 @media(max-width:680px){.charts-row{grid-template-columns:1fr}}
 .chart-box{padding:clamp(18px,3vw,28px);border-right:1px solid rgba(255,255,255,.05)}
@@ -267,10 +249,11 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .sec-label i{color:var(--gold);font-size:.75rem}
 .chart-canvas{position:relative;height:200px}
 
+/* subjects */
 .subjects-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
 .subjects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px}
-.subj-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:var(--transition);cursor:default}
-.subj-card:hover{border-color:var(--gold-border);transform:translateY(-4px);box-shadow:0 10px 24px rgba(0,0,0,0.4)}
+.subj-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:var(--transition);cursor:default}
+.subj-card:hover{border-color:var(--gold-border);transform:translateY(-2px)}
 .subj-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--c,var(--gold))}
 .subj-name{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:10px}
 .subj-marks{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700;color:var(--text)}
@@ -279,22 +262,23 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .grade-badge{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 10px;border-radius:20px;background:var(--c,var(--gold));color:#080808}
 .pass-badge{font-size:.74rem;font-weight:600}
 .subj-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:10px}
-.subj-bar-fill{height:100%;border-radius:2px;width:0;transition:width 1s cubic-bezier(0.4, 0, 0.2, 1);background:var(--c,var(--gold))}
+.subj-bar-fill{height:100%;border-radius:2px;width:0;transition:width .8s ease;background:var(--c,var(--gold))}
 
+/* insights */
 .insights-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
 .insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.insight-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;transition:var(--transition)}
-.insight-card:hover{background:rgba(255,255,255,0.04)}
+.insight-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px}
 .insight-card h5{font-size:.85rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--gold)}
 .insight-card p,.insight-card li{font-size:.83rem;color:var(--text2);line-height:1.7}
 .insight-card ul{list-style:none;margin-top:8px}
 .insight-card li{padding:2px 0;display:flex;gap:8px;align-items:flex-start}
 .insight-card li::before{content:"›";color:var(--gold);flex-shrink:0}
 
+/* ── ATTENDANCE SECTION ── */
 .attendance-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
 .attendance-grid{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start}
 @media(max-width:700px){.attendance-grid{grid-template-columns:1fr}}
-.att-gauge-wrap{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 20px;text-align:center}
+.att-gauge-wrap{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 20px;text-align:center}
 .att-gauge-svg{width:150px;height:150px;display:block;margin:0 auto 12px}
 .att-pct-big{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;line-height:1}
 .att-days-txt{font-size:.8rem;color:var(--text3);margin-top:6px}
@@ -302,17 +286,17 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 .att-right{display:flex;flex-direction:column;gap:12px}
 .att-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:480px){.att-stats-row{grid-template-columns:1fr 1fr}}
-.att-stat{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;text-align:center}
+.att-stat{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;text-align:center}
 .att-stat .num{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700}
 .att-stat .lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
-.att-bar-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
+.att-bar-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
 .att-bar-card h6{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .att-bar-card h6 i{color:var(--gold);font-size:.72rem}
 .att-bar-track{height:14px;background:rgba(255,255,255,.06);border-radius:7px;overflow:hidden;position:relative;margin-bottom:8px}
 .att-bar-fill{height:100%;border-radius:7px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
 .att-thresholds{display:flex;justify-content:space-between;font-size:.66rem;color:var(--text3)}
 .att-thresh-mark{position:absolute;top:0;bottom:0;width:2px;opacity:.5}
-.att-remark-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
+.att-remark-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px}
 .att-remark-card h6{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .att-remark-card p{font-size:.83rem;color:var(--text2);line-height:1.75}
 .att-dot-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
@@ -333,12 +317,13 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 /* signatures */
 .sig-section{padding:clamp(18px,3vw,28px);display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-bottom:1px solid rgba(255,255,255,.05)}
 @media(max-width:520px){.sig-section{grid-template-columns:1fr}}
-.sig-box{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;text-align:center}
+.sig-box{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;text-align:center}
 .sig-area{height:52px;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--text3);font-style:italic;border-bottom:1px solid var(--gold-border);margin-bottom:10px}
 .sig-box h5{font-size:.68rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3)}
 .sig-box p{font-size:.84rem;color:var(--text2);margin-top:4px;font-weight:500}
 
-.r-footer{padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:rgba(255,255,255,.02)}
+/* footer / actions */
+.r-footer{padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;background:var(--bg3)}
 .r-footer p{font-size:.74rem;color:var(--text3)}
 .r-footer span{color:var(--gold)}
 .action-bar{display:flex;gap:12px;padding:20px 24px;border-top:1px solid rgba(255,255,255,.05);flex-wrap:wrap}
@@ -417,11 +402,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
       </div>
     </div>
     <div class="nav-right">
+      <!-- Shown on student/result pages: parent account entry points -->
       <button class="nav-portal-btn" id="navParentLoginBtn" onclick="showPage('parentLogin')"><i class="fas fa-user"></i> Login</button>
       <button class="nav-portal-btn hidden" id="navParentDashBtn" onclick="showPage('parentDashboard')"><i class="fas fa-address-card"></i> My Dashboard</button>
+      <!-- Shown on student/result pages: go to admin -->
       <button class="nav-admin-btn" id="navAdminBtn" onclick="goAdmin()"><i class="fas fa-shield-halved"></i> Admin</button>
+      <!-- Shown on admin/parent pages: go back to student portal WITHOUT logging out / losing DB -->
       <button class="nav-portal-btn hidden" id="navPortalBtn" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
+      <!-- Shown on admin page: logout -->
       <button class="nav-admin-btn hidden" id="navLogoutBtn" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      <!-- Shown on parent dashboard: logout -->
       <button class="nav-admin-btn hidden" id="navParentLogoutBtn" onclick="parentLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
   </div>
@@ -429,14 +419,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 
 <!-- ═══════════ PAGE 1: STUDENT PORTAL (default) ═══════════ -->
 <div id="pageStudent" class="page active">
-  <div class="hero stagger-1">
+  <div class="hero">
     <div class="hero-badge" id="heroBadge"><i class="fas fa-graduation-cap"></i>&nbsp;<span id="heroBadgeText">Academic Result Portal</span></div>
     <h2>Your <span>Result</span>,<br>Beautifully Presented</h2>
     <p>Enter your credentials to access your complete academic performance report with charts, insights, and a downloadable PDF report card.</p>
     <div class="divider"></div>
   </div>
 
-  <div class="portal-wrap stagger-2">
+  <div class="portal-wrap">
+
+    <!-- Shown while no results are published yet -->
     <div class="card hidden" id="notLiveCard">
       <div style="padding:clamp(32px,6vw,56px) 24px;text-align:center">
         <div style="font-size:2.4rem;color:var(--gold);margin-bottom:18px"><i class="fas fa-hourglass-half"></i></div>
@@ -445,6 +437,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
       </div>
     </div>
 
+    <!-- Shown once an admin has published a session -->
     <div class="hidden" id="liveCard">
       <div class="card" style="margin-bottom:16px">
         <div style="padding:16px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -481,16 +474,19 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
   </div>
 </div>
 
-<!-- ═══════════ PAGE 2: ADMIN LOGIN ═══════════ -->
+<!-- ═══════════ PAGE 2: ADMIN LOGIN ═══════════
+     BUG FIX: No display:flex on this div — .page controls visibility.
+     Centering is handled by the inner .admin-login-wrap which has min-height + flexbox.
+════════════════════════════════════════════ -->
 <div id="pageAdminLogin" class="page">
   <div class="admin-login-wrap">
     <div class="admin-login-box">
-      <div class="admin-login-logo stagger-1">
+      <div class="admin-login-logo">
         <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo">
         <h2>Admin Portal</h2>
         <p>Ythaen</p>
       </div>
-      <div class="admin-login-card stagger-2">
+      <div class="admin-login-card">
         <div id="loginToast" class="toast"></div>
         <div class="form-group" style="margin-bottom:16px">
           <label><i class="fas fa-user-shield"></i>Admin Email</label>
@@ -512,12 +508,12 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 <div id="pageParentLogin" class="page">
   <div class="admin-login-wrap">
     <div class="admin-login-box">
-      <div class="admin-login-logo stagger-1">
+      <div class="admin-login-logo">
         <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo">
         <h2 id="parentAuthTitle">Parent / Student Login</h2>
         <p>Save your children's details securely and unlock deeper insights</p>
       </div>
-      <div class="admin-login-card stagger-2">
+      <div class="admin-login-card">
         <div id="parentToast" class="toast"></div>
 
         <div id="parentSignInFields">
@@ -545,14 +541,14 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 
 <!-- ═══════════ PAGE: PARENT DASHBOARD ═══════════ -->
 <div id="pageParentDashboard" class="page">
-  <div class="hero stagger-1" style="padding-bottom:20px">
+  <div class="hero" style="padding-bottom:20px">
     <div class="hero-badge"><i class="fas fa-address-card"></i>&nbsp;Parent Dashboard</div>
     <h2>Your <span>Children</span></h2>
     <p id="parentWelcomeLine">Manage linked children and view their full results anytime.</p>
     <div class="divider"></div>
   </div>
 
-  <div class="portal-wrap stagger-2">
+  <div class="portal-wrap">
     <div id="parentDashToast" class="toast"></div>
 
     <div class="card" style="margin-bottom:20px">
@@ -621,6 +617,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
         <button class="nav-item" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
       </div>
       <div class="sidebar-bottom">
+        <!-- Back to portal WITHOUT logging out — database is preserved in memory -->
         <button class="btn btn-outline btn-full btn-sm" onclick="showPage('student')"><i class="fas fa-home"></i> Student Portal</button>
         <button class="btn btn-ghost btn-full btn-sm" onclick="adminLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
       </div>
@@ -629,12 +626,13 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
     <main class="admin-content">
 
       <!-- ─ Panel: Upload ─ -->
-      <div class="admin-panel active stagger-1" id="panelUpload">
+      <div class="admin-panel active" id="panelUpload">
         <div class="admin-topbar">
           <div><h2>Upload Database</h2><p>Upload the school Excel file to power student results</p></div>
         </div>
         <div id="adminToast" class="toast" style="margin-bottom:18px"></div>
 
+        <!-- Current publish status -->
         <div class="card mt-16" style="margin-bottom:20px">
           <div style="padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px">
             <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -660,8 +658,10 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
           <strong>Required Excel columns:</strong> Student ID &bull; Admn. No. &bull; Class &bull; Roll No. &bull; Student Name &bull; Father's Name &bull; [Subject 1] &bull; [Subject 2] &bull; …
           <br><span style="color:var(--text3);margin-top:6px;display:block">Subject columns are auto-detected. Max marks per subject: 100. Pass mark: 40.</span>
           <br><strong>Optional Attendance columns:</strong> <code style="color:var(--gold)">Working Days</code> &bull; <code style="color:var(--gold)">Days Present</code>
+          <span style="color:var(--text3);display:block;margin-top:4px">When present, a rich attendance section is shown on each student's report card and PDF.</span>
         </div>
 
+        <!-- Review & Publish — appears only after a file has been parsed, nothing goes live until confirmed here -->
         <div class="card hidden mt-24" id="reviewCard" style="border-color:var(--gold-border)">
           <div class="card-head">
             <h3><i class="fas fa-clipboard-check" style="color:var(--gold);margin-right:10px"></i>Review Before Publishing</h3>
@@ -695,6 +695,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
           <div class="stat-card"><div class="num" id="stPassed">0</div><div class="lbl">Passed</div><div class="sub" id="stPassPct"></div></div>
         </div>
 
+        <!-- Session History -->
         <div class="card mt-24">
           <div class="card-head">
             <h3><i class="fas fa-clock-rotate-left" style="color:var(--gold);margin-right:10px"></i>Session History</h3>
@@ -705,7 +706,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
       </div>
 
       <!-- ─ Panel: Students ─ -->
-      <div class="admin-panel stagger-1" id="panelStudents">
+      <div class="admin-panel" id="panelStudents">
         <div class="admin-topbar">
           <div><h2>Student Records</h2><p id="recordCount">No database loaded</p></div>
         </div>
@@ -728,8 +729,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
         </div>
       </div>
 
-      <!-- ─ Panel: Statistics ─ -->
-      <div class="admin-panel stagger-1" id="panelStats">
+      <!-- ─ Panel: Statistics (BUG FIX: statsCards now populated in buildStatsCharts) ─ -->
+      <div class="admin-panel" id="panelStats">
         <div class="admin-topbar"><div><h2>Statistics</h2><p>Overview of loaded database</p></div></div>
         <div class="stats-row" id="statsCards"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px" id="statsCharts">
@@ -739,12 +740,13 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
       </div>
 
       <!-- ─ Panel: Settings ─ -->
-      <div class="admin-panel stagger-1" id="panelSettings">
+      <div class="admin-panel" id="panelSettings">
         <div class="admin-topbar"><div><h2>Settings</h2><p>Portal configuration</p></div></div>
         <div class="settings-grid">
           <div class="settings-section">
             <h4><i class="fas fa-key"></i> Admin Credentials</h4>
             <p class="text-muted">Admin login is managed securely through Supabase Auth — no password is stored in this page's code.</p>
+            <p class="text-muted mt-16" style="margin-top:12px">To add or change admin accounts: go to your Supabase project → <strong style="color:var(--text)">Authentication → Users</strong> → Add user (email + password).</p>
           </div>
           <div class="settings-section">
             <h4><i class="fas fa-school"></i> Portal Info</h4>
@@ -757,6 +759,16 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
             <h4><i class="fas fa-info-circle"></i> Admin Access URL</h4>
             <p class="text-muted">Share this URL with admin staff. Students see only the student portal by default.</p>
             <div class="cred-badge mt-16" style="margin-top:12px;word-break:break-all"><code id="adminUrl"></code></div>
+            <p class="text-muted" style="margin-top:8px">Or directly click the "Admin" button on the nav bar → enter credentials.</p>
+          </div>
+          <div class="settings-section settings-full">
+            <h4><i class="fas fa-circle-info"></i> Navigation Guide</h4>
+            <p class="text-muted" style="line-height:1.8">
+              <strong style="color:var(--text)">Student Portal</strong> — Default view when the page loads. Students verify identity and access their results.<br>
+              <strong style="color:var(--text)">Admin Button (top-right)</strong> — Visible on student portal. Redirects to admin login if not authenticated, or directly to the dashboard if already logged in.<br>
+              <strong style="color:var(--text)">Student Portal Button (top-right or sidebar)</strong> — Takes admin back to student portal <em>without logging out or clearing the database</em>.<br>
+              <strong style="color:var(--text)">Logout</strong> — Ends the admin session and returns to the student portal.
+            </p>
           </div>
         </div>
       </div>
@@ -768,7 +780,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 <!-- ═══════════ PAGE 4: RESULT VIEW ═══════════ -->
 <div id="pageResult" class="page">
   <div class="result-wrap">
-    <div class="result-paper stagger-1">
+    <div class="result-paper">
 
       <div class="r-header">
         <div class="r-header-top">
@@ -788,9 +800,9 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
         <div class="student-grid" id="studentGrid"></div>
       </div>
 
-      <div class="summary-bar stagger-1" id="summaryBar"></div>
+      <div class="summary-bar" id="summaryBar"></div>
 
-      <div class="charts-row stagger-1">
+      <div class="charts-row">
         <div class="chart-box">
           <div class="sec-label"><i class="fas fa-chart-bar"></i> Subject-wise Marks</div>
           <div class="chart-canvas"><canvas id="barChart"></canvas></div>
@@ -802,28 +814,24 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
         </div>
       </div>
 
-      <div class="subjects-section stagger-2">
+      <div class="subjects-section">
         <div class="sec-label"><i class="fas fa-book-open"></i> Subject Breakdown</div>
         <div class="subjects-grid" id="subjectsGrid"></div>
       </div>
-      
-      <!-- Gamification Badges Section -->
-      <div class="insights-section stagger-2 hidden" id="badgesSection">
-        <div class="sec-label"><i class="fas fa-medal"></i> Achievements Unlocked</div>
-        <div class="insights-grid" id="badgesGrid"></div>
-      </div>
 
-      <div class="insights-section stagger-3">
+      <div class="insights-section">
         <div class="sec-label"><i class="fas fa-lightbulb"></i> Performance Insights</div>
         <div class="insights-grid" id="insightsGrid"></div>
       </div>
 
-      <div class="insights-section stagger-3" id="progressSection" style="display:none">
+      <!-- Progress Over Time — shown only if the student has more than one published session -->
+      <div class="insights-section" id="progressSection" style="display:none">
         <div class="sec-label"><i class="fas fa-chart-line"></i> Progress Over Time</div>
         <div class="chart-canvas" style="height:220px"><canvas id="progressChart"></canvas></div>
       </div>
 
-      <div class="attendance-section stagger-3" id="attendanceSection" style="display:none">
+      <!-- Attendance Section — shown only when data is available -->
+      <div class="attendance-section" id="attendanceSection" style="display:none">
         <div class="sec-label"><i class="fas fa-calendar-check"></i> Attendance Record</div>
         <div class="attendance-grid">
           <div class="att-gauge-wrap">
@@ -895,7 +903,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
   </div>
 </div>
 
-<!-- ═══════════ PDF TEMPLATE ═══════════ -->
+<!-- ═══════════ PDF TEMPLATE (off-screen, white) ═══════════ -->
 <div id="pdfTpl">
   <div style="position:relative;flex:1;display:flex;flex-direction:column">
     <div class="p-watermark">OFFICIAL</div>
@@ -941,21 +949,32 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.75);backdrop-filte
 </div>
 
 <script>
+/* ═══════════ CONFIG ═══════════
+   Paste your Supabase project values here.
+   Find them in: Supabase Dashboard → Project Settings → API
+   These two values are SAFE to expose publicly — they only allow
+   what your Row Level Security policies (set up in supabase_setup.sql)
+   permit. They are not secret admin keys.
+═══════════════════════════════════════════ */
 const SUPABASE_URL      = 'https://imrkclaqojthtnuakujv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImltcmtjbGFxb2p0aHRudWFrdWp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzE4NzYsImV4cCI6MjA5OTc0Nzg3Nn0.OCynnmr7QE9Z61_s6UiMUXK3LPeFIA3wIL37B_NMJEo';
 
 const MAX_MARKS   = 100;
 const PASS_MARK   = 40;
 
+/* ═══════════ STATE ═══════════
+   Declared BEFORE the Supabase client is created, so that even if
+   the client fails to initialize (e.g. CDN blocked), the rest of
+   the page's variables still exist and buttons don't go dead. */
 let DB = [], SUBJECTS = [];
 let barChart = null, donutChart = null, classChart = null, gradeChart = null, progressChart = null;
 let adminLoggedIn = false;
 let parentLoggedIn = false;
 let parentEmail = null;
 let resultCameFromDashboard = false;
-let LIVE_SESSION = null;
-let ALL_SESSIONS = [];
-let VIEW_SESSION_ID = null;
+let LIVE_SESSION = null;      // {id, name, published_at, file_name} — currently public session, or null
+let ALL_SESSIONS = [];        // full history, newest first
+let VIEW_SESSION_ID = null;   // which session admin is currently viewing in Students/Stats
 
 let sb = null;
 try {
@@ -964,24 +983,21 @@ try {
 } catch (e) {
   console.error('Supabase init failed:', e);
   window.addEventListener('DOMContentLoaded', () => {
-    alert('Could not connect to the database service. Please refresh the page.');
+    alert('Could not connect to the database service. Please refresh the page. If this keeps happening, check your internet connection or ad-blocker settings.');
   });
 }
 
-// Micro-interaction: Animated number count up
-function animateValue(obj, start, end, duration) {
-  let startTimestamp = null;
-  const step = (timestamp) => {
-    if (!startTimestamp) startTimestamp = timestamp;
-    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-    const easeProgress = 1 - Math.pow(1 - progress, 3);
-    obj.innerHTML = Math.floor(easeProgress * (end - start) + start) + "%";
-    if (progress < 1) window.requestAnimationFrame(step);
-    else obj.innerHTML = end + "%";
-  };
-  window.requestAnimationFrame(step);
-}
-
+/* ═══════════════════════════════════════════
+   PAGE ROUTING
+   Controls which page is visible and which
+   nav buttons appear.
+   navAdminBtn         — shown on student / result pages (when not parent-logged-in context)
+   navParentLoginBtn   — shown on student/result pages when no parent session
+   navParentDashBtn    — shown on student/result pages when a parent IS logged in
+   navPortalBtn        — shown on admin/parent pages (back without logout)
+   navLogoutBtn        — shown only on admin dashboard
+   navParentLogoutBtn  — shown only on parent dashboard
+═══════════════════════════════════════════ */
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page' + cap(name)).classList.add('active');
@@ -998,6 +1014,7 @@ function showPage(name) {
   document.getElementById('navPortalBtn').classList.toggle('hidden', !isBackPage);
   document.getElementById('navLogoutBtn').classList.toggle('hidden', !isAdmin);
   document.getElementById('navParentLogoutBtn').classList.toggle('hidden', !isParentDash);
+
   window.scrollTo(0, 0);
 }
 
@@ -1043,12 +1060,17 @@ async function adminLogout() {
   showPage('student');
 }
 
+/* Checks the profiles table (not just "is someone logged in") to
+   confirm this specific user has the admin role. */
 async function checkIsAdmin(userId) {
   const { data, error } = await sb.from('profiles').select('role').eq('id', userId).maybeSingle();
   if (error || !data) return false;
   return data.role === 'admin';
 }
 
+/* Restore session on page load/refresh so nobody is logged out
+   just because they reloaded the tab. Determines whether the
+   restored session belongs to an admin or a parent account. */
 async function restoreSession() {
   if (!sb) return;
   const { data } = await sb.auth.getSession();
@@ -1072,7 +1094,8 @@ async function restoreSession() {
 restoreSession();
 loadSessionsAndStatus();
 
-let parentAuthMode = 'signin'; 
+/* ═══════════ PARENT / STUDENT ACCOUNTS ═══════════ */
+let parentAuthMode = 'signin'; // 'signin' | 'signup'
 
 function toggleParentAuthMode() {
   parentAuthMode = parentAuthMode === 'signin' ? 'signup' : 'signin';
@@ -1174,6 +1197,8 @@ async function unlinkChild(id) {
   toast('parentDash', 'Child removed.', 'info');
 }
 
+/* Fetches a full result (used by both the anonymous 3-field form
+   and the parent dashboard's "View Result" click) and renders it. */
 async function fetchAndRenderResult(sid, father, admno) {
   const { data, error } = await sb.rpc('verify_student', { p_sid: sid, p_father: father, p_admno: admno });
   if (error) { toast(parentLoggedIn ? 'parentDash' : 'student', 'Something went wrong. Please try again shortly.', 'error'); console.error(error); return; }
@@ -1212,6 +1237,7 @@ function goBackFromResult() {
   }
 }
 
+/* ═══════════ ADMIN PANELS ═══════════ */
 function switchPanel(name, btn) {
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel' + cap(name)).classList.add('active');
@@ -1228,6 +1254,7 @@ function switchPanel(name, btn) {
   if (name === 'stats') buildStatsCharts();
 }
 
+/* ═══════════ TOAST ═══════════ */
 function toast(target, msg, type) {
   const ids = { student:'studentToast', admin:'adminToast', login:'loginToast', parent:'parentToast', parentDash:'parentDashToast' };
   const el = document.getElementById(ids[target] || target);
@@ -1238,7 +1265,8 @@ function toast(target, msg, type) {
   if (type !== 'error') setTimeout(() => el.classList.remove('show'), 5000);
 }
 
-let stagedRecords = [];  
+/* ═══════════ EXCEL UPLOAD (STAGED — nothing goes live until Publish) ═══════════ */
+let stagedRecords = [];   // parsed rows, waiting for admin confirmation
 let stagedFileName = '';
 
 function dragOver(e)  { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag'); }
@@ -1246,6 +1274,9 @@ function dragLeave()  { document.getElementById('uploadZone').classList.remove('
 function dropFile(e)  { e.preventDefault(); dragLeave(); const f = e.dataTransfer.files[0]; if (f) processExcel(f); }
 function loadExcel(i) { if (i.files[0]) processExcel(i.files[0]); }
 
+/* Parses the Excel file into memory only. Nothing is sent to
+   Supabase here — it just populates the Review card so the admin
+   can check everything before it goes live. */
 function processExcel(file) {
   const reader = new FileReader();
   reader.onload = e => {
@@ -1295,6 +1326,7 @@ function processExcel(file) {
         <div class="stat-card"><div class="num">${classes.length}</div><div class="lbl">Classes</div></div>
       `;
 
+      // Bulk sanity checks — catch common spreadsheet mistakes before they go live
       const warnings = [];
       const idCounts = {};
       parsed.forEach(r => { idCounts[r.sid] = (idCounts[r.sid] || 0) + 1; });
@@ -1347,6 +1379,11 @@ function discardStaged() {
   toast('admin', 'Staged upload discarded. Nothing was changed.', 'info');
 }
 
+/* The ONLY place that actually writes to Supabase and makes
+   results visible to the public. Creates a brand-new session row
+   (keeping every prior session intact) and attaches every staged
+   student record to it. Requires the session name + confirmation
+   checkbox, enforced by the disabled Publish button. */
 async function publishResults() {
   const sessionName = document.getElementById('sessionNameInput').value.trim();
   const confirmed    = document.getElementById('confirmCheckbox').checked;
@@ -1357,13 +1394,16 @@ async function publishResults() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing…';
 
   try {
+    // Take any currently live session offline first
     await sb.from('sessions').update({ is_live:false }).eq('is_live', true);
 
+    // Create the new session
     const { data: newSession, error: sessionErr } = await sb.from('sessions').insert({
       name: sessionName, file_name: stagedFileName, is_live: true, published_at: new Date().toISOString()
     }).select().single();
     if (sessionErr) throw sessionErr;
 
+    // Attach every staged record to this new session and upload
     const rows = stagedRecords.map(r => ({ ...r, session_id: newSession.id }));
     const BATCH = 200;
     for (let i = 0; i < rows.length; i += BATCH) {
@@ -1391,6 +1431,8 @@ async function publishResults() {
   updatePublishBtnState();
 }
 
+/* Hides results from the public WITHOUT deleting data — useful if
+   something needs correcting after publishing. */
 async function takeResultsOffline() {
   if (!confirm('This will hide results from all students immediately. The session data itself is kept in history. Continue?')) return;
   const { error } = await sb.from('sessions').update({ is_live:false }).eq('is_live', true);
@@ -1399,6 +1441,9 @@ async function takeResultsOffline() {
   toast('admin', 'Results are now hidden from the public portal.', 'info');
 }
 
+/* Makes a specific past session live again (and unsets whichever
+   session was live before). This is how "Go Live Again" works now —
+   pick any session from history, not just the most recent one. */
 async function setLiveSession(id, name) {
   if (!confirm(`Make "${name}" the live session shown to students? Any currently live session will be taken offline.`)) return;
   const { error: e1 } = await sb.from('sessions').update({ is_live:false }).eq('is_live', true);
@@ -1410,6 +1455,8 @@ async function setLiveSession(id, name) {
   toast('admin', `"${name}" is now live.`, 'success');
 }
 
+/* Permanently deletes a session and all its student records
+   (cascade). Cannot be undone. */
 async function deleteSession(id, name) {
   if (!confirm(`Permanently delete session "${name}" and all its student records? This cannot be undone.`)) return;
   const { error } = await sb.from('sessions').delete().eq('id', id);
@@ -1419,6 +1466,11 @@ async function deleteSession(id, name) {
   toast('admin', `Session "${name}" deleted.`, 'info');
 }
 
+/* Reads the full session history and updates: student portal
+   banners, homepage badge, settings panel, the admin status card,
+   the session history list, and the session-picker dropdown.
+   Anyone can call this — sessions are public-readable metadata,
+   no student data is exposed here. */
 async function loadSessionsAndStatus() {
   if (!sb) return;
   const { data, error } = await sb.from('sessions').select('*').order('published_at', { ascending:false });
@@ -1427,6 +1479,7 @@ async function loadSessionsAndStatus() {
   ALL_SESSIONS = data || [];
   LIVE_SESSION = ALL_SESSIONS.find(s => s.is_live) || null;
 
+  // Student-facing banners
   const notLiveCard = document.getElementById('notLiveCard');
   const liveCard    = document.getElementById('liveCard');
   if (notLiveCard && liveCard) {
@@ -1435,12 +1488,15 @@ async function loadSessionsAndStatus() {
     if (LIVE_SESSION) document.getElementById('liveSessionName').textContent = LIVE_SESSION.name;
   }
 
+  // Homepage hero badge
   const heroText = document.getElementById('heroBadgeText');
   if (heroText) heroText.textContent = LIVE_SESSION ? LIVE_SESSION.name.toUpperCase() : 'Academic Result Portal';
 
+  // Settings panel
   const settingsSession = document.getElementById('settingsSessionName');
   if (settingsSession) settingsSession.textContent = LIVE_SESSION ? LIVE_SESSION.name : (ALL_SESSIONS.length ? 'Not currently live' : 'Not declared yet');
 
+  // Admin status card
   const badge = document.getElementById('statusBadge');
   if (badge) {
     const fileLine = document.getElementById('statusFileLine');
@@ -1463,6 +1519,7 @@ async function loadSessionsAndStatus() {
     }
   }
 
+  // Session history list (admin)
   const listEl = document.getElementById('sessionHistoryList');
   if (listEl) {
     if (!ALL_SESSIONS.length) {
@@ -1487,6 +1544,7 @@ async function loadSessionsAndStatus() {
     }
   }
 
+  // Session picker dropdown (Students panel)
   const sel = document.getElementById('viewSessionSelect');
   if (sel) {
     if (!ALL_SESSIONS.length) {
@@ -1508,6 +1566,9 @@ function onViewSessionChange(id) {
   loadStudentsFromDB(id);
 }
 
+/* Pull records for one session down from Supabase and rebuild
+   local view-state (DB / SUBJECTS) used by the table, stats, and
+   charts. Defaults to the live session if none specified. */
 async function loadStudentsFromDB(sessionId) {
   const targetId = sessionId || VIEW_SESSION_ID || (LIVE_SESSION ? LIVE_SESSION.id : (ALL_SESSIONS[0] && ALL_SESSIONS[0].id));
   if (!targetId) { DB = []; SUBJECTS = []; buildStudentTable(); updateRecordCount(); return; }
@@ -1550,6 +1611,7 @@ async function loadStudentsFromDB(sessionId) {
   updateRecordCount();
 }
 
+/* ═══════════ STUDENT TABLE ═══════════ */
 function buildStudentTable(data) {
   const arr = data || DB;
   document.getElementById('studentTbody').innerHTML = arr.map((r, i) => {
@@ -1587,6 +1649,11 @@ function updateRecordCount() {
     DB.length ? `${DB.length} students loaded` : 'No database loaded — go to Upload tab';
 }
 
+/* ═══════════════════════════════════════════
+   STATS CHARTS
+   BUG FIX: statsCards div is now populated
+   with real summary statistics before charts.
+═══════════════════════════════════════════ */
 function buildStatsCharts() {
   const el = document.getElementById('statsCards');
   if (!DB.length) {
@@ -1597,11 +1664,13 @@ function buildStatsCharts() {
   const passed  = DB.filter(r => r.passed).length;
   const failed  = DB.length - passed;
   const avg     = (DB.reduce((a, r) => a + r.pct, 0) / DB.length).toFixed(1);
+  const topS    = DB.reduce((a, b) => a.pct > b.pct ? a : b);
   const classes = [...new Set(DB.map(r => r.cls))].length;
   const attStudents = DB.filter(r => r.attPct !== null);
   const avgAtt = attStudents.length ? Math.round(attStudents.reduce((a, r) => a + r.attPct, 0) / attStudents.length) : null;
   const criticalAtt = attStudents.filter(r => r.attPct < 75).length;
 
+  // Populate stat cards
   el.innerHTML = `
     <div class="stat-card"><div class="num">${DB.length}</div><div class="lbl">Total Students</div></div>
     <div class="stat-card"><div class="num" style="color:var(--green)">${passed}</div><div class="lbl">Passed</div><div class="sub">${Math.round(passed/DB.length*100)}% pass rate</div></div>
@@ -1613,6 +1682,7 @@ function buildStatsCharts() {
     ${criticalAtt > 0 ? `<div class="stat-card"><div class="num" style="color:var(--red)">${criticalAtt}</div><div class="lbl">Low Attendance</div><div class="sub">Below 75%</div></div>` : ''}
   `;
 
+  // Class distribution chart
   const classCounts = {};
   DB.forEach(r => classCounts[r.cls] = (classCounts[r.cls] || 0) + 1);
 
@@ -1626,8 +1696,10 @@ function buildStatsCharts() {
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ color:'#5c5975', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } } }
   });
 
+  // Grade distribution chart
   const grades = { 'A+':0, A:0, 'B+':0, B:0, C:0, D:0, F:0 };
   DB.forEach(r => { grades[r.grade] = (grades[r.grade] || 0) + 1; });
+  // Override A+ (getGrade returns A for 80-89, A+ for 90+, but stored grade uses getGrade)
   const gc_data = Object.entries(grades).filter(([, v]) => v > 0);
 
   if (gradeChart) gradeChart.destroy();
@@ -1641,6 +1713,7 @@ function buildStatsCharts() {
   });
 }
 
+/* ═══════════ ATTENDANCE HELPER ═══════════ */
 function getAttInfo(pct) {
   if (pct === null) return null;
   if (pct >= 90) return { label:'Excellent', color:'#10d98a', bg:'rgba(16,217,138,.15)', remark:'Outstanding attendance! Your consistent presence in school reflects great discipline and dedication. Keep it up!' };
@@ -1649,6 +1722,7 @@ function getAttInfo(pct) {
   return { label:'Critical', color:'#ff4d6d', bg:'rgba(255,77,109,.15)', remark:'Attendance is critically low and falls well below school requirements. Immediate improvement is essential. Please meet the class teacher to discuss a plan.' };
 }
 
+/* ═══════════ GRADE HELPER ═══════════ */
 function getGrade(pct) {
   if (pct >= 90) return { grade:'A+', color:'#10d98a', label:'Outstanding' };
   if (pct >= 80) return { grade:'A',  color:'#4d9fff', label:'Excellent' };
@@ -1659,6 +1733,7 @@ function getGrade(pct) {
   return           { grade:'F',  color:'#ff4d6d', label:'Needs Work' };
 }
 
+/* ═══════════ STUDENT VERIFY ═══════════ */
 async function verifyStudent() {
   const sid    = document.getElementById('fSid').value.trim();
   const father = document.getElementById('fFather').value.trim();
@@ -1670,8 +1745,15 @@ async function verifyStudent() {
   await fetchAndRenderResult(sid, father, admno.replace(/\.0$/, ''));
 }
 
+/* ═══════════════════════════════════════════
+   RENDER RESULT
+   BUG FIX (line 899): removed shadowing `colors`
+   variable — `s` was reused as arrow-fn param,
+   overwriting the student object reference.
+   The unused `colors` array is eliminated entirely.
+═══════════════════════════════════════════ */
 function renderResult(student, history, classAverages, rankInfo) {
-  const s       = student; 
+  const s       = student; // explicit alias, no shadowing risk
   history = history || [];
   classAverages = classAverages || {};
   const subs    = Object.keys(s.marks);
@@ -1684,9 +1766,11 @@ function renderResult(student, history, classAverages, rankInfo) {
   const failed  = subs.filter(k => s.marks[k] < PASS_MARK);
   const topSub  = subs.reduce((a, b) => s.marks[a] > s.marks[b] ? a : b);
 
+  // Session name (result page header + PDF badge)
   document.getElementById('resultSessionYr').textContent = (LIVE_SESSION && LIVE_SESSION.name) || 'Current Session';
   document.getElementById('pdfBadgeYr').textContent = (LIVE_SESSION && LIVE_SESSION.name) || 'Current Session';
 
+  // Student grid
   document.getElementById('studentGrid').innerHTML = [
     { l:'Student Name',   v:s.name,   g:true },
     { l:"Father's Name",  v:s.father },
@@ -1696,18 +1780,15 @@ function renderResult(student, history, classAverages, rankInfo) {
     { l:'Roll Number',    v:s.roll }
   ].map(c => `<div class="s-cell"><div class="lbl">${c.l}</div><div class="val${c.g ? ' g' : ''}">${c.v || '—'}</div></div>`).join('');
 
+  // Summary bar
   document.getElementById('summaryBar').innerHTML = [
-    { b:`${pct}%`, c:'var(--gold)', t:'Overall %', id:'animPctVal' },
-    { b:grade,     c:color, t:'Final Grade' },
+    { b:`${pct}%`, c:'var(--gold)',                     t:'Overall %' },
+    { b:grade,     c:color,                              t:'Final Grade' },
     { b:passed ? 'PASS':'FAIL', c:passed ? 'var(--green)':'var(--red)', t:'Result' },
-    { b:topSub,    c:'var(--text)', t:'Best Subject', sz:'1.3rem' }
-  ].map(c => `<div class="sum-cell"><div class="big" ${c.id ? `id="${c.id}"` : ''} style="color:${c.c};${c.sz ? 'font-size:'+c.sz : ''}">${c.id ? '0%' : c.b}</div><small>${c.t}</small></div>`).join('');
+    { b:topSub,    c:'var(--text)',                      t:'Best Subject', sz:'1.3rem' }
+  ].map(c => `<div class="sum-cell"><div class="big" style="color:${c.c};${c.sz ? 'font-size:'+c.sz : ''}">${c.b}</div><small>${c.t}</small></div>`).join('');
 
-  setTimeout(() => {
-    const pctNode = document.getElementById('animPctVal');
-    if(pctNode) animateValue(pctNode, 0, pct, 1200);
-  }, 100);
-
+  // Bar chart — BUG FIX: use `sub` as parameter name, NOT `s`
   if (barChart) barChart.destroy();
   const barColors = subs.map(sub => getGrade(Math.round((s.marks[sub] / MAX_MARKS) * 100)).color);
   const hasClassAvg = subs.some(sub => classAverages[sub] !== undefined);
@@ -1724,6 +1805,7 @@ function renderResult(student, history, classAverages, rankInfo) {
     options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:hasClassAvg, position:'bottom', labels:{ color:'#a8a4b8', font:{ size:10 }, boxWidth:12, filter:item => item.text !== 'Pass Mark' || true } }, tooltip:{ callbacks:{ label:c => ` ${c.dataset.label}: ${c.raw}` } } }, scales:{ y:{ min:0, max:MAX_MARKS, grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ color:'#5c5975', font:{ size:10 } } }, x:{ grid:{ display:false }, ticks:{ color:'#a8a4b8', font:{ size:11 } } } } }
   });
 
+  // Donut
   if (donutChart) donutChart.destroy();
   donutChart = new Chart(document.getElementById('donutChart').getContext('2d'), {
     type: 'doughnut',
@@ -1734,6 +1816,7 @@ function renderResult(student, history, classAverages, rankInfo) {
     `<div style="font-family:'Playfair Display',serif;font-size:1.5rem;color:${color};font-weight:700">${pct}%</div>
      <div style="font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-top:3px">${label}</div>`;
 
+  // Subject cards
   document.getElementById('subjectsGrid').innerHTML = subs.map(sub => {
     const m  = s.marks[sub];
     const sp = Math.round((m / MAX_MARKS) * 100);
@@ -1751,50 +1834,7 @@ function renderResult(student, history, classAverages, rankInfo) {
   }).join('');
   setTimeout(() => document.querySelectorAll('.subj-bar-fill').forEach(el => el.style.width = el.dataset.w), 120);
 
-  // Gamification Badges Logic
-  const mathMark = s.marks['Mathematics'] || s.marks['Math'] || 0;
-  const sciMark = s.marks['Science'] || 0;
-  let badgesHTML = '';
-  
-  if (mathMark >= 95 && sciMark >= 95) {
-    badgesHTML += `<div class="insight-card" style="text-align:center; border-color: var(--gold);">
-      <i class="fas fa-atom" style="font-size:2.2rem; color:var(--gold); margin-bottom:12px;"></i>
-      <h5 style="justify-content:center;">The Soliton Award</h5>
-      <p style="font-size:0.75rem;">Exceptional analytical mastery (95%+ in Science & Math).</p>
-    </div>`;
-  }
-  
-  if (s.attPct === 100) {
-    badgesHTML += `<div class="insight-card" style="text-align:center; border-color: var(--green);">
-      <i class="fas fa-shield-halved" style="font-size:2.2rem; color:var(--green); margin-bottom:12px;"></i>
-      <h5 style="justify-content:center; color:var(--green)">The Ironclad</h5>
-      <p style="font-size:0.75rem;">Flawless dedication. 100% Attendance for the session.</p>
-    </div>`;
-  }
-  
-  if (history && history.length > 0) {
-    const lastSessionSubs = Object.keys(history[0].marks || {});
-    if(lastSessionSubs.length > 0) {
-        const lastTotal = lastSessionSubs.reduce((a, k) => a + (Number(history[0].marks[k]) || 0), 0);
-        const lastPct = Math.round((lastTotal / (lastSessionSubs.length * MAX_MARKS)) * 100);
-        if (pct - lastPct >= 10) {
-          badgesHTML += `<div class="insight-card" style="text-align:center; border-color: #ff4d6d;">
-            <i class="fas fa-fire-flame-curved" style="font-size:2.2rem; color:#ff4d6d; margin-bottom:12px;"></i>
-            <h5 style="justify-content:center; color:#ff4d6d;">The Phoenix</h5>
-            <p style="font-size:0.75rem;">Massive comeback! Over 10% overall improvement from last term.</p>
-          </div>`;
-        }
-    }
-  }
-
-  const badgeSec = document.getElementById('badgesSection');
-  if (badgesHTML !== '') {
-      badgeSec.style.display = '';
-      document.getElementById('badgesGrid').innerHTML = badgesHTML;
-  } else {
-      badgeSec.style.display = 'none';
-  }
-
+  // Insights
   const strengths = subs.filter(sub => s.marks[sub] >= 80);
   const improve   = subs.filter(sub => s.marks[sub] < 60);
   const avg       = (total / subs.length).toFixed(1);
@@ -1805,11 +1845,8 @@ function renderResult(student, history, classAverages, rankInfo) {
   else if (pct >= 40) rec = 'You have cleared the minimum threshold but significant improvement is possible. Create a structured daily study plan and stick to it consistently.';
   else                rec = 'This result requires immediate attention. Please discuss a personalised improvement plan with your class teacher without delay.';
 
-  const aiRecId = 'ai-rec-' + Math.random().toString(36).substr(2, 9);
-
   document.getElementById('insightsGrid').innerHTML = `
     ${rankInfo && rankInfo.rank ? `<div class="insight-card" style="border-color:var(--gold-border)"><h5><i class="fas fa-ranking-star"></i> Class Rank</h5><p style="font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--gold);font-weight:700">#${rankInfo.rank} <span style="font-size:.85rem;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400">of ${rankInfo.out_of} in Class ${s.cls}</span></p></div>` : ''}
-    <div class="insight-card"><h5><i class="fas fa-robot"></i> AI Virtual Advisor</h5><p id="${aiRecId}"><i class="fas fa-spinner fa-spin"></i> Generating personalized insight...</p></div>
     <div class="insight-card"><h5><i class="fas fa-trophy"></i> Strengths</h5><p>Subjects scoring ≥ 80:</p><ul>${strengths.length ? strengths.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>Keep pushing — all subjects show potential!</li>'}</ul></div>
     <div class="insight-card"><h5><i class="fas fa-arrow-trend-up"></i> Improve Here</h5><p>Subjects scoring below 60:</p><ul>${improve.length ? improve.map(sub => `<li>${sub} — ${s.marks[sub]}/${MAX_MARKS}</li>`).join('') : '<li>No subject below 60% — great balance!</li>'}</ul></div>
     <div class="insight-card"><h5><i class="fas fa-chart-simple"></i> Key Stats</h5><ul>
@@ -1819,32 +1856,13 @@ function renderResult(student, history, classAverages, rankInfo) {
       <li>Lowest: <strong>${Math.min(...marksArr)} (${subs[marksArr.indexOf(Math.min(...marksArr))]})</strong></li>
       ${failed.length ? `<li>Failed: <strong>${failed.join(', ')}</strong></li>` : '<li>Passed in all subjects ✓</li>'}
     </ul></div>
+    <div class="insight-card"><h5><i class="fas fa-lightbulb"></i> Recommendation</h5><p>${rec}</p></div>
   `;
 
-  // Trigger Edge Function call for Agentic AI
-  if (sb && sb.functions) {
-    sb.functions.invoke('generate-insight', {
-      body: { studentData: s, historyData: history }
-    }).then(({ data, error }) => {
-      const recEl = document.getElementById(aiRecId);
-      if (recEl) {
-        if (error || !data || !data.insight) recEl.textContent = rec;
-        else recEl.textContent = data.insight;
-      }
-    }).catch(() => {
-      const recEl = document.getElementById(aiRecId);
-      if (recEl) recEl.textContent = rec;
-    });
-  } else {
-    const recEl = document.getElementById(aiRecId);
-    if (recEl) recEl.textContent = rec;
-  }
-
-  // Predictive Progress Chart
+  // ── Progress Over Time (only if this student has more than 1 published session) ──
   const progSec = document.getElementById('progressSection');
   if (progressChart) { progressChart.destroy(); progressChart = null; }
-  
-  if (history.length >= 2) {
+  if (history.length > 1) {
     progSec.style.display = '';
     const labels = history.map(h => h.session_name);
     const pctSeries = history.map(h => {
@@ -1853,49 +1871,26 @@ function renderResult(student, history, classAverages, rankInfo) {
       const hTotal = hSubs.reduce((a, k) => a + (Number(h.marks[k]) || 0), 0);
       return Math.round((hTotal / (hSubs.length * MAX_MARKS)) * 100);
     });
-
-    const n = pctSeries.length;
-    let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-    for (let i = 0; i < n; i++) {
-        sumX += i; sumY += pctSeries[i]; sumXY += i * pctSeries[i]; sumXX += i * i;
-    }
-    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-    const predictedPct = Math.min(Math.max(Math.round(slope * n + intercept), 0), 100);
-
-    labels.push("Proj. Next Term");
-    const projectionData = new Array(n - 1).fill(null);
-    projectionData.push(pctSeries[n - 1]); 
-    projectionData.push(predictedPct);
-
     progressChart = new Chart(document.getElementById('progressChart').getContext('2d'), {
       type: 'line',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'Overall %', data: pctSeries, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,.12)',
-            borderWidth: 2.5, pointBackgroundColor: '#d4af37', pointRadius: 5, pointHoverRadius: 7, fill: true, tension: 0.35
-          },
-          {
-            label: 'Projected Trajectory', data: projectionData, borderColor: 'rgba(77,159,255,0.8)', borderDash: [5, 5],
-            borderWidth: 2, pointBackgroundColor: '#4d9fff', pointRadius: 5, fill: false, tension: 0.35
-          }
-        ]
-      },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:true, labels: { color: '#a8a4b8', font:{size:11} } }, tooltip:{ callbacks:{ label:c => ` ${c.raw}%` } } },
+      data: { labels, datasets: [{
+        label: 'Overall %', data: pctSeries, borderColor: '#d4af37', backgroundColor: 'rgba(212,175,55,.12)',
+        borderWidth: 2.5, pointBackgroundColor: '#d4af37', pointRadius: 5, pointHoverRadius: 7, fill: true, tension: 0.35
+      }] },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => ` ${c.raw}%` } } },
         scales:{ y:{ min:0, max:100, grid:{ color:'rgba(255,255,255,.05)' }, ticks:{ color:'#5c5975', font:{ size:10 }, callback:v => v+'%' } }, x:{ grid:{ display:false }, ticks:{ color:'#a8a4b8', font:{ size:10 } } } } }
     });
-  } else if (history.length === 1) {
+  } else {
     progSec.style.display = 'none';
   }
 
+  // ── Attendance ──
   const attSec = document.getElementById('attendanceSection');
   const attInfo = getAttInfo(s.attPct);
   if (s.attPct !== null && s.workingDays > 0) {
     attSec.style.display = '';
     const absent = s.workingDays - s.daysPresent;
-    const circ   = 2 * Math.PI * 58; 
+    const circ   = 2 * Math.PI * 58; // r=58
     const dash   = Math.min(s.attPct / 100, 1) * circ;
     document.getElementById('attArc').setAttribute('stroke', attInfo.color);
     document.getElementById('attArc').setAttribute('stroke-dasharray', `${dash} ${circ}`);
@@ -1913,14 +1908,14 @@ function renderResult(student, history, classAverages, rankInfo) {
     bar.style.background = attInfo.color;
     setTimeout(() => { bar.style.width = Math.min(s.attPct, 100) + '%'; }, 150);
     document.getElementById('attRemark').textContent = attInfo.remark;
-
+    // Dot visualisation — 1 dot per day (cap at 60 for display)
     const total60 = Math.min(s.workingDays, 60);
     const present60 = Math.round((s.daysPresent / s.workingDays) * total60);
     const dots = Array.from({ length: total60 }, (_, i) =>
       `<div class="att-dot" style="background:${i < present60 ? attInfo.color : 'rgba(255,255,255,.1)'}"></div>`
     ).join('');
     document.getElementById('attDotRow').innerHTML = dots + (s.workingDays > 60 ? `<span style="font-size:.7rem;color:var(--text3);margin-left:4px">+${s.workingDays - 60} more</span>` : '');
-    
+    // PDF attendance
     document.getElementById('pdfAttSection').classList.remove('hidden');
     document.getElementById('pdfAttGrid').innerHTML = [
       { b: s.workingDays, l: 'Working Days' },
@@ -1936,12 +1931,14 @@ function renderResult(student, history, classAverages, rankInfo) {
     document.getElementById('pdfAttSection').classList.add('hidden');
   }
 
+  // Signatures & footer
   document.getElementById('sigTeacher').textContent = `Class ${s.cls} Teacher`;
   const now   = new Date();
   const docId = 'TVM' + Math.random().toString(36).substr(2, 9).toUpperCase();
   document.getElementById('genDate').textContent = now.toLocaleDateString('en-IN', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
   document.getElementById('genId').textContent   = docId;
 
+  // Build PDF template
   document.getElementById('pdfStudent').innerHTML = [
     { l:'Student Name', v:s.name },    { l:'Student ID',    v:s.sid },
     { l:"Father's Name",v:s.father },  { l:'Admission No.', v:s.admno },
@@ -1953,6 +1950,7 @@ function renderResult(student, history, classAverages, rankInfo) {
     { b:label,     l:'Performance' },{ b:passed ? 'PASS':'FAIL', l:'Result' },
     ...(s.attPct !== null ? [{ b: s.attPct + '%', l: 'Attendance' }] : [])
   ].map(c => `<div class="p-sum-cell"><div class="big">${c.b}</div><div class="lab">${c.l}</div></div>`).join('');
+  // Update grid columns dynamically
   document.getElementById('pdfSummary').style.gridTemplateColumns = s.attPct !== null ? 'repeat(5,1fr)' : 'repeat(4,1fr)';
 
   document.getElementById('pdfTable').innerHTML = `
@@ -1979,6 +1977,7 @@ function renderResult(student, history, classAverages, rankInfo) {
   showPage('result');
 }
 
+/* ═══════════ PDF DOWNLOAD ═══════════ */
 async function downloadPDF() {
   const btn = document.getElementById('pdfBtn');
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF…';
@@ -1992,7 +1991,7 @@ async function downloadPDF() {
     const H     = pdf.internal.pageSize.getHeight();
     const imgData = canvas.toDataURL('image/jpeg', .97);
     const imgH  = (canvas.height * W) / canvas.width;
-    const TOLERANCE = 1; 
+    const TOLERANCE = 1; // 1mm — prevents sub-pixel ghost page
     if (imgH <= H + TOLERANCE) {
       pdf.addImage(imgData, 'JPEG', 0, 0, W, Math.min(imgH, H));
     } else {
@@ -2012,8 +2011,13 @@ async function downloadPDF() {
   btn.disabled  = false;
 }
 
+/* ═══════════ INIT ═══════════ */
 document.getElementById('adminUrl').textContent = location.href;
 
+/* PWA — lets the portal be installed to a phone/desktop home screen
+   and reopen quickly even on a flaky connection. Silently does
+   nothing if the browser doesn't support it or the file isn't
+   served over http(s) (e.g. opened directly from disk). */
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('service-worker.js').catch(() => {});
