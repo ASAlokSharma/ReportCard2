@@ -487,6 +487,26 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   </div>
 </div>
 
+<!-- ═══════════ PAGE: TEACHER SUBJECT UPLOAD (token-based, no login) ═══════════ -->
+<div id="pageTeacherUpload" class="page">
+  <div class="admin-login-wrap">
+    <div class="admin-login-box">
+      <div class="admin-login-logo">
+        <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" alt="Logo">
+        <h2 id="teacherUploadTitle">Subject Marks Upload</h2>
+        <p id="teacherUploadSubtitle">Loading…</p>
+      </div>
+      <div class="admin-login-card">
+        <div id="teacherUploadToast" class="toast"></div>
+
+        <div id="teacherUploadBody">
+          <p class="text-muted" style="padding:20px 0;text-align:center">Checking your link…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ PAGE 2: ADMIN LOGIN ═══════════
      BUG FIX: No display:flex on this div — .page controls visibility.
      Centering is handled by the inner .admin-login-wrap which has min-height + flexbox.
@@ -522,6 +542,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   <!-- Mobile top nav -->
   <div class="mobile-admin-nav" id="mobileNav">
     <button class="mobile-nav-btn active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload</button>
+    <button class="mobile-nav-btn" onclick="switchPanel('approvals',this)"><i class="fas fa-user-check"></i> Teachers</button>
     <button class="mobile-nav-btn" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Students</button>
     <button class="mobile-nav-btn" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Stats</button>
     <button class="mobile-nav-btn" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
@@ -541,6 +562,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="sep"></div>
         <div class="sidebar-label">Management</div>
         <button class="nav-item active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload Database</button>
+        <button class="nav-item" onclick="switchPanel('approvals',this)"><i class="fas fa-user-check"></i> Teacher Uploads</button>
         <button class="nav-item" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Student Records</button>
         <button class="nav-item" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Statistics</button>
         <div class="sidebar-label">System</div>
@@ -635,6 +657,62 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         </div>
       </div>
 
+      <!-- ─ Panel: Teacher Uploads (multi-teacher approval workflow) ─ -->
+      <div class="admin-panel" id="panelApprovals">
+        <div class="admin-topbar">
+          <div><h2>Teacher Uploads</h2><p>Assemble a term's results from separate subject uploads, with your approval before anything merges in</p></div>
+        </div>
+        <div id="approvalsToast" class="toast" style="margin-bottom:18px"></div>
+
+        <!-- Draft term picker + creator -->
+        <div class="card" style="margin-bottom:20px">
+          <div style="padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap">
+            <div class="form-group" style="max-width:340px;margin-bottom:0;flex:1">
+              <label><i class="fas fa-layer-group"></i>Draft Term</label>
+              <select class="inp" id="draftSessionSelect" onchange="onDraftSessionChange(this.value)"></select>
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="toggleNewDraftForm()"><i class="fas fa-plus"></i> New Draft Term</button>
+          </div>
+          <div class="hidden" id="newDraftForm" style="padding:0 22px 20px">
+            <div class="form-row cols-2" style="margin-bottom:12px">
+              <div class="form-group">
+                <label>Term / Exam Name</label>
+                <input class="inp" id="newDraftName" placeholder="e.g. Term 2 2025–26">
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="createDraftSession()"><i class="fas fa-check"></i> Create Draft</button>
+          </div>
+        </div>
+
+        <!-- Request a new subject link -->
+        <div class="card" style="margin-bottom:20px" id="requestSubjectCard">
+          <div class="card-head">
+            <h3><i class="fas fa-link" style="color:var(--gold);margin-right:10px"></i>Request a Subject Upload</h3>
+            <p>Generates a private link — send it to that subject's teacher, no login needed on their end</p>
+          </div>
+          <div style="padding:clamp(18px,3vw,26px);display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+            <div class="form-group" style="margin-bottom:0;flex:1;min-width:200px">
+              <label>Subject Name</label>
+              <input class="inp" id="newSubjectName" placeholder="e.g. Mathematics" onkeydown="if(event.key==='Enter')generateSubjectLink()">
+            </div>
+            <button class="btn btn-gold" onclick="generateSubjectLink()"><i class="fas fa-link"></i> Generate Link</button>
+          </div>
+          <div id="newLinkResult" style="padding:0 clamp(18px,3vw,26px) 20px"></div>
+        </div>
+
+        <!-- Submissions list for the selected draft -->
+        <div class="card">
+          <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div>
+              <h3><i class="fas fa-list-check" style="color:var(--gold);margin-right:10px"></i>Subject Submissions</h3>
+              <p>Preview, approve, or reject each subject before it merges into the term</p>
+            </div>
+            <button class="btn btn-gold btn-sm" id="finalizeDraftBtn" onclick="finalizeDraftSession()"><i class="fas fa-globe"></i> Finalize &amp; Publish Term</button>
+          </div>
+          <div id="submissionsList" style="padding:8px 0"></div>
+        </div>
+      </div>
+
       <!-- ─ Panel: Students ─ -->
       <div class="admin-panel" id="panelStudents">
         <div class="admin-topbar">
@@ -643,6 +721,9 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="form-group" style="max-width:340px;margin-bottom:16px">
           <label><i class="fas fa-layer-group"></i>Viewing Session</label>
           <select class="inp" id="viewSessionSelect" onchange="onViewSessionChange(this.value)"></select>
+        </div>
+        <div style="margin-bottom:16px">
+          <button class="btn btn-outline btn-sm" onclick="downloadCompiledExcel()"><i class="fas fa-file-excel"></i> Download Compiled Excel</button>
         </div>
         <div class="table-wrap">
           <div class="table-search">
@@ -910,6 +991,7 @@ let DB = [], SUBJECTS = [];
 let barChart = null, donutChart = null, classChart = null, gradeChart = null, progressChart = null;
 let adminLoggedIn = false;
 let CURRENT_RESULT_STUDENT = null;
+let CURRENT_DRAFT_ID = null;
 let LIVE_SESSION = null;      // {id, name, published_at, file_name} — currently public session, or null
 let ALL_SESSIONS = [];        // full history, newest first
 let VIEW_SESSION_ID = null;   // which session admin is currently viewing in Students/Stats
@@ -1016,7 +1098,7 @@ function switchPanel(name, btn) {
 
 /* ═══════════ TOAST ═══════════ */
 function toast(target, msg, type) {
-  const ids = { student:'studentToast', admin:'adminToast', login:'loginToast', parent:'parentToast', parentDash:'parentDashToast' };
+  const ids = { student:'studentToast', admin:'adminToast', login:'loginToast', approvals:'approvalsToast', teacherUpload:'teacherUploadToast' };
   const el = document.getElementById(ids[target] || target);
   if (!el) return;
   const icons = { success:'fa-circle-check', error:'fa-circle-exclamation', info:'fa-circle-info', warn:'fa-triangle-exclamation' };
@@ -1285,22 +1367,27 @@ async function loadSessionsAndStatus() {
     if (!ALL_SESSIONS.length) {
       listEl.innerHTML = '<p class="text-muted" style="padding:16px 22px">No sessions published yet — upload a file above to get started.</p>';
     } else {
-      listEl.innerHTML = ALL_SESSIONS.map(s => `
+      listEl.innerHTML = ALL_SESSIONS.map(s => {
+        const isDraft = s.status === 'draft';
+        const badge = isDraft
+          ? `<span class="badge" style="background:rgba(155,135,245,.15);color:#9b87f5">DRAFT</span>`
+          : `<span class="badge ${s.is_live ? 'badge-green' : ''}" style="${s.is_live ? '' : 'background:rgba(255,255,255,.08);color:var(--text3)'}">${s.is_live ? 'LIVE' : 'Offline'}</span>`;
+        return `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.05)">
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-            <span class="badge ${s.is_live ? 'badge-green' : ''}" style="${s.is_live ? '' : 'background:rgba(255,255,255,.08);color:var(--text3)'}">${s.is_live ? 'LIVE' : 'Offline'}</span>
+            ${badge}
             <div>
               <div style="font-size:.88rem;color:var(--text);font-weight:500">${s.name}</div>
-              <div style="font-size:.72rem;color:var(--text3)">${new Date(s.published_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}${s.file_name ? ' · ' + s.file_name : ''}</div>
+              <div style="font-size:.72rem;color:var(--text3)">${new Date(s.published_at).toLocaleString('en-IN', { dateStyle:'medium', timeStyle:'short' })}${s.file_name ? ' · ' + s.file_name : ''}${isDraft ? ' · via Teacher Uploads' : ''}</div>
             </div>
           </div>
           <div class="flex-row" style="gap:6px">
-            ${!s.is_live ? `<button class="btn btn-outline btn-sm" onclick="setLiveSession(${s.id}, '${s.name.replace(/'/g, "\\'")}')"><i class="fas fa-tower-broadcast"></i> Set Live</button>` : ''}
+            ${!s.is_live && !isDraft ? `<button class="btn btn-outline btn-sm" onclick="setLiveSession(${s.id}, '${s.name.replace(/'/g, "\\'")}')"><i class="fas fa-tower-broadcast"></i> Set Live</button>` : ''}
             <button class="btn btn-ghost btn-sm" onclick="onViewSessionChange(${s.id})"><i class="fas fa-eye"></i> View</button>
             <button class="btn btn-red btn-sm" onclick="deleteSession(${s.id}, '${s.name.replace(/'/g, "\\'")}')"><i class="fas fa-trash"></i></button>
           </div>
-        </div>
-      `).join('');
+        </div>`;
+      }).join('');
     }
   }
 
@@ -1310,11 +1397,13 @@ async function loadSessionsAndStatus() {
     if (!ALL_SESSIONS.length) {
       sel.innerHTML = '<option>No sessions yet</option>';
     } else {
-      sel.innerHTML = ALL_SESSIONS.map(s => `<option value="${s.id}">${s.name}${s.is_live ? ' (LIVE)' : ''} — ${new Date(s.published_at).toLocaleDateString('en-IN')}</option>`).join('');
+      sel.innerHTML = ALL_SESSIONS.map(s => `<option value="${s.id}">${s.name}${s.is_live ? ' (LIVE)' : ''}${s.status === 'draft' ? ' (DRAFT)' : ''} — ${new Date(s.published_at).toLocaleDateString('en-IN')}</option>`).join('');
       const target = VIEW_SESSION_ID || (LIVE_SESSION ? LIVE_SESSION.id : ALL_SESSIONS[0].id);
       sel.value = target;
     }
   }
+
+  refreshDraftSessionDropdown();
 }
 
 function onViewSessionChange(id) {
@@ -1921,6 +2010,305 @@ async function downloadPDF() {
 
 /* ═══════════ INIT ═══════════ */
 document.getElementById('adminUrl').textContent = location.href;
+
+/* ═══════════ TEACHER SUBJECT UPLOAD (token-based, no login) ═══════════
+   If the URL has ?upload=TOKEN, this hijacks the page into a minimal
+   standalone upload screen for that one subject — no nav, no other
+   pages reachable. Used by teachers via a link the admin sends them. */
+const TEACHER_UPLOAD_TOKEN = new URLSearchParams(location.search).get('upload');
+
+if (TEACHER_UPLOAD_TOKEN) {
+  document.querySelector('nav').style.display = 'none';
+  showPage('teacherUpload');
+  loadTeacherUploadContext(TEACHER_UPLOAD_TOKEN);
+}
+
+async function loadTeacherUploadContext(token) {
+  const body = document.getElementById('teacherUploadBody');
+  try {
+    const { data, error } = await sb.rpc('get_submission_by_token', { p_token: token });
+    if (error || !data || !data.length) {
+      document.getElementById('teacherUploadSubtitle').textContent = 'Invalid link';
+      body.innerHTML = '<p class="text-muted" style="padding:20px 0;text-align:center">This link is invalid or has expired. Please ask the admin for a fresh link.</p>';
+      return;
+    }
+    const s = data[0];
+    document.getElementById('teacherUploadTitle').textContent = `${s.subject} — Marks Upload`;
+    document.getElementById('teacherUploadSubtitle').textContent = `Session: ${s.session_name}`;
+
+    if (s.status === 'approved') {
+      body.innerHTML = `<div style="text-align:center;padding:20px 0"><i class="fas fa-circle-check" style="font-size:2rem;color:var(--green);margin-bottom:14px"></i><p style="color:var(--text2)">This subject has already been approved and merged by the admin. If you need to correct something, please contact the admin.</p></div>`;
+      return;
+    }
+
+    const statusLine = s.status === 'submitted'
+      ? `<p class="text-muted" style="margin-bottom:16px"><i class="fas fa-clock"></i> You previously submitted ${s.row_count || 0} rows${s.uploaded_at ? ' on ' + new Date(s.uploaded_at).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : ''}, awaiting admin approval. Uploading again will replace it.</p>`
+      : '';
+
+    body.innerHTML = `
+      ${statusLine}
+      <div class="upload-area" id="teacherUploadZone" onclick="document.getElementById('teacherFile').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="event.preventDefault();this.classList.remove('drag');const f=event.dataTransfer.files[0];if(f)processTeacherExcel(f);">
+        <div class="upload-icon"><i class="fas fa-file-arrow-up"></i></div>
+        <h4 id="teacherUploadZoneTitle">Drop your Excel file here or click to browse</h4>
+        <p>Include: Student ID, Admn. No., Class, Roll No., Student Name, Father's Name, and your subject's marks column</p>
+        <input type="file" id="teacherFile" accept=".xlsx,.xls" style="display:none" onchange="if(this.files[0])processTeacherExcel(this.files[0])">
+      </div>
+      <p class="security-note mt-16"><i class="fas fa-shield-halved"></i> This link only submits marks for review — nothing goes live until the admin approves it</p>
+    `;
+  } catch (e) {
+    body.innerHTML = '<p class="text-muted" style="padding:20px 0;text-align:center">Something went wrong loading this link.</p>';
+    console.error(e);
+  }
+}
+
+function processTeacherExcel(file) {
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const wb   = XLSX.read(e.target.result, { type:'binary', cellFormula:false });
+      const ws   = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+      if (!rows.length) { toast('teacherUpload', 'No data found in file.', 'error'); return; }
+
+      const idCols = ['Student ID','Admn. No.','Class','Roll No.','Student Name',"Father's Name",'Working Days','Days Present'];
+      const markCol = Object.keys(rows[0]).find(k => !idCols.includes(k) && k.trim() !== '');
+      if (!markCol) { toast('teacherUpload', 'Could not find a marks column in this file.', 'error'); return; }
+
+      const parsed = rows.filter(r => r['Student ID'] && r['Student ID'].toString().trim()).map(r => ({
+        sid: r['Student ID'].toString().trim(),
+        admno: r['Admn. No.'].toString().replace(/\.0$/, '').trim(),
+        class: r['Class'].toString().trim(),
+        roll: r['Roll No.'].toString().trim(),
+        name: r['Student Name'].toString().trim(),
+        father: r["Father's Name"].toString().trim(),
+        mark: Number(r[markCol]) || 0
+      }));
+
+      if (!parsed.length) { toast('teacherUpload', 'No valid student rows found.', 'error'); return; }
+
+      const { data, error } = await sb.rpc('submit_subject_marks', { p_token: TEACHER_UPLOAD_TOKEN, p_rows: parsed, p_file_name: file.name });
+      if (error) { toast('teacherUpload', 'Submission failed: ' + error.message, 'error'); console.error(error); return; }
+      if (!data.success) { toast('teacherUpload', data.message || 'Submission failed.', 'error'); return; }
+
+      document.getElementById('teacherUploadBody').innerHTML = `<div style="text-align:center;padding:20px 0"><i class="fas fa-circle-check" style="font-size:2rem;color:var(--green);margin-bottom:14px"></i><p style="color:var(--text2)">Submitted ${parsed.length} rows successfully! The admin will review and approve this shortly.</p></div>`;
+    } catch (err) {
+      toast('teacherUpload', 'Error reading file. Please check the format.', 'error');
+      console.error(err);
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+/* ═══════════ ADMIN: TEACHER UPLOADS / APPROVALS PANEL ═══════════ */
+function onDraftSessionChange(id) {
+  CURRENT_DRAFT_ID = Number(id);
+  loadSubmissions(CURRENT_DRAFT_ID);
+}
+
+function refreshDraftSessionDropdown() {
+  const sel = document.getElementById('draftSessionSelect');
+  if (!sel) return;
+  const drafts = ALL_SESSIONS.filter(s => s.status === 'draft');
+  if (!drafts.length) {
+    sel.innerHTML = '<option value="">No draft terms yet — create one</option>';
+    document.getElementById('requestSubjectCard').classList.add('hidden');
+    document.getElementById('submissionsList').innerHTML = '<p class="text-muted" style="padding:20px 24px">Create a draft term above to start requesting subject uploads.</p>';
+    document.getElementById('finalizeDraftBtn').classList.add('hidden');
+    return;
+  }
+  document.getElementById('requestSubjectCard').classList.remove('hidden');
+  document.getElementById('finalizeDraftBtn').classList.remove('hidden');
+  sel.innerHTML = drafts.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  if (!CURRENT_DRAFT_ID || !drafts.find(d => d.id === CURRENT_DRAFT_ID)) CURRENT_DRAFT_ID = drafts[0].id;
+  sel.value = CURRENT_DRAFT_ID;
+  loadSubmissions(CURRENT_DRAFT_ID);
+}
+
+function toggleNewDraftForm() {
+  document.getElementById('newDraftForm').classList.toggle('hidden');
+}
+
+async function createDraftSession() {
+  const name = document.getElementById('newDraftName').value.trim();
+  if (!name) { toast('approvals', 'Please enter a term/exam name.', 'warn'); return; }
+  const { data, error } = await sb.from('sessions').insert({ name, status:'draft', is_live:false }).select().single();
+  if (error) { toast('approvals', 'Could not create draft: ' + error.message, 'error'); return; }
+  document.getElementById('newDraftName').value = '';
+  document.getElementById('newDraftForm').classList.add('hidden');
+  CURRENT_DRAFT_ID = data.id;
+  await loadSessionsAndStatus();
+  toast('approvals', `Draft term "${name}" created. Now request subject uploads below.`, 'success');
+}
+
+function genToken() {
+  return (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2) + Date.now().toString(36)).replace(/-/g, '');
+}
+
+async function generateSubjectLink() {
+  const subject = document.getElementById('newSubjectName').value.trim();
+  if (!subject) { toast('approvals', 'Please enter a subject name.', 'warn'); return; }
+  if (!CURRENT_DRAFT_ID) { toast('approvals', 'Create or select a draft term first.', 'warn'); return; }
+
+  const token = genToken();
+  const { error } = await sb.from('subject_submissions').insert({ session_id: CURRENT_DRAFT_ID, subject, token });
+  if (error) { toast('approvals', 'Could not generate link: ' + error.message, 'error'); return; }
+
+  const link = `${location.origin}${location.pathname}?upload=${token}`;
+  document.getElementById('newLinkResult').innerHTML = `
+    <div style="background:rgba(212,175,55,.08);border:1px solid var(--gold-border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <code style="color:var(--gold);font-size:.8rem;word-break:break-all;flex:1">${link}</code>
+      <button class="btn btn-outline btn-sm" onclick="navigator.clipboard.writeText('${link}');toast('approvals','Link copied!','success')"><i class="fas fa-copy"></i> Copy</button>
+    </div>`;
+  document.getElementById('newSubjectName').value = '';
+  toast('approvals', `Link generated for ${subject}. Send it to the teacher.`, 'success');
+  await loadSubmissions(CURRENT_DRAFT_ID);
+}
+
+async function loadSubmissions(sessionId) {
+  const listEl = document.getElementById('submissionsList');
+  if (!sessionId) { listEl.innerHTML = ''; return; }
+  const { data, error } = await sb.from('subject_submissions').select('*').eq('session_id', sessionId).order('created_at', { ascending:true });
+  if (error) { listEl.innerHTML = `<p class="text-muted" style="padding:20px 24px">Could not load: ${error.message}</p>`; return; }
+
+  if (!data.length) { listEl.innerHTML = '<p class="text-muted" style="padding:20px 24px">No subjects requested yet — use the form above.</p>'; return; }
+
+  const statusMeta = {
+    pending:   { label:'Awaiting Upload', color:'var(--text3)', bg:'rgba(255,255,255,.06)' },
+    submitted: { label:'Pending Review',  color:'var(--gold)',  bg:'rgba(212,175,55,.15)' },
+    approved:  { label:'Approved',        color:'var(--green)', bg:'rgba(16,217,138,.15)' },
+    rejected:  { label:'Rejected',        color:'var(--red)',   bg:'rgba(255,77,109,.12)' }
+  };
+
+  listEl.innerHTML = data.map(sub => {
+    const sm = statusMeta[sub.status];
+    const link = `${location.origin}${location.pathname}?upload=${sub.token}`;
+    return `
+    <div style="padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span class="badge" style="background:${sm.bg};color:${sm.color}">${sm.label}</span>
+          <div>
+            <div style="font-size:.9rem;color:var(--text);font-weight:500">${sub.subject}</div>
+            <div style="font-size:.72rem;color:var(--text3)">${sub.row_count ? sub.row_count + ' rows' : 'No submission yet'}${sub.uploaded_at ? ' · ' + new Date(sub.uploaded_at).toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'}) : ''}</div>
+          </div>
+        </div>
+        <div class="flex-row" style="gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText('${link}');toast('approvals','Link copied!','success')"><i class="fas fa-copy"></i> Copy Link</button>
+          ${sub.status === 'submitted' ? `<button class="btn btn-outline btn-sm" onclick="previewSubmission(${sub.id})"><i class="fas fa-eye"></i> Preview</button>
+          <button class="btn btn-gold btn-sm" onclick="approveSubmission(${sub.id})"><i class="fas fa-check"></i> Approve</button>
+          <button class="btn btn-red btn-sm" onclick="rejectSubmission(${sub.id})"><i class="fas fa-xmark"></i> Reject</button>` : ''}
+          ${sub.status === 'rejected' || sub.status === 'approved' ? `<button class="btn btn-ghost btn-sm" onclick="resetSubmission(${sub.id})"><i class="fas fa-rotate-left"></i> Reset</button>` : ''}
+        </div>
+      </div>
+      <div id="preview-${sub.id}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function previewSubmission(id) {
+  const el = document.getElementById(`preview-${id}`);
+  if (el.innerHTML) { el.innerHTML = ''; return; }
+  const { data, error } = await sb.from('subject_submissions').select('data,subject').eq('id', id).single();
+  if (error || !data) { toast('approvals', 'Could not load preview.', 'error'); return; }
+  const rows = (data.data || []).slice(0, 5);
+  el.innerHTML = `
+    <div style="margin-top:12px;overflow-x:auto">
+      <table style="width:100%;font-size:.78rem;border-collapse:collapse">
+        <thead><tr style="color:var(--text3);text-align:left"><th style="padding:6px 10px">Student ID</th><th style="padding:6px 10px">Name</th><th style="padding:6px 10px">Class</th><th style="padding:6px 10px">${data.subject}</th></tr></thead>
+        <tbody>${rows.map(r => `<tr style="border-top:1px solid rgba(255,255,255,.05)"><td style="padding:6px 10px">${r.sid}</td><td style="padding:6px 10px">${r.name}</td><td style="padding:6px 10px">${r.class}</td><td style="padding:6px 10px">${r.mark}</td></tr>`).join('')}</tbody>
+      </table>
+      <p class="text-muted" style="margin-top:6px;font-size:.7rem">Showing first ${rows.length} of ${(data.data||[]).length} rows</p>
+    </div>`;
+}
+
+/* Merges an approved subject's marks into the draft session's
+   student records — creating a student row if this is the first
+   subject approved for them, or adding the subject key into their
+   existing marks if other subjects were approved already. */
+async function approveSubmission(id) {
+  if (!confirm('Approve this subject and merge it into the term? This will be reflected in Student Records immediately.')) return;
+
+  const { data: sub, error: subErr } = await sb.from('subject_submissions').select('*').eq('id', id).single();
+  if (subErr || !sub) { toast('approvals', 'Could not load submission.', 'error'); return; }
+
+  const { data: existing, error: exErr } = await sb.from('students').select('*').eq('session_id', sub.session_id);
+  if (exErr) { toast('approvals', 'Could not load existing students: ' + exErr.message, 'error'); return; }
+
+  const existingBySid = {};
+  (existing || []).forEach(r => existingBySid[r.sid] = r);
+
+  const upserts = sub.data.map(row => {
+    const ex = existingBySid[row.sid];
+    const marks = { ...(ex ? ex.marks : {}), [sub.subject]: row.mark };
+    return {
+      sid: row.sid, admno: row.admno, class: row.class, roll: row.roll,
+      name: row.name, father: row.father, marks,
+      working_days: ex ? ex.working_days : 0, days_present: ex ? ex.days_present : 0,
+      session_id: sub.session_id
+    };
+  });
+
+  const BATCH = 200;
+  for (let i = 0; i < upserts.length; i += BATCH) {
+    const { error } = await sb.from('students').upsert(upserts.slice(i, i + BATCH), { onConflict: 'sid,session_id' });
+    if (error) { toast('approvals', 'Merge failed: ' + error.message, 'error'); return; }
+  }
+
+  await sb.from('subject_submissions').update({ status:'approved', approved_at:new Date().toISOString() }).eq('id', id);
+  toast('approvals', `${sub.subject} approved and merged — ${upserts.length} students updated.`, 'success');
+  await loadSubmissions(CURRENT_DRAFT_ID);
+  if (VIEW_SESSION_ID === sub.session_id) await loadStudentsFromDB(sub.session_id);
+}
+
+async function rejectSubmission(id) {
+  if (!confirm('Reject this submission? The teacher will need to be told to re-upload.')) return;
+  await sb.from('subject_submissions').update({ status:'rejected' }).eq('id', id);
+  toast('approvals', 'Submission rejected.', 'info');
+  await loadSubmissions(CURRENT_DRAFT_ID);
+}
+
+async function resetSubmission(id) {
+  if (!confirm('Reset this back to "awaiting upload"? If it was already approved, previously merged marks will NOT be automatically removed.')) return;
+  await sb.from('subject_submissions').update({ status:'pending', data:[], row_count:null, uploaded_at:null, approved_at:null }).eq('id', id);
+  toast('approvals', 'Reset — the teacher can upload again using the same link.', 'info');
+  await loadSubmissions(CURRENT_DRAFT_ID);
+}
+
+/* Converts a draft term into a normal published/live session —
+   same finish line as the regular single-file Publish flow. */
+async function finalizeDraftSession() {
+  if (!CURRENT_DRAFT_ID) return;
+  if (!confirm('Finalize this term and make it live to students now? Make sure all subjects you need have been approved first.')) return;
+
+  await sb.from('sessions').update({ is_live:false }).eq('is_live', true);
+  const { error } = await sb.from('sessions').update({ is_live:true, status:'published', published_at:new Date().toISOString() }).eq('id', CURRENT_DRAFT_ID);
+  if (error) { toast('approvals', 'Could not finalize: ' + error.message, 'error'); return; }
+
+  await loadSessionsAndStatus();
+  await loadStudentsFromDB(CURRENT_DRAFT_ID);
+  toast('approvals', 'Term finalized and published live!', 'success');
+}
+
+/* ═══════════ EXPORT: Compiled Excel for the currently viewed session ═══════════ */
+function downloadCompiledExcel() {
+  if (!DB.length) { toast('admin', 'No students loaded for this session.', 'warn'); return; }
+  const rows = DB.map(r => {
+    const row = {
+      'Student ID': r.sid, 'Admn. No.': r.admno, 'Class': r.cls, 'Roll No.': r.roll,
+      'Student Name': r.name, "Father's Name": r.father
+    };
+    SUBJECTS.forEach(sub => row[sub] = r.marks[sub] !== undefined ? r.marks[sub] : '');
+    if (r.workingDays) { row['Working Days'] = r.workingDays; row['Days Present'] = r.daysPresent; }
+    return row;
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Students');
+  const sessionObj = ALL_SESSIONS.find(x => x.id === VIEW_SESSION_ID);
+  const safeName = ((sessionObj && sessionObj.name) || 'Session').replace(/[^a-z0-9]+/gi, '_');
+  XLSX.writeFile(wb, `Compiled_${safeName}.xlsx`);
+  toast('admin', 'Compiled Excel downloaded.', 'success');
+}
 
 /* PWA — lets the portal be installed to a phone/desktop home screen
    and reopen quickly even on a flaky connection. Silently does
