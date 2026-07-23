@@ -74,7 +74,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
 /* ── CARD ── */
 .portal-wrap{max-width:860px;margin:0 auto 60px;padding:0 16px}
-.card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-lg);box-shadow:var(--shadow);overflow:hidden}
+.card{background:rgba(20,20,34,.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.06);border-radius:var(--r-lg);box-shadow:0 8px 32px rgba(0,0,0,.4);overflow:hidden;position:relative}
+.card::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(212,175,55,.35),rgba(255,255,255,.06) 40%,transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:1}
 .card-head{background:linear-gradient(135deg,var(--bg3),var(--bg4));padding:clamp(24px,5vw,40px);border-bottom:1px solid var(--gold-border)}
 .card-head h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px}
 .card-head p{font-size:.85rem;color:var(--text2)}
@@ -87,7 +88,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 .form-group{display:flex;flex-direction:column;gap:8px}
 .form-group label{font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:500}
 .form-group label i{color:var(--gold);margin-right:5px;width:14px}
-.inp{padding:13px 16px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.08);border-radius:var(--r-sm);color:var(--text);font-size:.95rem;transition:var(--transition);width:100%}
+.inp{padding:13px 16px;background:rgba(255,255,255,.03);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1.5px solid rgba(255,255,255,.09);border-radius:var(--r-sm);color:var(--text);font-size:.95rem;transition:var(--transition);width:100%}
 .inp:focus{outline:none;border-color:var(--gold);background:rgba(212,175,55,.05);box-shadow:0 0 0 3px rgba(212,175,55,.1)}
 .inp::placeholder{color:var(--text3)}
 .inp.error-field{border-color:var(--red)}
@@ -163,7 +164,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
 /* stats row */
 .stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:20px;text-align:center}
+.stat-card{background:rgba(255,255,255,.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.07);border-radius:var(--r);padding:20px;text-align:center;transition:var(--transition)}
+.stat-card:hover{transform:translateY(-3px);border-color:var(--gold-border)}
 .stat-card .num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--gold)}
 .stat-card .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-top:4px}
 .stat-card .sub{font-size:.78rem;color:var(--text2);margin-top:6px}
@@ -234,6 +236,14 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 /* summary bar */
 .summary-bar{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid rgba(255,255,255,.05)}
 @media(max-width:480px){.summary-bar{grid-template-columns:1fr 1fr}}
+.stagger-in>*{opacity:0;animation:staggerFadeIn .5s ease forwards}
+.stagger-in>*:nth-child(1){animation-delay:.05s}
+.stagger-in>*:nth-child(2){animation-delay:.12s}
+.stagger-in>*:nth-child(3){animation-delay:.19s}
+.stagger-in>*:nth-child(4){animation-delay:.26s}
+.stagger-in>*:nth-child(5){animation-delay:.33s}
+.stagger-in>*:nth-child(6){animation-delay:.40s}
+@keyframes staggerFadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .sum-cell{padding:18px 12px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
 .sum-cell:last-child{border-right:none}
 .sum-cell .big{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:700}
@@ -252,7 +262,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 /* subjects */
 .subjects-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
 .subjects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:12px}
-.subj-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:var(--transition);cursor:default}
+.subj-card{background:rgba(255,255,255,.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;position:relative;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;cursor:default}
+.subj-card:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.35);border-color:rgba(212,175,55,.3)}
 .subj-card:hover{border-color:var(--gold-border);transform:translateY(-2px)}
 .subj-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--c,var(--gold))}
 .subj-name{font-size:.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:10px}
@@ -266,8 +277,24 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
 /* insights */
 .insights-section{padding:clamp(18px,3vw,28px);border-bottom:1px solid rgba(255,255,255,.05)}
+.badges-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:16px}
+.badge-medal{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;transition:transform .25s ease,box-shadow .25s ease}
+.badge-medal:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 10px 26px rgba(0,0,0,.35)}
+.medal-icon{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.45rem;margin-bottom:10px;color:#3a2c05;box-shadow:0 4px 14px rgba(0,0,0,.3),inset 0 1px 2px rgba(255,255,255,.6)}
+.badge-medal h6{font-size:.8rem;color:var(--text);margin-bottom:3px;font-weight:600}
+.badge-medal p{font-size:.68rem;color:var(--text3);line-height:1.35}
+.child-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:22px 16px;background:rgba(255,255,255,.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:16px;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;cursor:pointer;position:relative}
+.child-card:hover{transform:translateY(-5px);box-shadow:0 14px 30px rgba(0,0,0,.4);border-color:var(--gold-border)}
+.child-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:700;font-size:1.3rem;color:#1a1420;margin-bottom:12px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.child-card h6{font-size:.95rem;color:var(--text);margin-bottom:2px}
+.child-card .child-meta{font-size:.72rem;color:var(--text3);margin-bottom:10px}
+.child-quick-stats{display:flex;gap:8px;margin-bottom:12px}
+.child-quick-stats span{font-size:.68rem;padding:4px 9px;border-radius:20px;background:rgba(255,255,255,.06);color:var(--text2)}
+.child-unlink{position:absolute;top:10px;right:10px;color:var(--text3);opacity:.6;transition:opacity .2s ease}
+.child-unlink:hover{opacity:1;color:var(--red)}
 .insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-.insight-card{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px}
+.insight-card{background:rgba(255,255,255,.03);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:20px;transition:transform .25s ease,box-shadow .25s ease}
+.insight-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.3)}
 .insight-card h5{font-size:.85rem;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--gold)}
 .insight-card p,.insight-card li{font-size:.83rem;color:var(--text2);line-height:1.7}
 .insight-card ul{list-style:none;margin-top:8px}
@@ -542,8 +569,8 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 <!-- ═══════════ PAGE: PARENT DASHBOARD ═══════════ -->
 <div id="pageParentDashboard" class="page">
   <div class="hero" style="padding-bottom:20px">
-    <div class="hero-badge"><i class="fas fa-address-card"></i>&nbsp;Parent Dashboard</div>
-    <h2>Your <span>Children</span></h2>
+    <div class="hero-badge"><i class="fas fa-address-card"></i>&nbsp;Family Hub</div>
+    <h2>Your <span>Family</span> Dashboard</h2>
     <p id="parentWelcomeLine">Manage linked children and view their full results anytime.</p>
     <div class="divider"></div>
   </div>
@@ -551,17 +578,21 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
   <div class="portal-wrap">
     <div id="parentDashToast" class="toast"></div>
 
+    <!-- Family Overview — appears once at least one child is loaded -->
+    <div class="stats-row hidden" id="familyOverviewGrid" style="margin-bottom:20px"></div>
+
     <div class="card" style="margin-bottom:20px">
-      <div class="card-head">
-        <h3><i class="fas fa-users" style="color:var(--gold);margin-right:10px"></i>Linked Children</h3>
-        <p>Click a child to view their full result instantly — no retyping needed</p>
+      <div class="card-head" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <h3><i class="fas fa-users" style="color:var(--gold);margin-right:10px"></i>Your Children</h3>
+          <p>Click a card to view the full result — charts, rank, progress &amp; badges</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="toggleAddChildForm()"><i class="fas fa-plus"></i> Link Child</button>
       </div>
-      <div id="linkedChildrenList" style="padding:8px 0">
-        <p class="text-muted" style="padding:20px 24px">Loading…</p>
-      </div>
+      <div class="badges-grid" id="linkedChildrenList" style="padding:20px 24px;gap:18px"></div>
     </div>
 
-    <div class="card" id="addChildCard">
+    <div class="card hidden" id="addChildCard">
       <div class="card-head">
         <h3><i class="fas fa-user-plus" style="color:var(--gold);margin-right:10px"></i>Link a Child</h3>
         <p>Verify once with their details — this is a one-time step per child</p>
@@ -734,8 +765,12 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="admin-topbar"><div><h2>Statistics</h2><p>Overview of loaded database</p></div></div>
         <div class="stats-row" id="statsCards"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:4px" id="statsCharts">
-          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-bar"></i> Class-wise student count</div><div style="height:200px"><canvas id="classChart"></canvas></div></div>
-          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-pie"></i> Grade distribution</div><div style="height:200px"><canvas id="gradeChart"></canvas></div></div>
+          <div class="card" style="padding:24px">
+            <div class="sec-label" id="drillLabel"><i class="fas fa-chart-bar"></i> Class-wise student count</div>
+            <div class="text-muted" id="statsBreadcrumb" style="font-size:.74rem;margin-bottom:8px"></div>
+            <div style="height:200px"><canvas id="classChart"></canvas></div>
+          </div>
+          <div class="card" style="padding:24px"><div class="sec-label"><i class="fas fa-chart-pie"></i> Grade distribution (overall)</div><div style="height:200px"><canvas id="gradeChart"></canvas></div></div>
         </div>
       </div>
 
@@ -800,7 +835,7 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
         <div class="student-grid" id="studentGrid"></div>
       </div>
 
-      <div class="summary-bar" id="summaryBar"></div>
+      <div class="summary-bar stagger-in" id="summaryBar"></div>
 
       <div class="charts-row">
         <div class="chart-box">
@@ -816,12 +851,18 @@ nav{position:sticky;top:0;z-index:300;background:rgba(7,7,15,.95);backdrop-filte
 
       <div class="subjects-section">
         <div class="sec-label"><i class="fas fa-book-open"></i> Subject Breakdown</div>
-        <div class="subjects-grid" id="subjectsGrid"></div>
+        <div class="subjects-grid stagger-in" id="subjectsGrid"></div>
       </div>
 
       <div class="insights-section">
         <div class="sec-label"><i class="fas fa-lightbulb"></i> Performance Insights</div>
-        <div class="insights-grid" id="insightsGrid"></div>
+        <div class="insights-grid stagger-in" id="insightsGrid"></div>
+      </div>
+
+      <!-- Achievements — shown only when at least one badge is earned -->
+      <div class="insights-section" id="achievementsSection" style="display:none">
+        <div class="sec-label"><i class="fas fa-award"></i> Achievements Unlocked</div>
+        <div class="badges-grid stagger-in" id="badgesGrid"></div>
       </div>
 
       <!-- Progress Over Time — shown only if the student has more than one published session -->
@@ -1147,28 +1188,87 @@ async function parentLogout() {
   showPage('student');
 }
 
+const CHILD_AVATAR_GRADIENTS = [
+  'radial-gradient(circle at 30% 30%,#f5d576,#d4af37)',
+  'radial-gradient(circle at 30% 30%,#c9b8ff,#9b87f5)',
+  'radial-gradient(circle at 30% 30%,#a8e6cf,#3ddc97)',
+  'radial-gradient(circle at 30% 30%,#ffd3c4,#ff7847)',
+  'radial-gradient(circle at 30% 30%,#b8dcff,#5b9bd5)'
+];
+
+function initials(name) {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0][0] || '') + (parts[1] ? parts[1][0] : '')).toUpperCase();
+}
+
 async function loadLinkedChildren() {
   const listEl = document.getElementById('linkedChildrenList');
+  const overviewEl = document.getElementById('familyOverviewGrid');
+  listEl.innerHTML = '<p class="text-muted" style="padding:12px 4px">Loading your family…</p>';
+
   const { data, error } = await sb.from('linked_children').select('*').order('linked_at', { ascending:true });
-  if (error) { listEl.innerHTML = `<p class="text-muted" style="padding:20px 24px">Could not load: ${error.message}</p>`; return; }
+  if (error) { listEl.innerHTML = `<p class="text-muted">Could not load: ${error.message}</p>`; return; }
 
   if (!data.length) {
-    listEl.innerHTML = '<p class="text-muted" style="padding:20px 24px">No children linked yet — add one below.</p>';
+    listEl.innerHTML = '<p class="text-muted">No children linked yet — click "Link Child" above to add your first one.</p>';
+    overviewEl.classList.add('hidden');
+    toggleAddChildForm(true);
     return;
   }
 
-  listEl.innerHTML = data.map(c => `
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 22px;border-bottom:1px solid rgba(255,255,255,.05)">
-      <div>
-        <div style="font-size:.92rem;color:var(--text);font-weight:500">${c.name || c.sid}</div>
-        <div style="font-size:.74rem;color:var(--text3)">Class ${c.class || '—'} · ID: ${c.sid}</div>
+  // Fetch a quick snapshot (% and rank) for each child in parallel —
+  // best effort; if a child has no live result yet, the card still
+  // shows with just their name/class.
+  const snapshots = await Promise.all(data.map(async c => {
+    try {
+      const { data: vs } = await sb.rpc('verify_student', { p_sid: c.sid, p_father: c.father, p_admno: c.admno });
+      if (!vs || !vs.length) return { ...c, pct:null, rank:null };
+      const r = vs[0];
+      const subs = Object.keys(r.marks || {});
+      const total = subs.reduce((a,k) => a + (Number(r.marks[k])||0), 0);
+      const pct = subs.length ? Math.round((total/(subs.length*MAX_MARKS))*100) : null;
+      const { data: rk } = await sb.rpc('get_class_rank', { p_sid: c.sid, p_father: c.father, p_admno: c.admno }).catch(() => ({ data:null }));
+      return { ...c, pct, rank: (rk && rk[0]) || null };
+    } catch (e) { return { ...c, pct:null, rank:null }; }
+  }));
+
+  // Family overview strip
+  const withPct = snapshots.filter(c => c.pct !== null);
+  if (withPct.length) {
+    const avg = Math.round(withPct.reduce((a,c) => a + c.pct, 0) / withPct.length);
+    const best = withPct.reduce((a,c) => c.pct > a.pct ? c : a, withPct[0]);
+    overviewEl.classList.remove('hidden');
+    overviewEl.innerHTML = `
+      <div class="stat-card"><div class="num">${data.length}</div><div class="lbl">Children Linked</div></div>
+      <div class="stat-card"><div class="num">${avg}%</div><div class="lbl">Family Average</div></div>
+      <div class="stat-card"><div class="num" style="font-size:1.1rem">${best.name || best.sid}</div><div class="lbl">Top Performer</div></div>
+    `;
+  } else {
+    overviewEl.classList.add('hidden');
+  }
+
+  listEl.innerHTML = snapshots.map((c, i) => `
+    <div class="child-card" onclick="viewChildResult('${c.sid.replace(/'/g,"\\'")}', '${c.father.replace(/'/g,"\\'")}', '${c.admno.replace(/'/g,"\\'")}')">
+      <i class="fas fa-xmark child-unlink" onclick="event.stopPropagation();unlinkChild(${c.id})" title="Unlink"></i>
+      <div class="child-avatar" style="background:${CHILD_AVATAR_GRADIENTS[i % CHILD_AVATAR_GRADIENTS.length]}">${initials(c.name)}</div>
+      <h6>${c.name || c.sid}</h6>
+      <div class="child-meta">Class ${c.class || '—'} · ID: ${c.sid}</div>
+      <div class="child-quick-stats">
+        ${c.pct !== null ? `<span>${c.pct}%</span>` : '<span>No result yet</span>'}
+        ${c.rank && c.rank.rank ? `<span>Rank #${c.rank.rank}</span>` : ''}
       </div>
-      <div class="flex-row" style="gap:6px">
-        <button class="btn btn-gold btn-sm" onclick="viewChildResult('${c.sid.replace(/'/g,"\\'")}', '${c.father.replace(/'/g,"\\'")}', '${c.admno.replace(/'/g,"\\'")}')"><i class="fas fa-eye"></i> View Result</button>
-        <button class="btn btn-red btn-sm" onclick="unlinkChild(${c.id})"><i class="fas fa-trash"></i></button>
-      </div>
+      <button class="btn btn-gold btn-sm" style="width:100%" onclick="event.stopPropagation();viewChildResult('${c.sid.replace(/'/g,"\\'")}', '${c.father.replace(/'/g,"\\'")}', '${c.admno.replace(/'/g,"\\'")}')"><i class="fas fa-eye"></i> View Full Result</button>
     </div>
   `).join('');
+}
+
+function toggleAddChildForm(forceOpen) {
+  const card = document.getElementById('addChildCard');
+  if (forceOpen === true) { card.classList.remove('hidden'); return; }
+  if (forceOpen === false) { card.classList.add('hidden'); return; }
+  card.classList.toggle('hidden');
+  if (!card.classList.contains('hidden')) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 async function linkChild() {
@@ -1186,6 +1286,7 @@ async function linkChild() {
   document.getElementById('linkSid').value = '';
   document.getElementById('linkFather').value = '';
   document.getElementById('linkAdmno').value = '';
+  toggleAddChildForm(false);
   await loadLinkedChildren();
 }
 
@@ -1682,24 +1783,12 @@ function buildStatsCharts() {
     ${criticalAtt > 0 ? `<div class="stat-card"><div class="num" style="color:var(--red)">${criticalAtt}</div><div class="lbl">Low Attendance</div><div class="sub">Below 75%</div></div>` : ''}
   `;
 
-  // Class distribution chart
-  const classCounts = {};
-  DB.forEach(r => classCounts[r.cls] = (classCounts[r.cls] || 0) + 1);
+  // ── Interactive drill-down chart (Class → Subject Avg → Grade Distribution) ──
+  renderClassLevelChart();
 
-  if (classChart) classChart.destroy();
-  classChart = new Chart(document.getElementById('classChart').getContext('2d'), {
-    type: 'bar',
-    data: {
-      labels: Object.keys(classCounts),
-      datasets: [{ data: Object.values(classCounts), backgroundColor: 'rgba(212,175,55,.25)', borderColor: '#d4af37', borderWidth: 2, borderRadius: 6 }]
-    },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ y:{ ticks:{ color:'#5c5975', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } } }
-  });
-
-  // Grade distribution chart
+  // Grade distribution chart (overall — stays fixed as a reference point)
   const grades = { 'A+':0, A:0, 'B+':0, B:0, C:0, D:0, F:0 };
   DB.forEach(r => { grades[r.grade] = (grades[r.grade] || 0) + 1; });
-  // Override A+ (getGrade returns A for 80-89, A+ for 90+, but stored grade uses getGrade)
   const gc_data = Object.entries(grades).filter(([, v]) => v > 0);
 
   if (gradeChart) gradeChart.destroy();
@@ -1713,6 +1802,87 @@ function buildStatsCharts() {
   });
 }
 
+/* ═══════════ INTERACTIVE DRILL-DOWN (class chart) ═══════════
+   Level 1: student count per class → click a bar
+   Level 2: subject-wise average for that class → click a bar
+   Level 3: grade distribution for that subject within the class
+   Breadcrumb lets the admin jump back up at any point. */
+function setBreadcrumb(items) {
+  document.getElementById('statsBreadcrumb').innerHTML = items.map((it, i) =>
+    i === items.length - 1
+      ? `<strong style="color:var(--gold)">${it.label}</strong>`
+      : `<a href="#" onclick="event.preventDefault();${it.action}" style="color:var(--text2);text-decoration:underline">${it.label}</a> <i class="fas fa-chevron-right" style="font-size:.6rem;margin:0 4px"></i>`
+  ).join('');
+}
+
+function renderClassLevelChart() {
+  document.getElementById('drillLabel').innerHTML = '<i class="fas fa-chart-bar"></i> Class-wise student count <span style="color:var(--text3);font-weight:400;font-size:.7rem">(click a bar to explore)</span>';
+  setBreadcrumb([{ label:'All Classes' }]);
+
+  const classCounts = {};
+  DB.forEach(r => classCounts[r.cls] = (classCounts[r.cls] || 0) + 1);
+  const labels = Object.keys(classCounts);
+
+  if (classChart) classChart.destroy();
+  classChart = new Chart(document.getElementById('classChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels, datasets: [{ data: Object.values(classCounts), backgroundColor: 'rgba(212,175,55,.25)', borderColor: '#d4af37', borderWidth: 2, borderRadius: 6 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } },
+      onClick: (evt, els) => { if (els.length) renderSubjectLevelChart(labels[els[0].index]); },
+      onHover: (evt, els) => { evt.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+      scales:{ y:{ ticks:{ color:'#5c5975', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } }
+    }
+  });
+}
+
+function renderSubjectLevelChart(className) {
+  document.getElementById('drillLabel').innerHTML = `<i class="fas fa-chart-bar"></i> ${className} — Subject Averages <span style="color:var(--text3);font-weight:400;font-size:.7rem">(click a bar to see grade spread)</span>`;
+  setBreadcrumb([{ label:'All Classes', action:'renderClassLevelChart()' }, { label:className }]);
+
+  const classStudents = DB.filter(r => r.cls === className);
+  const subjectAvgs = SUBJECTS.map(sub => {
+    const vals = classStudents.map(r => Number(r.marks[sub]) || 0);
+    return vals.length ? Math.round(vals.reduce((a,b) => a+b, 0) / vals.length) : 0;
+  });
+
+  if (classChart) classChart.destroy();
+  classChart = new Chart(document.getElementById('classChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: SUBJECTS, datasets: [{ data: subjectAvgs, backgroundColor: 'rgba(155,135,245,.25)', borderColor: '#9b87f5', borderWidth: 2, borderRadius: 6 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => ` Class average: ${c.raw}` } } },
+      onClick: (evt, els) => { if (els.length) renderGradeSpreadChart(className, SUBJECTS[els[0].index]); },
+      onHover: (evt, els) => { evt.native.target.style.cursor = els.length ? 'pointer' : 'default'; },
+      scales:{ y:{ min:0, max:MAX_MARKS, ticks:{ color:'#5c5975', font:{ size:10 } }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } }
+    }
+  });
+}
+
+function renderGradeSpreadChart(className, subject) {
+  document.getElementById('drillLabel').innerHTML = `<i class="fas fa-chart-bar"></i> ${className} — ${subject} Grade Spread`;
+  setBreadcrumb([{ label:'All Classes', action:'renderClassLevelChart()' }, { label:className, action:`renderSubjectLevelChart('${className.replace(/'/g,"\\'")}')` }, { label:subject }]);
+
+  const classStudents = DB.filter(r => r.cls === className);
+  const bands = { 'A+':0, A:0, 'B+':0, B:0, C:0, D:0, F:0 };
+  classStudents.forEach(r => {
+    const m = Number(r.marks[subject]) || 0;
+    const spct = Math.round((m / MAX_MARKS) * 100);
+    bands[getGrade(spct).grade]++;
+  });
+  const entries = Object.entries(bands).filter(([,v]) => v > 0);
+
+  if (classChart) classChart.destroy();
+  classChart = new Chart(document.getElementById('classChart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: entries.map(([k]) => k), datasets: [{ data: entries.map(([,v]) => v), backgroundColor: ['#10d98a','#4d9fff','#9b87f5','#d4af37','#ff8c42','#ff4d6d','#e84393'], borderRadius: 6 }] },
+    options: {
+      responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:c => ` ${c.raw} student(s)` } } },
+      scales:{ y:{ ticks:{ color:'#5c5975', font:{ size:10 }, stepSize:1 }, grid:{ color:'rgba(255,255,255,.04)' } }, x:{ ticks:{ color:'#a8a4b8', font:{ size:10 } }, grid:{ display:false } } }
+    }
+  });
+}
+
 /* ═══════════ ATTENDANCE HELPER ═══════════ */
 function getAttInfo(pct) {
   if (pct === null) return null;
@@ -1723,6 +1893,24 @@ function getAttInfo(pct) {
 }
 
 /* ═══════════ GRADE HELPER ═══════════ */
+/* Animates a number counting up from 0 to `target` over ~800ms —
+   used for the Overall % stat so results feel alive rather than
+   just snapping into place. */
+function animateCountUp(elId, target, suffix) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  suffix = suffix || '';
+  const duration = 800;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3); // ease-out cubic
+    el.textContent = Math.round(eased * target) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
 function getGrade(pct) {
   if (pct >= 90) return { grade:'A+', color:'#10d98a', label:'Outstanding' };
   if (pct >= 80) return { grade:'A',  color:'#4d9fff', label:'Excellent' };
@@ -1782,11 +1970,12 @@ function renderResult(student, history, classAverages, rankInfo) {
 
   // Summary bar
   document.getElementById('summaryBar').innerHTML = [
-    { b:`${pct}%`, c:'var(--gold)',                     t:'Overall %' },
+    { b:`0%`, id:'pctCountUp', c:'var(--gold)',           t:'Overall %' },
     { b:grade,     c:color,                              t:'Final Grade' },
     { b:passed ? 'PASS':'FAIL', c:passed ? 'var(--green)':'var(--red)', t:'Result' },
     { b:topSub,    c:'var(--text)',                      t:'Best Subject', sz:'1.3rem' }
-  ].map(c => `<div class="sum-cell"><div class="big" style="color:${c.c};${c.sz ? 'font-size:'+c.sz : ''}">${c.b}</div><small>${c.t}</small></div>`).join('');
+  ].map(c => `<div class="sum-cell"><div class="big" ${c.id ? `id="${c.id}"` : ''} style="color:${c.c};${c.sz ? 'font-size:'+c.sz : ''}">${c.b}</div><small>${c.t}</small></div>`).join('');
+  animateCountUp('pctCountUp', pct, '%');
 
   // Bar chart — BUG FIX: use `sub` as parameter name, NOT `s`
   if (barChart) barChart.destroy();
@@ -1858,6 +2047,37 @@ function renderResult(student, history, classAverages, rankInfo) {
     </ul></div>
     <div class="insight-card"><h5><i class="fas fa-lightbulb"></i> Recommendation</h5><p>${rec}</p></div>
   `;
+
+  // ── Achievements (computed from data already available — no extra table needed) ──
+  const badgesEarned = [];
+  const highScorers = subs.filter(sub => s.marks[sub] >= 95);
+  if (pct === 100) badgesEarned.push({ icon:'fa-crown', bg:'radial-gradient(circle at 30% 30%,#fff3c4,#d4af37)', name:'Perfect Score', desc:'100% across every subject' });
+  if (highScorers.length >= 2) badgesEarned.push({ icon:'fa-atom', bg:'radial-gradient(circle at 30% 30%,#e0e7ff,#9b87f5)', name:'The Soliton Award', desc:`95+ in ${highScorers.slice(0,2).join(' & ')}` });
+  if (s.attPct === 100) badgesEarned.push({ icon:'fa-shield-heart', bg:'radial-gradient(circle at 30% 30%,#d4f5e2,#10d98a)', name:'The Ironclad', desc:'100% attendance this session' });
+  if (rankInfo && rankInfo.rank === 1) badgesEarned.push({ icon:'fa-trophy', bg:'radial-gradient(circle at 30% 30%,#fff3c4,#d4af37)', name:'Class Topper', desc:`Rank #1 of ${rankInfo.out_of}` });
+  if (failed.length === 0 && marksArr.every(m => Math.round((m/MAX_MARKS)*100) >= 60)) badgesEarned.push({ icon:'fa-user-graduate', bg:'radial-gradient(circle at 30% 30%,#dceeff,#5b9bd5)', name:'All Rounder', desc:'No subject below 60%' });
+  if (history.length >= 2) {
+    const prevPct = (() => { const h = history[history.length - 2]; const hs = Object.keys(h.marks||{}); if (!hs.length) return null; const t = hs.reduce((a,k)=>a+(Number(h.marks[k])||0),0); return Math.round((t/(hs.length*MAX_MARKS))*100); })();
+    if (prevPct !== null) {
+      const improvement = pct - prevPct;
+      if (improvement > 10) badgesEarned.push({ icon:'fa-fire', bg:'radial-gradient(circle at 30% 30%,#ffe0d4,#ff7847)', name:'The Phoenix', desc:`+${improvement}% since last session` });
+      else if (improvement > 5) badgesEarned.push({ icon:'fa-arrow-trend-up', bg:'radial-gradient(circle at 30% 30%,#d4f5e2,#3ddc97)', name:'Rising Star', desc:`+${improvement}% since last session` });
+    }
+  }
+
+  const achSec = document.getElementById('achievementsSection');
+  if (badgesEarned.length) {
+    achSec.style.display = '';
+    document.getElementById('badgesGrid').innerHTML = badgesEarned.map(b => `
+      <div class="badge-medal">
+        <div class="medal-icon" style="background:${b.bg}"><i class="fas ${b.icon}"></i></div>
+        <h6>${b.name}</h6>
+        <p>${b.desc}</p>
+      </div>
+    `).join('');
+  } else {
+    achSec.style.display = 'none';
+  }
 
   // ── Progress Over Time (only if this student has more than 1 published session) ──
   const progSec = document.getElementById('progressSection');
