@@ -64,12 +64,37 @@ html[data-theme="light"]{
 }
 html[data-theme="light"] .medal-icon{box-shadow:0 4px 14px var(--sh30),inset 0 1px 2px rgba(255,255,255,.8)}
 html[data-theme="light"] ::selection{background:rgba(212,175,55,.35)}
+
+/* Teacher marks-upload portal (opened via a standalone token link, no nav,
+   no toggle) always stays on the original dark look — it should never
+   change with whatever theme the admin happened to leave the toggle on. */
+#pageTeacherUpload{
+  --bg:#07070f;--bg2:#0f0f1c;--bg3:#161628;--bg4:#1d1d35;
+  --text:#f0eee8;--text2:#a8a4b8;--text3:#5c5975;
+  --green:#10d98a;--red:#ff4d6d;--blue:#4d9fff;--purple:#9b87f5;
+  --ov02:rgba(255,255,255,.02);--ov03:rgba(255,255,255,.03);--ov04:rgba(255,255,255,.04);
+  --ov05:rgba(255,255,255,.05);--ov06:rgba(255,255,255,.06);--ov07:rgba(255,255,255,.07);
+  --ov08:rgba(255,255,255,.08);--ov09:rgba(255,255,255,.09);--ov10:rgba(255,255,255,.1);
+  --sh30:rgba(0,0,0,.3);--sh35:rgba(0,0,0,.35);--sh4:rgba(0,0,0,.4);--sh5:rgba(0,0,0,.5);
+  --shadow:0 20px 60px var(--sh5);
+  --nav-bg:rgba(7,7,15,.95);--card-bg:rgba(20,20,34,.45);
+  --chart-grid:rgba(255,255,255,.05);--chart-tick2:#a8a4b8;--chart-tick3:#5c5975;
+  --scrollbar-track:var(--bg2);--scrollbar-thumb:var(--bg4);
+  --logo-filter:brightness(0) invert(1);
+  color-scheme:dark;
+  background:var(--bg);
+  min-height:100vh;
+}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-track{background:var(--scrollbar-track)}
 ::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:6px}
 *{margin:0;padding:0;box-sizing:border-box}
+/* Uniform, fast transition for the light/dark switch — every element
+   fades colors together at the same speed, so the switch reads as one
+   clean change instead of pieces catching up at different times. */
+*,*::before,*::after{transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,fill .16s ease,stroke .16s ease}
 html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;transition:background .3s ease,color .3s ease}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-tap-highlight-color:transparent;}
 img{max-width:100%}
 a{color:inherit;text-decoration:none}
 button{font-family:'DM Sans',sans-serif;cursor:pointer}
@@ -85,7 +110,7 @@ input{font-family:'DM Sans',sans-serif}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── NAV ── */
-nav{position:sticky;top:0;z-index:300;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-border);transition:background .3s ease}
+nav{position:sticky;top:0;z-index:300;background:var(--nav-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--gold-border);}
 .nav-inner{max-width:1260px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:64px;gap:12px}
 .brand{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
 .brand-logo{width:40px;height:40px;flex-shrink:0;filter:var(--logo-filter);transition:var(--transition)}
@@ -122,7 +147,7 @@ html[data-theme="light"] .theme-icon-moon{opacity:.4}
 
 /* ── CARD ── */
 .portal-wrap{max-width:860px;margin:0 auto 60px;padding:0 16px}
-.card{background:var(--card-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--ov06);border-radius:var(--r-lg);box-shadow:0 8px 32px var(--sh4);overflow:hidden;position:relative;transition:background .3s ease,border-color .3s ease}
+.card{background:var(--card-bg);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--ov06);border-radius:var(--r-lg);box-shadow:0 8px 32px var(--sh4);overflow:hidden;position:relative;}
 .card::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(212,175,55,.35),var(--ov06) 40%,transparent 60%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:1}
 .card-head{background:linear-gradient(135deg,var(--bg3),var(--bg4));padding:clamp(24px,5vw,40px);border-bottom:1px solid var(--gold-border)}
 .card-head h3{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:6px}
