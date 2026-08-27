@@ -6,6 +6,51 @@
 const CLOSE_HOUR_UTC = 17; // 22:30 IST
 const OPEN_HOUR_UTC = 18;  // 23:30 IST
 
+// Every response — including 503s, errors, and static assets — gets these.
+// This is a portal holding student names, parents' names, and marks, so
+// nothing about it should ever be cached, framed, or loaded cross-origin.
+const SUPABASE_ORIGIN = "https://imrkclaqojthtnuakujv.supabase.co";
+
+const SECURITY_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, private",
+  "Pragma": "no-cache",
+  "Expires": "0",
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "geolocation=(), camera=(), microphone=(), payment=(), usb=()",
+  "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+  "X-Robots-Tag": "noindex, nofollow",
+  "Content-Security-Policy": [
+    "default-src 'self'",
+    // Inline <script>/<style> blocks are how this app is built today, so
+    // 'unsafe-inline' is required for it to run — see note in the README
+    // about moving to nonces if you want to drop this later.
+    "script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
+    "img-src 'self' data: blob:",
+    `connect-src 'self' ${SUPABASE_ORIGIN} wss://imrkclaqojthtnuakujv.supabase.co`,
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+    "upgrade-insecure-requests",
+  ].join("; "),
+};
+
+function withSecurityHeaders(response) {
+  const headers = new Headers(response.headers);
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    headers.set(key, value);
+  }
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export async function onRequest(context) {
   const { request, next } = context;
 
@@ -15,27 +60,18 @@ export async function onRequest(context) {
 
   if (!isClosed) {
     const response = await next();
-    // Force every refresh (soft or hard) to revalidate with the server
-    // instead of silently reusing a cached copy from before the window
-    // opened or closed. Important for a private results portal either way.
-    const headers = new Headers(response.headers);
-    headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
-    headers.set("Pragma", "no-cache");
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers,
-    });
+    return withSecurityHeaders(response);
   }
 
-  return new Response(renderMaintenancePage(), {
-    status: 503,
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Retry-After": "3600",
-      "Cache-Control": "no-store",
-    },
-  });
+  return withSecurityHeaders(
+    new Response(renderMaintenancePage(), {
+      status: 503,
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Retry-After": "3600",
+      },
+    })
+  );
 }
 
 function renderMaintenancePage() {
