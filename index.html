@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow">
 <title>Academic Portal — YTHAEN</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#07070f">
@@ -1142,7 +1147,17 @@ let VIEW_SESSION_ID = null;   // which session admin is currently viewing in Stu
 let sb = null;
 try {
   if (!window.supabase) throw new Error('Supabase library failed to load from CDN.');
-  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      // sessionStorage (not localStorage) — the admin session is gone the
+      // moment the browser/tab is closed, instead of sitting on disk
+      // indefinitely on a shared/school computer.
+      storage: window.sessionStorage,
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    },
+  });
 } catch (e) {
   console.error('Supabase init failed:', e);
   window.addEventListener('DOMContentLoaded', () => {
@@ -1182,7 +1197,24 @@ async function goAdmin() {
   else { showPage('adminLogin'); }
 }
 
+/* Client-side login throttling.
+   This is a speed bump, not real rate limiting — it lives in a JS variable
+   that resets on page reload, so it stops casual/automated guessing from
+   inside the tab but can't stop a scripted attacker hitting Supabase
+   directly. The real backstop has to be server-side: in the Supabase
+   dashboard, turn on Auth → Rate Limits, and consider enabling CAPTCHA
+   on the sign-in endpoint. */
+let loginFailCount = 0;
+let loginLockedUntil = 0;
+
 async function adminLogin() {
+  const now = Date.now();
+  if (now < loginLockedUntil) {
+    const secs = Math.ceil((loginLockedUntil - now) / 1000);
+    toast('login', `Too many failed attempts. Try again in ${secs}s.`, 'warn');
+    return;
+  }
+
   const u = document.getElementById('lUser').value.trim();
   const p = document.getElementById('lPass').value;
   if (!u || !p) { toast('login', 'Please enter email and password.', 'warn'); return; }
@@ -1195,13 +1227,24 @@ async function adminLogin() {
   const { data, error } = await sb.auth.signInWithPassword({ email: u, password: p });
 
   if (error) {
-    toast('login', 'Invalid credentials. Please try again.', 'error');
+    loginFailCount++;
     document.getElementById('lPass').value = '';
     btn.disabled = false;
     btn.innerHTML = originalLabel;
+
+    if (loginFailCount >= 5) {
+      // Exponential-ish backoff: 30s, 60s, 120s, ... capped at 10 min.
+      const lockSeconds = Math.min(30 * Math.pow(2, loginFailCount - 5), 600);
+      loginLockedUntil = Date.now() + lockSeconds * 1000;
+      toast('login', `Too many failed attempts. Locked for ${lockSeconds}s.`, 'error');
+    } else {
+      toast('login', 'Invalid credentials. Please try again.', 'error');
+    }
     return;
   }
 
+  loginFailCount = 0;
+  loginLockedUntil = 0;
   adminLoggedIn = true;
   document.getElementById('adminUrl').textContent = location.href;
   showPage('admin');
@@ -1210,26 +1253,80 @@ async function adminLogin() {
   toast('admin', 'Welcome back, Admin! Loading student database…', 'success');
   await loadSessionsAndStatus();
   await loadStudentsFromDB();
+  startAdminSessionGuard();
 }
 
-async function adminLogout() {
+async function adminLogout(reason) {
+  stopAdminSessionGuard();
   await sb.auth.signOut();
   adminLoggedIn = false;
   DB = []; SUBJECTS = [];
   showPage('student');
+  if (reason) toast('student', reason, 'warn');
+}
+
+/* ═══════════ ADMIN SESSION GUARD ═══════════
+   Two independent timers apply only while an admin is logged in:
+   - IDLE_TIMEOUT_MS: signs out if there's no mouse/keyboard/touch
+     activity for a while (someone walks away from a shared computer).
+   - ABSOLUTE_SESSION_MS: signs out this browser session at a hard cap
+     regardless of activity, forcing a fresh re-login periodically.
+   Neither of these replaces the JWT's own expiry (set in Supabase
+   dashboard → Authentication → Settings — keep that short too, e.g.
+   3600s with refresh, or shorter if your policy calls for it). */
+const IDLE_TIMEOUT_MS = 10 * 60 * 1000;      // 10 minutes of inactivity
+const ABSOLUTE_SESSION_MS = 60 * 60 * 1000;  // 60 minutes, active or not
+
+let idleTimer = null;
+let absoluteTimer = null;
+const ACTIVITY_EVENTS = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+
+function resetIdleTimer() {
+  if (!adminLoggedIn) return;
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    adminLogout('You were signed out after 10 minutes of inactivity.');
+  }, IDLE_TIMEOUT_MS);
+}
+
+function startAdminSessionGuard() {
+  stopAdminSessionGuard();
+  ACTIVITY_EVENTS.forEach(evt => document.addEventListener(evt, resetIdleTimer, { passive: true }));
+  resetIdleTimer();
+  absoluteTimer = setTimeout(() => {
+    adminLogout('Your admin session expired. Please sign in again.');
+  }, ABSOLUTE_SESSION_MS);
+}
+
+function stopAdminSessionGuard() {
+  ACTIVITY_EVENTS.forEach(evt => document.removeEventListener(evt, resetIdleTimer));
+  clearTimeout(idleTimer);
+  clearTimeout(absoluteTimer);
 }
 
 /* Restore session on page load/refresh so admin isn't logged out
-   just because they reloaded the tab. */
+   just because they reloaded the tab (sessionStorage means this only
+   ever applies within the same tab/browser session anyway). */
 async function restoreSession() {
   if (!sb) return;
   const { data } = await sb.auth.getSession();
   if (data && data.session) {
     adminLoggedIn = true;
+    startAdminSessionGuard();
   }
 }
 restoreSession();
 loadSessionsAndStatus();
+
+/* Defense against the back-forward cache: if a signed-out browser
+   restores this page from bfcache (so the DOM still shows whatever
+   admin panel was last rendered), force a real reload so it re-checks
+   auth state instead of flashing stale student data on screen. */
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted && !adminLoggedIn) {
+    location.reload();
+  }
+});
 
 /* ═══════════ ADMIN PANELS ═══════════ */
 function switchPanel(name, btn) {
