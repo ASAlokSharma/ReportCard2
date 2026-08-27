@@ -14,7 +14,18 @@ export async function onRequest(context) {
   const isClosed = hourUTC >= CLOSE_HOUR_UTC && hourUTC < OPEN_HOUR_UTC;
 
   if (!isClosed) {
-    return next();
+    const response = await next();
+    // Force every refresh (soft or hard) to revalidate with the server
+    // instead of silently reusing a cached copy from before the window
+    // opened or closed. Important for a private results portal either way.
+    const headers = new Headers(response.headers);
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    headers.set("Pragma", "no-cache");
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   }
 
   return new Response(renderMaintenancePage(), {
