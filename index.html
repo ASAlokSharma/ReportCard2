@@ -1128,6 +1128,42 @@ let adminLoggedIn = false;
 let CURRENT_RESULT_STUDENT = null;
 let LAST_RENDER_RESULT_ARGS = null;
 
+/* ═══════════ ROLE / TENANT STATE (Phase 1) ═══════════
+   Populated after login (or session restore) from the `user_roles`
+   table. A user can hold multiple role rows (e.g. super_admin +
+   principal) — MY_ROLES keeps all of them, the flags below are
+   convenience shortcuts computed from that list.
+   PUBLIC_SCHOOL_ID is separate: it's resolved once at page load
+   (no login required) so the public student-verification RPCs can
+   be scoped to a school even for anonymous visitors. Right now it
+   always resolves to the 'default' school slug — swap that for a
+   real subdomain/URL-param lookup once more than one school exists. */
+let MY_ROLES = [];
+let IS_SUPER_ADMIN = false;
+let MY_SCHOOL_ID = null;     // first school this user has a non-super_admin role in
+let MY_ROLE_LABEL = null;    // highest-priority role, for display
+let PUBLIC_SCHOOL_ID = null;
+
+async function loadMyRoles(userId) {
+  MY_ROLES = []; IS_SUPER_ADMIN = false; MY_SCHOOL_ID = null; MY_ROLE_LABEL = null;
+  if (!userId) return;
+  const { data, error } = await sb.from('user_roles').select('role,school_id,class_scope,subject_scope').eq('user_id', userId);
+  if (error || !data) { console.error('Could not load roles:', error); return; }
+  MY_ROLES = data;
+  IS_SUPER_ADMIN = data.some(r => r.role === 'super_admin');
+  const priority = ['super_admin', 'principal', 'class_teacher', 'subject_teacher'];
+  const best = data.slice().sort((a, b) => priority.indexOf(a.role) - priority.indexOf(b.role))[0];
+  if (best) MY_ROLE_LABEL = best.role;
+  const scoped = data.find(r => r.school_id);
+  if (scoped) MY_SCHOOL_ID = scoped.school_id;
+}
+
+async function resolvePublicSchool() {
+  if (!sb) return;
+  const { data, error } = await sb.rpc('get_school_by_slug', { p_slug: 'default' });
+  if (!error && data && data[0]) PUBLIC_SCHOOL_ID = data[0].id;
+}
+
 // Rebuilds any on-screen Chart.js charts with fresh colors after a theme switch
 // (canvas colors are baked in at creation time, so a plain CSS var swap isn't enough).
 function refreshChartsForTheme() {
@@ -1246,11 +1282,12 @@ async function adminLogin() {
   loginFailCount = 0;
   loginLockedUntil = 0;
   adminLoggedIn = true;
+  await loadMyRoles(data.user.id);
   document.getElementById('adminUrl').textContent = location.href;
   showPage('admin');
   btn.disabled = false;
   btn.innerHTML = originalLabel;
-  toast('admin', 'Welcome back, Admin! Loading student database…', 'success');
+  toast('admin', `Welcome back${MY_ROLE_LABEL ? ' (' + MY_ROLE_LABEL.replace('_',' ') + ')' : ''}! Loading student database…`, 'success');
   await loadSessionsAndStatus();
   await loadStudentsFromDB();
   startAdminSessionGuard();
@@ -1260,6 +1297,7 @@ async function adminLogout(reason) {
   stopAdminSessionGuard();
   await sb.auth.signOut();
   adminLoggedIn = false;
+  MY_ROLES = []; IS_SUPER_ADMIN = false; MY_SCHOOL_ID = null; MY_ROLE_LABEL = null;
   DB = []; SUBJECTS = [];
   showPage('student');
   if (reason) toast('student', reason, 'warn');
@@ -1312,10 +1350,12 @@ async function restoreSession() {
   const { data } = await sb.auth.getSession();
   if (data && data.session) {
     adminLoggedIn = true;
+    await loadMyRoles(data.session.user.id);
     startAdminSessionGuard();
   }
 }
 restoreSession();
+resolvePublicSchool();
 loadSessionsAndStatus();
 
 /* Defense against the back-forward cache: if a signed-out browser
@@ -1572,12 +1612,12 @@ async function publishResults() {
 
     // Create the new session
     const { data: newSession, error: sessionErr } = await sb.from('sessions').insert({
-      name: sessionName, file_name: stagedFileName, is_live: true, published_at: new Date().toISOString()
+      name: sessionName, file_name: stagedFileName, is_live: true, published_at: new Date().toISOString(), school_id: MY_SCHOOL_ID
     }).select().single();
     if (sessionErr) throw sessionErr;
 
     // Attach every staged record to this new session and upload
-    const rows = stagedRecords.map(r => ({ ...r, session_id: newSession.id }));
+    const rows = stagedRecords.map(r => ({ ...r, session_id: newSession.id, school_id: MY_SCHOOL_ID }));
     const BATCH = 200;
     for (let i = 0; i < rows.length; i += BATCH) {
       const chunk = rows.slice(i, i + BATCH);
@@ -2013,7 +2053,7 @@ async function verifyStudent() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching…';
 
   const cleanAdmno = admno.replace(/\.0$/, '');
-  const { data, error } = await sb.rpc('verify_student', { p_sid: sid, p_father: father, p_admno: cleanAdmno });
+  const { data, error } = await sb.rpc('verify_student', { p_sid: sid, p_father: father, p_admno: cleanAdmno, p_school_id: PUBLIC_SCHOOL_ID });
 
   if (error) { toast('student', 'Something went wrong. Please try again shortly.', 'error'); console.error(error); btn.disabled = false; btn.innerHTML = originalLabel; return; }
   if (!data || !data.length) { toast('student', "No record found. Please verify your Student ID, Father's Name and Admission No.", 'error'); btn.disabled = false; btn.innerHTML = originalLabel; return; }
@@ -2030,9 +2070,9 @@ async function verifyStudent() {
   // Fetch progress history + class averages + class rank in parallel —
   // best effort, none should block showing the core result if they fail.
   const [historyRes, classAvgRes, rankRes] = await Promise.all([
-    Promise.resolve(sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: cleanAdmno })).catch(() => ({ data: null })),
-    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class })).catch(() => ({ data: null })),
-    Promise.resolve(sb.rpc('get_class_rank', { p_sid: sid, p_father: father, p_admno: cleanAdmno })).catch(() => ({ data: null }))
+    Promise.resolve(sb.rpc('get_student_history', { p_sid: sid, p_father: father, p_admno: cleanAdmno, p_school_id: PUBLIC_SCHOOL_ID })).catch(() => ({ data: null })),
+    Promise.resolve(sb.rpc('get_class_averages', { p_class: r.class, p_school_id: PUBLIC_SCHOOL_ID })).catch(() => ({ data: null })),
+    Promise.resolve(sb.rpc('get_class_rank', { p_sid: sid, p_father: father, p_admno: cleanAdmno, p_school_id: PUBLIC_SCHOOL_ID })).catch(() => ({ data: null }))
   ]);
 
   const rankInfo = (rankRes.data && rankRes.data[0]) || null;
@@ -2530,7 +2570,7 @@ function toggleNewDraftForm() {
 async function createDraftSession() {
   const name = document.getElementById('newDraftName').value.trim();
   if (!name) { toast('approvals', 'Please enter a term/exam name.', 'warn'); return; }
-  const { data, error } = await sb.from('sessions').insert({ name, status:'draft', is_live:false }).select().single();
+  const { data, error } = await sb.from('sessions').insert({ name, status:'draft', is_live:false, school_id: MY_SCHOOL_ID }).select().single();
   if (error) { toast('approvals', 'Could not create draft: ' + error.message, 'error'); return; }
   document.getElementById('newDraftName').value = '';
   document.getElementById('newDraftForm').classList.add('hidden');
@@ -2549,7 +2589,7 @@ async function generateSubjectLink() {
   if (!CURRENT_DRAFT_ID) { toast('approvals', 'Create or select a draft term first.', 'warn'); return; }
 
   const token = genToken();
-  const { error } = await sb.from('subject_submissions').insert({ session_id: CURRENT_DRAFT_ID, subject, token });
+  const { error } = await sb.from('subject_submissions').insert({ session_id: CURRENT_DRAFT_ID, subject, token, school_id: MY_SCHOOL_ID });
   if (error) { toast('approvals', 'Could not generate link: ' + error.message, 'error'); return; }
 
   const link = `${location.origin}${location.pathname}?upload=${token}`;
@@ -2643,7 +2683,7 @@ async function approveSubmission(id) {
       sid: row.sid, admno: row.admno, class: row.class, roll: row.roll,
       name: row.name, father: row.father, marks,
       working_days: ex ? ex.working_days : 0, days_present: ex ? ex.days_present : 0,
-      session_id: sub.session_id
+      session_id: sub.session_id, school_id: MY_SCHOOL_ID
     };
   });
 
