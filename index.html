@@ -662,17 +662,21 @@ html[data-theme="light"] .theme-icon-moon{opacity:.4}
           <img src="Screenshot_from_2026-03-28_21-47-43-removebg-preview.png" style="width:32px;height:32px;filter:var(--logo-filter);opacity:.7" alt="">
           <div>
             <div style="font-size:.82rem;font-weight:600">Admin Dashboard</div>
-            <div style="font-size:.7rem;color:var(--text3)">Logged in as admin</div>
+            <div style="font-size:.7rem;color:var(--text3)" id="adminRoleSubtitle">Logged in as admin</div>
           </div>
         </div>
         <div class="sep"></div>
         <div class="sidebar-label">Management</div>
-        <button class="nav-item active" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload Database</button>
-        <button class="nav-item" onclick="switchPanel('approvals',this)"><i class="fas fa-user-check"></i> Teacher Uploads</button>
+        <button class="nav-item active" data-min-role="principal" onclick="switchPanel('upload',this)"><i class="fas fa-upload"></i> Upload Database</button>
+        <button class="nav-item" data-min-role="principal" onclick="switchPanel('approvals',this)"><i class="fas fa-user-check"></i> Teacher Uploads</button>
         <button class="nav-item" onclick="switchPanel('students',this)"><i class="fas fa-users"></i> Student Records</button>
         <button class="nav-item" onclick="switchPanel('stats',this)"><i class="fas fa-chart-bar"></i> Statistics</button>
-        <div class="sidebar-label">System</div>
-        <button class="nav-item" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
+        <button class="nav-item" data-role="class_teacher" style="display:none" onclick="switchPanel('gradebook',this)"><i class="fas fa-book"></i> My Gradebook</button>
+        <div class="sidebar-label" data-min-role="principal">Team &amp; Oversight</div>
+        <button class="nav-item" data-min-role="principal" onclick="switchPanel('team',this)"><i class="fas fa-people-group"></i> Team</button>
+        <button class="nav-item" data-min-role="principal" onclick="switchPanel('auditlog',this)"><i class="fas fa-clock-rotate-left"></i> Audit Log</button>
+        <div class="sidebar-label" data-min-role="principal">System</div>
+        <button class="nav-item" data-min-role="principal" onclick="switchPanel('settings',this)"><i class="fas fa-gear"></i> Settings</button>
       </div>
       <div class="sidebar-bottom">
         <!-- Back to portal WITHOUT logging out — database is preserved in memory -->
@@ -891,6 +895,55 @@ html[data-theme="light"] .theme-icon-moon{opacity:.4}
               <strong style="color:var(--text)">Logout</strong> — Ends the admin session and returns to the student portal.
             </p>
           </div>
+        </div>
+      </div>
+
+      <!-- ─ Panel: Team ─ -->
+      <div class="admin-panel" id="panelTeam">
+        <div class="admin-topbar"><div><h2>Team</h2><p>Assign class/subject teachers to roles — no password sharing required</p></div></div>
+        <div id="teamToast" class="toast" style="margin-bottom:18px"></div>
+        <div class="card mt-16" style="padding:20px 22px;margin-bottom:20px">
+          <h4 style="margin-bottom:12px"><i class="fas fa-user-plus"></i> Add / Update a Team Member</h4>
+          <p class="text-muted" style="margin-bottom:14px">The person must already have a login account (Supabase Dashboard → Authentication → Users → Add user) before you can assign them a role here.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+            <div><label class="text-muted" style="font-size:.75rem">Email</label><br><input id="teamEmail" class="inp" type="email" placeholder="teacher@school.com" style="min-width:220px"></div>
+            <div><label class="text-muted" style="font-size:.75rem">Role</label><br>
+              <select id="teamRole" class="inp" onchange="document.getElementById('teamClassWrap').style.display = this.value==='class_teacher'?'block':'none'; document.getElementById('teamSubjectWrap').style.display = this.value==='subject_teacher'?'block':'none';">
+                <option value="principal">Principal</option>
+                <option value="class_teacher" selected>Class Teacher</option>
+                <option value="subject_teacher">Subject Teacher</option>
+              </select>
+            </div>
+            <div id="teamClassWrap"><label class="text-muted" style="font-size:.75rem">Class (e.g. 9th A)</label><br><input id="teamClassScope" class="inp" placeholder="9th A"></div>
+            <div id="teamSubjectWrap" style="display:none"><label class="text-muted" style="font-size:.75rem">Subject</label><br><input id="teamSubjectScope" class="inp" placeholder="Maths"></div>
+            <button class="btn btn-primary" onclick="addTeamMember()"><i class="fas fa-plus"></i> Add</button>
+          </div>
+        </div>
+        <div class="card mt-16">
+          <table class="tbl" id="teamTable">
+            <thead><tr><th>Email</th><th>Role</th><th>Class</th><th>Subject</th><th></th></tr></thead>
+            <tbody id="teamTableBody"><tr><td colspan="5" class="text-muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─ Panel: Audit Log ─ -->
+      <div class="admin-panel" id="panelAuditlog">
+        <div class="admin-topbar"><div><h2>Audit Log</h2><p>Who did what, and when — recorded automatically, cannot be edited from the browser</p></div></div>
+        <div class="card mt-16">
+          <table class="tbl" id="auditTable">
+            <thead><tr><th>When</th><th>Actor Role</th><th>Action</th><th>Target</th><th>Details</th></tr></thead>
+            <tbody id="auditTableBody"><tr><td colspan="5" class="text-muted">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─ Panel: Gradebook (class teacher) ─ -->
+      <div class="admin-panel" id="panelGradebook">
+        <div class="admin-topbar"><div><h2>My Gradebook</h2><p>Enter marks, remarks and a photo for your class — only while the session is a draft</p></div></div>
+        <div id="gradebookToast" class="toast" style="margin-bottom:18px"></div>
+        <div class="card mt-16" id="gradebookCard" style="padding:20px 22px">
+          <p class="text-muted">Loading…</p>
         </div>
       </div>
 
@@ -1142,10 +1195,11 @@ let MY_ROLES = [];
 let IS_SUPER_ADMIN = false;
 let MY_SCHOOL_ID = null;     // first school this user has a non-super_admin role in
 let MY_ROLE_LABEL = null;    // highest-priority role, for display
+let MY_CLASS_SCOPE = null;   // this user's class, if they are a class_teacher
 let PUBLIC_SCHOOL_ID = null;
 
 async function loadMyRoles(userId) {
-  MY_ROLES = []; IS_SUPER_ADMIN = false; MY_SCHOOL_ID = null; MY_ROLE_LABEL = null;
+  MY_ROLES = []; IS_SUPER_ADMIN = false; MY_SCHOOL_ID = null; MY_ROLE_LABEL = null; MY_CLASS_SCOPE = null;
   if (!userId) return;
   const { data, error } = await sb.from('user_roles').select('role,school_id,class_scope,subject_scope').eq('user_id', userId);
   if (error || !data) { console.error('Could not load roles:', error); return; }
@@ -1156,12 +1210,146 @@ async function loadMyRoles(userId) {
   if (best) MY_ROLE_LABEL = best.role;
   const scoped = data.find(r => r.school_id);
   if (scoped) MY_SCHOOL_ID = scoped.school_id;
+  const ct = data.find(r => r.role === 'class_teacher');
+  if (ct) MY_CLASS_SCOPE = ct.class_scope;
+  applyRoleGating();
+}
+
+function applyRoleGating() {
+  const canManage = IS_SUPER_ADMIN || MY_ROLES.some(r => r.role === 'principal');
+  const isClassTeacherOnly = !canManage && MY_ROLES.some(r => r.role === 'class_teacher');
+  document.querySelectorAll('[data-min-role="principal"]').forEach(el => { el.style.display = canManage ? '' : 'none'; });
+  document.querySelectorAll('[data-role="class_teacher"]').forEach(el => { el.style.display = (canManage || isClassTeacherOnly) ? '' : 'none'; });
+  const subtitle = document.getElementById('adminRoleSubtitle');
+  if (subtitle) {
+    const label = IS_SUPER_ADMIN ? 'Super Admin' : (MY_ROLE_LABEL ? MY_ROLE_LABEL.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Admin');
+    subtitle.textContent = 'Logged in as ' + label + (MY_CLASS_SCOPE ? ' · ' + MY_CLASS_SCOPE : '');
+  }
+  if (isClassTeacherOnly) {
+    const btn = document.querySelector('.nav-item[onclick*="gradebook"]');
+    switchPanel('gradebook', btn);
+  }
 }
 
 async function resolvePublicSchool() {
   if (!sb) return;
   const { data, error } = await sb.rpc('get_school_by_slug', { p_slug: 'default' });
   if (!error && data && data[0]) PUBLIC_SCHOOL_ID = data[0].id;
+}
+
+/* ═══════════ TEAM MANAGEMENT ═══════════ */
+async function loadTeamPanel() {
+  const body = document.getElementById('teamTableBody');
+  body.innerHTML = '<tr><td colspan="5" class="text-muted">Loading…</td></tr>';
+  const { data, error } = await sb.rpc('get_team_members', { p_school_id: MY_SCHOOL_ID });
+  if (error) { body.innerHTML = `<tr><td colspan="5" class="text-muted">Error: ${error.message}</td></tr>`; return; }
+  if (!data || !data.length) { body.innerHTML = '<tr><td colspan="5" class="text-muted">No team members yet.</td></tr>'; return; }
+  body.innerHTML = data.map(m => `
+    <tr>
+      <td>${escapeHtml(m.email)}</td>
+      <td>${escapeHtml(m.role.replace(/_/g,' '))}</td>
+      <td>${m.class_scope ? escapeHtml(m.class_scope) : '—'}</td>
+      <td>${m.subject_scope ? escapeHtml(m.subject_scope) : '—'}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="removeTeamMember('${m.role_id}')"><i class="fas fa-trash"></i></button></td>
+    </tr>`).join('');
+}
+
+async function addTeamMember() {
+  const email = document.getElementById('teamEmail').value.trim();
+  const role = document.getElementById('teamRole').value;
+  const classScope = document.getElementById('teamClassScope').value.trim() || null;
+  const subjectScope = document.getElementById('teamSubjectScope').value.trim() || null;
+  if (!email) { toast('team', 'Enter an email first.', 'error'); return; }
+  const { data, error } = await sb.rpc('assign_role_by_email', {
+    p_email: email, p_role: role, p_school_id: MY_SCHOOL_ID,
+    p_class_scope: role === 'class_teacher' ? classScope : null,
+    p_subject_scope: role === 'subject_teacher' ? subjectScope : null
+  });
+  if (error || !data || !data.success) { toast('team', (data && data.message) || (error && error.message) || 'Failed to add.', 'error'); return; }
+  toast('team', 'Team member added.', 'success');
+  document.getElementById('teamEmail').value = '';
+  loadTeamPanel();
+}
+
+async function removeTeamMember(roleId) {
+  if (!confirm('Remove this team member\'s access?')) return;
+  const { data, error } = await sb.rpc('remove_team_role', { p_role_id: roleId, p_school_id: MY_SCHOOL_ID });
+  if (error || !data || !data.success) { toast('team', (data && data.message) || (error && error.message) || 'Failed to remove.', 'error'); return; }
+  toast('team', 'Removed.', 'success');
+  loadTeamPanel();
+}
+
+/* ═══════════ AUDIT LOG ═══════════ */
+async function loadAuditLogPanel() {
+  const body = document.getElementById('auditTableBody');
+  body.innerHTML = '<tr><td colspan="5" class="text-muted">Loading…</td></tr>';
+  let q = sb.from('audit_log').select('*').order('created_at', { ascending: false }).limit(200);
+  if (!IS_SUPER_ADMIN) q = q.eq('school_id', MY_SCHOOL_ID);
+  const { data, error } = await q;
+  if (error) { body.innerHTML = `<tr><td colspan="5" class="text-muted">Error: ${error.message}</td></tr>`; return; }
+  if (!data || !data.length) { body.innerHTML = '<tr><td colspan="5" class="text-muted">No activity logged yet.</td></tr>'; return; }
+  body.innerHTML = data.map(a => `
+    <tr>
+      <td>${new Date(a.created_at).toLocaleString()}</td>
+      <td>${a.actor_role ? escapeHtml(a.actor_role.replace(/_/g,' ')) : '—'}</td>
+      <td>${escapeHtml(a.action.replace(/_/g,' '))}</td>
+      <td>${a.target_table ? escapeHtml(a.target_table) : '—'}</td>
+      <td style="font-size:.78rem;color:var(--text3)">${a.details ? escapeHtml(JSON.stringify(a.details)) : '—'}</td>
+    </tr>`).join('');
+}
+
+/* ═══════════ CLASS TEACHER GRADEBOOK ═══════════ */
+let GRADEBOOK_SESSION_ID = null;
+async function loadGradebookPanel() {
+  const card = document.getElementById('gradebookCard');
+  card.innerHTML = '<p class="text-muted">Loading…</p>';
+  if (!MY_CLASS_SCOPE) { card.innerHTML = '<p class="text-muted">No class assigned to you yet — ask your principal to set your class scope.</p>'; return; }
+
+  const { data: draft, error: dErr } = await sb.from('sessions').select('id,name').eq('is_live', false).order('created_at', { ascending: false }).limit(1);
+  if (dErr || !draft || !draft.length) { card.innerHTML = '<p class="text-muted">No draft session open right now. Ask your principal to create one before you enter marks.</p>'; return; }
+  GRADEBOOK_SESSION_ID = draft[0].id;
+
+  const { data: students, error: sErr } = await sb.from('students').select('*').eq('session_id', GRADEBOOK_SESSION_ID).eq('class', MY_CLASS_SCOPE).order('roll', { ascending: true });
+  if (sErr) { card.innerHTML = `<p class="text-muted">Error: ${escapeHtml(sErr.message)}</p>`; return; }
+  if (!students || !students.length) { card.innerHTML = `<p class="text-muted">No students found for class ${escapeHtml(MY_CLASS_SCOPE)} in draft session "${escapeHtml(draft[0].name)}" yet.</p>`; return; }
+
+  const subjectSet = new Set();
+  students.forEach(s => Object.keys(s.marks || {}).forEach(k => subjectSet.add(k)));
+  const subjects = subjectSet.size ? [...subjectSet] : ['Maths','Science','English','History','Sanskrit'];
+
+  card.innerHTML = `<p class="text-muted" style="margin-bottom:14px">Draft session: <strong style="color:var(--gold)">${escapeHtml(draft[0].name)}</strong> · Class ${escapeHtml(MY_CLASS_SCOPE)}</p>` +
+    students.map(s => `
+      <div class="card" style="padding:16px 18px;margin-bottom:14px" data-student-id="${s.id}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <strong>${escapeHtml(s.name)} <span class="text-muted" style="font-weight:400">(Roll ${escapeHtml(String(s.roll))})</span></strong>
+          <button class="btn btn-primary btn-sm" onclick="saveGradebookRow(${s.id})"><i class="fas fa-save"></i> Save</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          ${subjects.map(subj => `
+            <div><label class="text-muted" style="font-size:.72rem">${escapeHtml(subj)}</label><br>
+              <input type="number" min="0" max="100" style="width:70px" class="inp gb-mark" data-subject="${escapeHtml(subj)}" value="${(s.marks && s.marks[subj] != null) ? s.marks[subj] : ''}"></div>
+          `).join('')}
+        </div>
+        <div><label class="text-muted" style="font-size:.72rem">Remark</label><br>
+          <textarea class="inp gb-remark" rows="2" style="width:100%">${escapeHtml(s.remark_text || '')}</textarea></div>
+        <div style="margin-top:8px"><label class="text-muted" style="font-size:.72rem">Photo URL</label><br>
+          <input type="text" class="inp gb-photo" style="width:100%" placeholder="https://…" value="${escapeHtml(s.photo_url || '')}"></div>
+      </div>
+    `).join('');
+}
+
+async function saveGradebookRow(studentId) {
+  const row = document.querySelector(`[data-student-id="${studentId}"]`);
+  if (!row) return;
+  const marks = {};
+  row.querySelectorAll('.gb-mark').forEach(inp => {
+    if (inp.value !== '') marks[inp.dataset.subject] = Number(inp.value);
+  });
+  const remark_text = row.querySelector('.gb-remark').value;
+  const photo_url = row.querySelector('.gb-photo').value || null;
+  const { error } = await sb.from('students').update({ marks, remark_text, photo_url }).eq('id', studentId);
+  if (error) { toast('gradebook', 'Save failed: ' + error.message, 'error'); return; }
+  toast('gradebook', 'Saved.', 'success');
 }
 
 // Rebuilds any on-screen Chart.js charts with fresh colors after a theme switch
@@ -1383,6 +1571,9 @@ function switchPanel(name, btn) {
     });
   }
   if (name === 'stats') buildStatsCharts();
+  if (name === 'team') loadTeamPanel();
+  if (name === 'auditlog') loadAuditLogPanel();
+  if (name === 'gradebook') loadGradebookPanel();
 }
 
 /* ═══════════ TOAST ═══════════
@@ -1391,7 +1582,7 @@ function switchPanel(name, btn) {
    (which could be scrolled far out of view on long admin screens).
    Falls back to the section's original toast slot if no interactive
    element was tracked (e.g. a toast fired from a background task). */
-const TOAST_FALLBACK_IDS = { student:'studentToast', admin:'adminToast', login:'loginToast', approvals:'approvalsToast', teacherUpload:'teacherUploadToast' };
+const TOAST_FALLBACK_IDS = { student:'studentToast', admin:'adminToast', login:'loginToast', approvals:'approvalsToast', teacherUpload:'teacherUploadToast', team:'teamToast', gradebook:'gradebookToast' };
 
 // Track the last element the person actually interacted with, so toast()
 // knows where "just above the component which sends the message" is.
